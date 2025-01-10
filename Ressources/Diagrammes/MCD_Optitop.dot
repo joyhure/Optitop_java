@@ -1,0 +1,10 @@
+digraph G {
+    node [shape=box];
+
+    Factures [label="Factures\n-------------------------\n- ID Facture (PK)\n- Date\n- ID Client (FK)\n- Total Facture\n- Ref Vendeur"];
+    Devis [label="Devis\n-------------------------\n- ID Devis (PK)\n- Date\n- ID Client (FK)\n- Total Devis\n- Ref Vendeur\n- Statut"];
+    Clients [label="Clients\n-------------------------\n- ID Client (PK)\n- Nom Client\n- Adresse (Optionnel)"];
+
+    Factures -> Clients [label="FK: ID Client"];
+    Devis -> Clients [label="FK: ID Client"];
+}
