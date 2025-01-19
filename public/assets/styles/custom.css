@@ -1,7 +1,9 @@
 .mt-10 {
     margin-top: 10rem;
 }
-
-.svg-muted {
-    fill: #6c757d; /* Couleur "muted" de Bootstrap */
+.sidebar {
+    width: 175px;
 }
+.link-body-emphasis:hover {
+    background-color: #e9ecef;
+  }

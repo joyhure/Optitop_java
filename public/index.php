@@ -1,6 +1,6 @@
 <?php
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    header('Location: Dashboard.html');
+    header('Location: Dashboard.php');
     exit();
 }
 ?>

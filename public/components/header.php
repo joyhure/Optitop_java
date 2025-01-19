@@ -1,19 +1,4 @@
-<!DOCTYPE html>
-<html lang="fr">
-
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard</title>
-  <meta name="author" content="Joy Huré">
-  <link rel="icon" href="assets/images/favicon.png">
-  <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
-  <link rel="stylesheet" href="../node_modules/bootstrap-icons/font/bootstrap-icons.css">
-  <link rel="stylesheet" href="assets/styles/custom.css">
-</head>
-
-<body>
-  <header>
+<header>
     <div class="px-3 py-2 text-bg-light border-bottom">
       <div class="container">
         <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
@@ -21,14 +6,6 @@
             class="d-flex align-items-center my-2 my-lg-0 me-lg-auto text-white text-decoration-none">
 
           <ul class="nav col-12 col-lg-auto my-2 justify-content-center my-md-0 text-small">
-            <li>
-              <a href="#" class="nav-link text-secondary mx-5">
-                <svg class="bi d-block mx-auto mb-1" width="24" height="24" fill="currentColor">
-                  <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#speedometer2"></use>
-                </svg>
-                Dashboard
-              </a>
-            </li>
             <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start mx-5">
               <li class="nav-item dropdown">
                 <a class="nav-link text-dark dropdown-toggle text-dark" href="#" id="entityDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -111,7 +88,3 @@
       </div>
     </div>
   </header>
-  <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-
-</html>
