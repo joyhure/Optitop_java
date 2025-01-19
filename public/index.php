@@ -1,3 +1,9 @@
+<?php
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    header('Location: Dashboard.html');
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -14,7 +20,7 @@
   </head>
 <body class="mt-10">
   <main class="form-signin w-25 m-auto">
-    <form class="d-flex justify-content-center flex-column">
+    <form class="d-flex justify-content-center flex-column" method="POST" action="index.php">
       <div class="d-flex justify-content-center">
         <img class="mb-4" src="assets/images/logo_optitop.png" alt="" width="300" height="128">
       </div>
