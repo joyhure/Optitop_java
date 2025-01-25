@@ -1,9 +1,39 @@
 .mt-10 {
     margin-top: 10rem;
 }
-.sidebar {
-    width: 175px;
+.sidebar, #title-container {
+    width: 16%;
 }
 .link-body-emphasis:hover {
     background-color: #e9ecef;
   }
+
+.nav-link:hover {
+    color: #2989DD !important;
+  }
+
+.light-blue {
+    background-color: #E6F4FE !important;
+}
+
+.text-blue {
+    color: #2989DD !important;
+}
+
+.svg-feature {
+    background-color: #2989DD !important;
+    fill: #f8f9fa !important;
+}
+
+.main-content {
+    width: 78% !important;
+    gap: 5rem;
+}
+
+.card {
+    border: 1px solid #e9ecef;
+    border-radius: 5px;
+    background-color: #F4FAFF;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 45%;
+}
