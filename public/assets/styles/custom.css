@@ -1,7 +1,7 @@
 .mt-10 {
     margin-top: 10rem;
 }
-.sidebar, #title-container {
+.sidebar {
     width: 16%;
 }
 .link-body-emphasis:hover {

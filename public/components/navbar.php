@@ -1,53 +1,61 @@
-<nav class="d-flex flex-column flex-shrink-0 sidebar">
+<section id="titles" class="d-flex align-items-end py-3 border-bottom">
+    <div id="title-container" class="px-4">
+        <h2 class="mb-0 text-blue"><?php echo htmlspecialchars($pageTitle); ?></h2>
+    </div>
+    <h6 class="ms-auto mb-0">Mis à Jour le [dd/mm/yyyy]</h6>
+</section>
+<div class="d-flex flex-row justify-content-between g-3">
+    <nav class="d-flex flex-column flex-shrink-0 sidebar">
         <ul class="nav nav-pills flex-column bg-body-tertiary rounded">
-          <li>
-            <a href="#" class="nav-link link-body-emphasis px-1">
-              <svg class="bi pe-none me-2" width="16" height="16">
-                <use xlink:href="#speedometer2"></use>
-              </svg>
-              Devis Optiques
-            </a>
-          </li>
-          <li>
-            <a href="#" class="nav-link link-body-emphasis px-1">
-              <svg class="bi pe-none me-2" width="16" height="16">
-                <use xlink:href="#grid"></use>
-              </svg>
-              Paniers Moyens
-            </a>
-          </li>
-          <li>
-            <a href="#" class="nav-link link-body-emphasis px-1">
-              <svg class="bi pe-none me-2" width="16" height="16">
-                <use xlink:href="#people-circle"></use>
-              </svg>
-              CA
-            </a>
-          </li>
-          <li>
-            <a href="#" class="nav-link link-body-emphasis px-1">
-              <svg class="bi pe-none me-2" width="16" height="16">
-                <use xlink:href="#people-circle"></use>
-              </svg>
-              Synthèse
-            </a>
-          </li>
-          <li>
-            <a href="#" class="nav-link link-body-emphasis px-1">
-              <svg class="bi pe-none me-2" width="16" height="16">
-                <use xlink:href="#people-circle"></use>
-              </svg>
-              Importation
-            </a>
-          </li>
-          <li>
-            <a href="#" class="nav-link link-body-emphasis px-1">
-              <svg class="bi pe-none me-2" width="16" height="16">
-                <use xlink:href="#people-circle"></use>
-              </svg>
-              Comptes
-            </a>
-          </li>
+            <?php if ($pageTitle !== "Dashboard") : ?>
+                <li>
+                    <a href="dashboard.php" class="nav-link link-body-emphasis px-4">
+                        Dashboard
+                    </a>
+                </li>
+            <?php endif; ?>
+            <?php if ($pageTitle !== "Devis Optiques") : ?>
+                <li>
+                    <a href="quotations.php" class="nav-link link-body-emphasis px-4">
+                        Devis Optiques
+                    </a>
+                </li>
+            <?php endif; ?>
+            <?php if ($pageTitle !== "Paniers Moyens") : ?>
+                <li>
+                    <a href="#" class="nav-link link-body-emphasis px-4">
+                        Paniers Moyens
+                    </a>
+                </li>
+            <?php endif; ?>
+            <?php if ($pageTitle !== "CA") : ?>
+                <li>
+                    <a href="#" class="nav-link link-body-emphasis px-4">
+                        CA
+                    </a>
+                </li>
+            <?php endif; ?>
+            <?php if ($pageTitle !== "Synthèse") : ?>
+                <li>
+                    <a href="#" class="nav-link link-body-emphasis px-4">
+                        Synthèse
+                    </a>
+                </li>
+            <?php endif; ?>
+            <?php if ($pageTitle !== "Importation") : ?>
+                <li>
+                    <a href="#" class="nav-link link-body-emphasis px-4">
+                        Importation
+                    </a>
+                </li>
+            <?php endif; ?>
+            <?php if ($pageTitle !== "Comptes") : ?>
+                <li>
+                    <a href="#" class="nav-link link-body-emphasis px-4">
+                        Comptes
+                    </a>
+                </li>
+            <?php endif; ?>
         </ul>
         <hr class="m-0">
-      </nav>
+    </nav>
