@@ -1,9 +1,80 @@
-.mt-10 {
-    margin-top: 10rem;
-}
+/*container*/
 .sidebar {
     width: 16%;
 }
+
+#main-dashboard {
+    width: 78%;
+    gap: 5rem;
+}
+
+#main-quotations {
+    width: 80%;
+    gap: 3rem;
+}
+
+#main-revenue {
+    width: 80%;
+}
+
+.card {
+    border: 1px solid #e9ecef;
+    border-radius: 5px;
+    background-color: #F4FAFF;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 45%;
+}
+
+#summary {
+    width: 10%;
+    margin-top: 2rem;
+    position: fixed;
+    top: 68%;
+    left: 16.5%;
+    transform: translate(-50%, -50%);
+}
+
+#table-quotations-section {
+    width: 100%;
+    margin-inline: 3rem;
+}
+
+#table-revenue-2024 {
+    width: 100%;
+}
+
+/*tables*/
+.table-col-date {
+    width: 12%;
+}
+
+.table-col-w4 {
+    width: 4%;
+}
+
+.table-col-client {
+    width: 20%;
+}
+
+.table-col-w15 {
+    width: 15%;
+}
+
+.table-col-commentaire {
+    width: 49%;
+}
+
+.table-col-w8 {
+    width: 8%;
+}
+
+
+/*sizes*/
+.mt-10 {
+    margin-top: 10rem;
+}
+
+/*colors*/
 .link-body-emphasis:hover {
     background-color: #e9ecef;
   }
@@ -21,19 +92,17 @@
 }
 
 .svg-feature {
-    background-color: #2989DD !important;
-    fill: #f8f9fa !important;
+    background-color: #2989DD;
+    fill: #f8f9fa;
 }
 
-.main-content {
-    width: 78% !important;
-    gap: 5rem;
+.svg-unvalidated-quotations {
+    fill: #E54D2E;
 }
 
-.card {
-    border: 1px solid #e9ecef;
-    border-radius: 5px;
-    background-color: #F4FAFF;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 45%;
+.svg-average-basket {
+    fill: #6c757d;
 }
+
+
+

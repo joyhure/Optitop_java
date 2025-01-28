@@ -8,7 +8,7 @@
         <ul class="nav col-12 col-lg-auto my-2 justify-content-center my-md-0 text-small">
           <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start mx-5">
             <li class="nav-item dropdown">
-              <a class="nav-link text-dark dropdown-toggle text-dark" href="#" id="entityDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <a class="nav-link text-dark dropdown-toggle" href="#" id="entityDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 <svg class="bi d-block mx-auto mb-1" width="24" height="24" fill="currentColor">
                   <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#people"></use>
                 </svg>

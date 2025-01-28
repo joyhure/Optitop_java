@@ -2,9 +2,9 @@
     <div id="title-container" class="px-4">
         <h2 class="mb-0 text-blue"><?php echo htmlspecialchars($pageTitle); ?></h2>
     </div>
-    <h6 class="ms-auto mb-0">Mis à Jour le [dd/mm/yyyy]</h6>
+    <h6 class="ms-auto mb-0">Mis à Jour le [dd/mm/yyyy] à [hh:mm]</h6>
 </section>
-<div class="d-flex flex-row justify-content-between g-3">
+<div class="d-flex flex-row justify-content-between">
     <nav class="d-flex flex-column flex-shrink-0 sidebar">
         <ul class="nav nav-pills flex-column bg-body-tertiary rounded">
             <?php if ($pageTitle !== "Dashboard") : ?>
@@ -23,14 +23,14 @@
             <?php endif; ?>
             <?php if ($pageTitle !== "Paniers Moyens") : ?>
                 <li>
-                    <a href="#" class="nav-link link-body-emphasis px-4">
+                    <a href="average-basket.php" class="nav-link link-body-emphasis px-4">
                         Paniers Moyens
                     </a>
                 </li>
             <?php endif; ?>
-            <?php if ($pageTitle !== "CA") : ?>
+            <?php if ($pageTitle !== "Chiffre d'Affaires") : ?>
                 <li>
-                    <a href="#" class="nav-link link-body-emphasis px-4">
+                    <a href="revenue.php" class="nav-link link-body-emphasis px-4">
                         CA
                     </a>
                 </li>

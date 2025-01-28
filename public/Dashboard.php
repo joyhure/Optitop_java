@@ -18,7 +18,7 @@
   require_once 'components/header.php';
   require_once 'components/navbar.php'; 
   ?>
-  <main class="main-content d-flex justify-content-around flex-wrap my-3">
+  <main id="main-dashboard" class="d-flex justify-content-around flex-wrap my-3">
     <section id="personal-section" class="col w-25">
       <div class="d-flex flex-column justify-content-center align-items-center mb-4 mt-3">
         <svg class="bi d-block mx-auto mb-1" width="30" height="30">
@@ -36,7 +36,7 @@
           <p class="p-2">CA : €<br>
             Nombre de factures : <br>
             <br>
-            <a href="#" class="icon-link">
+            <a href="revenue.php" class="icon-link">
               Accès aux détails
               <svg class="bi">
                 <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#chevron-right"></use>
@@ -73,7 +73,7 @@
           <p class="p-2">Panier Moyen (opt) : €<br>
             Nombre de factures : <br>
             <br>
-            <a href="#" class="icon-link">
+            <a href="average-basket.php" class="icon-link">
               Accès aux détails
               <svg class="bi">
                 <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#chevron-right"></use>
@@ -113,7 +113,7 @@
           <p class="p-2">CA : €<br>
             Nombre de factures : <br>
             <br>
-            <a href="#" class="icon-link">
+            <a href="revenue.php" class="icon-link">
               Accès aux détails
               <svg class="bi">
                 <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#chevron-right"></use>
@@ -150,7 +150,7 @@
           <p class="p-2">Panier Moyen (opt) : €<br>
             Nombre de factures : <br>
             <br>
-            <a href="#" class="icon-link">
+            <a href="average-basket.php" class="icon-link">
               Accès aux détails
               <svg class="bi">
                 <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#chevron-right"></use>
