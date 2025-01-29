@@ -20,12 +20,20 @@
   ?>
   <main id="main-revenue" class="d-flex flex-column justify-content-between">
     <section id="table-revenue-2024" class="table-responsive small w-100">
-      <h3 class="py-3">
+    <div class="d-flex d-inline-flex my-4">
+        <div class="d-inline-flex align-items-center justify-content-center fs-2">
+          <svg class="bi svg-average-basket rounded" width="1em" height="1em">
+            <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#calendar2"></use>
+          </svg>
+        </div>
+        <h3 class="px-4 mb-0">Année</h3>
+      </div>
+      <h4 class="py-3">
         <a class="text-decoration-none dropdown-toggle text-dark nav-link" data-bs-toggle="collapse" href="#collapseRevenue2024" role="button" aria-expanded="false" aria-controls="collapseRevenue2024">
           2024
         </a>
-      </h3>
-      <div class="collapse" id="collapseRevenue2024">
+      </h4>
+      <div class="collapse show" id="collapseRevenue2024">
         <table class="table table-striped table-sm">
           <thead>
             <tr>
@@ -99,11 +107,11 @@
       </div>
     </section>
     <section id="table-revenue-2023" class="table-responsive small w-100">
-      <h3 class="py-3">
+      <h4 class="py-3">
         <a class="text-decoration-none dropdown-toggle text-dark nav-link" data-bs-toggle="collapse" href="#collapseRevenue2023" role="button" aria-expanded="false" aria-controls="collapseRevenue2023">
           2023
         </a>
-      </h3>
+      </h4>
       <div class="collapse" id="collapseRevenue2023">
         <table class="table table-striped table-sm">
           <thead>
@@ -181,22 +189,44 @@
       <div class="card px-1 py-3 w-100">
         <div class="feature-icon d-inline-flex align-items-center justify-content-center fs-2">
           <svg class="bi svg-feature rounded" width="1em" height="1em">
-            <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#cart4"></use>
+            <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#currency-euro"></use>
           </svg>
         </div>
-        <h2 class="text-center pt-2">630€</h2>
-        <p class="text-center mb-0"> Panier Moyen
-        </p>
+        <h2 class="text-center pt-2">1119000€</h2>
+        <h2 class="text-center pt-2">+10%</h2>
       </div>
-      <div class="card px-1 py-3 w-100">
-        <div class="feature-icon d-inline-flex align-items-center justify-content-center fs-2">
-          <svg class="bi svg-feature rounded" width="1em" height="1em">
-            <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#2-square"></use>
-          </svg>
-        </div>
-        <h2 class="text-center pt-2">19€</h2>
-        <p class="text-center mb-0"> Panier Moyen P2
-        </p>
+      <div class="table-responsive card small w-100">
+        <table class="table table-striped table-sm">
+          <thead>
+            <tr class="text-center">
+              <th scope="col">Nom</th>
+              <th scope="col">CA</th>
+              <th scope="col">% CA</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="text-center">
+              <td>BS</td>
+              <td>11506€</td>
+              <td>25%</td>
+            </tr>
+            <tr class="text-center">
+              <td>EG</td>
+              <td>110000€</td>
+              <td>51%</td>
+            </tr>
+            <tr class="text-center">
+              <td>IH</td>
+              <td>90000€</td>
+              <td>15%</td>
+            </tr>
+            <tr class="text-center">
+              <td>IR</td>
+              <td>60000€</td>
+              <td>18%</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </section>
   </main>

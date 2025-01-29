@@ -37,7 +37,7 @@
             <?php endif; ?>
             <?php if ($pageTitle !== "Synthèse") : ?>
                 <li>
-                    <a href="#" class="nav-link link-body-emphasis px-4">
+                    <a href="summary.php" class="nav-link link-body-emphasis px-4">
                         Synthèse
                     </a>
                 </li>

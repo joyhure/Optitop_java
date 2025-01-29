@@ -68,6 +68,10 @@
     width: 8%;
 }
 
+#table-header {
+    background-color: #FFF7C2;
+}
+
 
 /*sizes*/
 .mt-10 {

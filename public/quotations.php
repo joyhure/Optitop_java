@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Paniers Moyens</title>
+  <title>Devis</title>
   <meta name="author" content="Joy Huré">
   <link rel="icon" href="assets/images/favicon.png">
   <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
