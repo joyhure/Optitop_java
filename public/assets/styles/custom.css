@@ -39,7 +39,7 @@
     margin-inline: 3rem;
 }
 
-#table-revenue-2024 {
+#table-revenue-2024, #table-user-creation, #table-user {
     width: 100%;
 }
 
@@ -72,6 +72,15 @@
     background-color: #FFF7C2;
 }
 
+#table-subtitle {
+    background-color: #FEFBE9 !important;
+}
+
+.table-card {
+    border: 1px solid #e9ecef !important;
+    border-radius: 5px !important;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+}
 
 /*sizes*/
 .mt-10 {
@@ -93,6 +102,11 @@
 
 .text-blue {
     color: #2989DD !important;
+}
+
+.row-blueperso {
+    background-color: #2989DD !important;
+    color: #f8f9fa !important;
 }
 
 .svg-feature {

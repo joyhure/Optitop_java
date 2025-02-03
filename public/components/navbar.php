@@ -42,16 +42,16 @@
                     </a>
                 </li>
             <?php endif; ?>
-            <?php if ($pageTitle !== "Importation") : ?>
+            <?php if ($pageTitle !== "Exportation") : ?>
                 <li>
-                    <a href="#" class="nav-link link-body-emphasis px-4">
-                        Importation
+                    <a href="export.php" class="nav-link link-body-emphasis px-4">
+                        Exportation
                     </a>
                 </li>
             <?php endif; ?>
             <?php if ($pageTitle !== "Comptes") : ?>
                 <li>
-                    <a href="#" class="nav-link link-body-emphasis px-4">
+                    <a href="accounts.php" class="nav-link link-body-emphasis px-4">
                         Comptes
                     </a>
                 </li>

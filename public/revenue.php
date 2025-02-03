@@ -195,13 +195,13 @@
         <h2 class="text-center pt-2">1119000€</h2>
         <h2 class="text-center pt-2">+10%</h2>
       </div>
-      <div class="table-responsive card small w-100">
-        <table class="table table-striped table-sm">
+      <div class="table-responsive table-card small w-100">
+        <table class="table table-striped table-sm mb-0">
           <thead>
             <tr class="text-center">
-              <th scope="col">Nom</th>
-              <th scope="col">CA</th>
-              <th scope="col">% CA</th>
+              <th scope="col" class="row-blueperso">Nom</th>
+              <th scope="col" class="row-blueperso">CA</th>
+              <th scope="col" class="row-blueperso">% CA</th>
             </tr>
           </thead>
           <tbody>

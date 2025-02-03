@@ -124,12 +124,12 @@
         </p>
       </div>
       <div class="table-responsive card small w-100">
-        <table class="table table-striped table-sm">
+        <table class="table table-striped table-sm mb-0">
           <thead>
             <tr class="text-center">
-              <th scope="col">Nom</th>
-              <th scope="col">Non V.</th>
-              <th scope="col">Taux</th>
+              <th scope="col" class="row-blueperso">Nom</th>
+              <th scope="col" class="row-blueperso">Non V.</th>
+              <th scope="col" class="row-blueperso">Taux</th>
             </tr>
           </thead>
           <tbody>

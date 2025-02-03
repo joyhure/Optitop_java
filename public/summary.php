@@ -28,142 +28,113 @@
         </div>
         <h3 class="px-4 mb-0">Synthèse</h3>
       </div>
-      <div class="container mt-5">
-        <table class="table table-bordered table-striped">
+      <div class="container">
+        <table class="table table-bordered my-3">
           <thead>
             <tr>
-              <th id="table-header" colspan="7">
-                <h2 class="text-center fw-bold">Chiffres & Stats Mensuels</h2>
+              <th id="table-header" colspan="5">
+                <h2 class="text-center fw-bold">Chiffres du Magasin</h2>
               </th>
             </tr>
             <tr>
-              <th>Catégorie</th>
-              <th>CA Encaissé</th>
-              <th>CA Facturé</th>
-              <th>Passages</th>
-              <th>Pass %</th>
-              <th>NPS</th>
-              <th>Taux Concret</th>
+              <th class="text-center" colspan="2">
+                <h5 class="text-secondary">Du [dd/mm/yyyy] au [dd/mm/yyyy]</h5>
+              </th>
+              <th class="bg-secondary-subtle"></th>
+              <th class="text-center" colspan="2">
+                <h5 class="text-secondary">Màj le [dd/mm/yyyy] à [hh:mm]</h5>
+              </th>
+            </tr>
+            <tr>
+              <th id="table-subtitle" class="text-center">Catégorie</th>
+              <th id="table-subtitle" class="text-center">CA Facturé</th>
+              <th id="table-subtitle" class="text-center">Delta CA</th>
+              <th id="table-subtitle" class="text-center">Delta CA %</th>
+              <th id="table-subtitle" class="text-center">Taux Concret</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td>N</td>
-              <td>68 381 €</td>
-              <td>62 541 €</td>
-              <td>194</td>
-              <td>5,43%</td>
-              <td>8,83</td>
-              <td>80%</td>
+              <td class="text-center">N</td>
+              <td class="text-center">68 381 €</td>
+              <td rowspan="2" class="align-middle text-center">1500 €</td>
+              <td rowspan="2" class="align-middle text-center">2 %</td>
+              <td class="text-center">80 %</td>
             </tr>
             <tr>
-              <td>N-1</td>
-              <td>69 350 €</td>
-              <td>59 450 €</td>
-              <td>184</td>
-              <td>-</td>
-              <td>-</td>
-              <td>-</td>
+              <td class="text-center">N-1</td>
+              <td class="text-center">69 350 €</td>
+              <td class="text-center">75 %</td>
             </tr>
           </tbody>
         </table>
 
-        <h2 class="text-center my-4">2ème Paire & Primes</h2>
-
-        <table class="table table-bordered table-striped">
-          <thead class="table-dark">
-            <tr>
-              <th>Nom</th>
-              <th>Nombre</th>
-              <th>PM</th>
-              <th>Primes</th>
-              <th>CA Mensuel</th>
-              <th>Objectif Janv.</th>
-              <th>Réalisé</th>
-              <th>%</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>LG</td>
-              <td>15</td>
-              <td>37,5€</td>
-              <td>50€</td>
-              <td>15 236 €</td>
-              <td>2 985 €</td>
-              <td>20%</td>
-            </tr>
-            <tr>
-              <td>LAM</td>
-              <td>21</td>
-              <td>7,7€</td>
-              <td>0€</td>
-              <td>6 135 €</td>
-              <td>4 764 €</td>
-              <td>78%</td>
-            </tr>
-            <tr>
-              <td>GM</td>
-              <td>15</td>
-              <td>10,2€</td>
-              <td>0€</td>
-              <td>23 519 €</td>
-              <td>3 888 €</td>
-              <td>17%</td>
-            </tr>
-            <tr>
-              <td>ID</td>
-              <td>52</td>
-              <td>14,6€</td>
-              <td>40€</td>
-              <td>26 586 €</td>
-              <td>13 348 €</td>
-              <td>50%</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-    <section id="summary" class="d-flex flex-column justify-content-center align-items-center gap-5">
-      <div id="quotation" class="card px-1 py-3 w-100">
-        <div class="feature-icon d-inline-flex align-items-center justify-content-center fs-2">
-          <svg class="bi svg-feature rounded" width="1em" height="1em">
-            <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#clipboard2"></use>
-          </svg>
-        </div>
-        <h2 class="text-center pt-2">100%</h2>
-        <p class="text-center mb-0">Non validés : [5]
-        </p>
-      </div>
-      <div class="table-responsive card small w-100">
-        <table class="table table-striped table-sm">
+        <table class="table table-bordered table-striped my-5">
           <thead>
-            <tr class="text-center">
-              <th scope="col">Nom</th>
-              <th scope="col">Non V.</th>
-              <th scope="col">Taux</th>
+
+            <tr>
+              <th id="table-header" colspan="8">
+                <h2 class="text-center fw-bold">Statistiques Collaborateurs</h2>
+              </th>
+            </tr>
+            <tr>
+              <th class="text-center"><h5 class="text-secondary">Nom</h5></th>
+              <th class="text-center" colspan="2"><h5 class="text-secondary">Primes</h5></th>
+              <th class="text-center" colspan="2"><h5 class="text-secondary">P2</h5></th>
+              <th class="text-center" colspan="2"><h5 class="text-secondary">Devis</h5></th>
+              <th class="text-center"><h5 class="text-secondary">CA</h5></th>
+            </tr>
+            <tr>
+              <th class="bg-secondary-subtle"></th>
+              <th id="table-subtitle" class="text-center">Prime Monture</th>
+              <th id="table-subtitle" class="text-center">% Mont. primées</th>
+              <th id="table-subtitle" class="text-center">Nombre</th>
+              <th id="table-subtitle" class="text-center">Panier Moyen</th>
+              <th id="table-subtitle" class="text-center">Nombre</th>
+              <th id="table-subtitle" class="text-center">Concrétisation</th>
+              <th class="bg-secondary-subtle"></th>
             </tr>
           </thead>
           <tbody>
-            <tr class="text-center">
-              <td>BS</td>
-              <td>[1]</td>
-              <td>[%]</td>
+            <tr>
+              <td class="fw-bold text-center">BS</td>
+              <td class="text-center">50€</td>
+              <td class="text-center">15%</td>
+              <td class="text-center">31</td>
+              <td class="text-center">18 €</td>
+              <td class="text-center">42</td>
+              <td class="text-center">85 %</td>
+              <td class="text-center">26590 €</td>
             </tr>
-            <tr class="text-center">
-              <td>EG</td>
-              <td>[2]</td>
-              <td>[%]</td>
+            <tr>
+              <td class="fw-bold text-center">EG</td>
+              <td class="text-center">95€</td>
+              <td class="text-center">36%</td>
+              <td class="text-center">28</td>
+              <td class="text-center">22 €</td>
+              <td class="text-center">35</td>
+              <td class="text-center">75 %</td>
+              <td class="text-center">21263 €</td>
             </tr>
-            <tr class="text-center">
-              <td>IH</td>
-              <td>[1]</td>
-              <td>[%]</td>
+            <tr>
+              <td class="fw-bold text-center">IH</td>
+              <td class="text-center">35€</td>
+              <td class="text-center">11%</td>
+              <td class="text-center">25</td>
+              <td class="text-center">18 €</td>
+              <td class="text-center">37</td>
+              <td class="text-center">85 %</td>
+              <td class="text-center">19575 €</td>
             </tr>
-            <tr class="text-center">
-              <td>IR</td>
-              <td>[1]</td>
-              <td>[%]</td>
+            <tr>
+              <td class="fw-bold text-center">IR</td>
+              <td class="text-center">50€</td>
+              <td class="text-center">15%</td>
+              <td class="text-center">31</td>
+              <td class="text-center">18 €</td>
+              <td class="text-center">42</td>
+              <td class="text-center">85 %</td>
+              <td class="text-center">15617 €</td>
             </tr>
           </tbody>
         </table>

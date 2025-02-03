@@ -35,13 +35,8 @@
           </div>
           <p class="p-2">CA : €<br>
             Nombre de factures : <br>
+            % du CA Magasin : %<br>
             <br>
-            <a href="revenue.php" class="icon-link">
-              Accès aux détails
-              <svg class="bi">
-                <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#chevron-right"></use>
-              </svg>
-            </a>
           </p>
         </div>
 
@@ -72,13 +67,8 @@
           </div>
           <p class="p-2">Panier Moyen (opt) : €<br>
             Nombre de factures : <br>
-            <br>
-            <a href="average-basket.php" class="icon-link">
-              Accès aux détails
-              <svg class="bi">
-                <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#chevron-right"></use>
-              </svg>
-            </a>
+            PM verres : <br>
+            PM Montures : <br>
           </p>
         </div>
         <div id="bonus" class="card my-3 px-1 pt-2">
