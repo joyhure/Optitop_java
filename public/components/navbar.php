@@ -24,7 +24,7 @@
             <?php if ($pageTitle !== "Paniers Moyens") : ?>
                 <li>
                     <a href="average-basket.php" class="nav-link link-body-emphasis px-4">
-                        Paniers Moyens
+                        Paniers Moyens & Prime
                     </a>
                 </li>
             <?php endif; ?>

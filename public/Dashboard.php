@@ -157,7 +157,12 @@
           <p class="p-2">Montures primées : %<br>
             Prime : €<br>
             Nombre : <br>
-            <br>
+            <a href="average-basket.php" class="icon-link">
+              Accès aux détails
+              <svg class="bi">
+                <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#chevron-right"></use>
+              </svg>
+            </a>
           </p>
         </div>
       </div>

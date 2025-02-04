@@ -82,6 +82,63 @@
           </tr>
         </tbody>
       </table>
+
+      <div class="d-flex d-inline-flex my-4">
+        <div class="d-inline-flex align-items-center justify-content-center fs-2">
+          <svg class="bi svg-average-basket rounded" width="1em" height="1em">
+            <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#piggy-bank"></use>
+          </svg>
+        </div>
+        <h3 class="px-4 mb-0">Primes Montures</h3>
+      </div>
+      <table class="table table-striped table-sm">
+        <thead>
+          <tr>
+            <th scope="col" class="table-col-w15 text-center">Nom</th>
+            <th scope="col" class="table-col-w15 text-center">Nb montures</th>
+            <th scope="col" class="table-col-w15 text-center">Nb primées</th>
+            <th scope="col" class="table-col-w15 text-center">%</th>
+            <th scope="col" class="table-col-w15 text-center">Montant</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="text-center">IR</td>
+            <td class="text-center">35</td>
+            <td class="text-center">10</td>
+            <td class="text-center">35%</td>
+            <td class="text-center">70€</td>
+          </tr>
+          <tr>
+            <td class="text-center">IH</td>
+            <td class="text-center">35</td>
+            <td class="text-center">10</td>
+            <td class="text-center">35%</td>
+            <td class="text-center">70€</td>
+          </tr>
+          <tr>
+            <td class="text-center">BD</td>
+            <td class="text-center">35</td>
+            <td class="text-center">10</td>
+            <td class="text-center">35%</td>
+            <td class="text-center">70€</td>
+          </tr>
+          <tr>
+            <td class="text-center">EG</td>
+            <td class="text-center">35</td>
+            <td class="text-center">10</td>
+            <td class="text-center">35%</td>
+            <td class="text-center">70€</td>
+          </tr>
+          <tr>
+            <td class="text-center fw-bold">Total</td>
+            <td class="text-center">35</td>
+            <td class="text-center">10</td>
+            <td class="text-center">35%</td>
+            <td class="text-center">70€</td>
+          </tr>
+        </tbody>
+      </table>
     </section>
     <section id="summary" class="d-flex flex-column justify-content-center align-items-center gap-5">
       <div class="card px-1 py-3 w-100">

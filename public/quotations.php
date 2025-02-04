@@ -120,7 +120,8 @@
           </svg>
         </div>
         <h2 class="text-center pt-2">100%</h2>
-        <p class="text-center mb-0">Non validés : [5]
+        <p class="text-center mb-0">Nb :<br>
+          Non validés : [5]
         </p>
       </div>
       <div class="table-responsive card small w-100">
@@ -128,6 +129,7 @@
           <thead>
             <tr class="text-center">
               <th scope="col" class="row-blueperso">Nom</th>
+              <th scope="col" class="row-blueperso">Nb</th>
               <th scope="col" class="row-blueperso">Non V.</th>
               <th scope="col" class="row-blueperso">Taux</th>
             </tr>
@@ -135,21 +137,25 @@
           <tbody>
             <tr class="text-center">
               <td>BS</td>
+              <td>[25]</td>
               <td>[1]</td>
               <td>[%]</td>
             </tr>
             <tr class="text-center">
               <td>EG</td>
+              <td>[31]</td>
               <td>[2]</td>
               <td>[%]</td>
             </tr>
             <tr class="text-center">
               <td>IH</td>
+              <td>[18]</td>
               <td>[1]</td>
               <td>[%]</td>
             </tr>
             <tr class="text-center">
               <td>IR</td>
+              <td>[29]</td>
               <td>[1]</td>
               <td>[%]</td>
             </tr>
