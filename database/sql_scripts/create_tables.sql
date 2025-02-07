@@ -59,6 +59,7 @@ CREATE TABLE quotation (
     total_quotation DECIMAL(10, 2) NOT NULL,
     pair INT NULL,
     status ENUM('validé', 'non validé') NOT NULL,
+    comment TEXT NULL,
     date_import DATE NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (seller_ref) REFERENCES seller(seller_ref)
