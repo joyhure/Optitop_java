@@ -29,6 +29,6 @@
             "password": ""
         }
     ],
-    "liveServer.settings.port": 5501,
-    "java.compile.nullAnalysis.mode": "automatic"
+   "java.compile.nullAnalysis.mode": "automatic",
+    "php.validate.executablePath": "C:\\xampp\\php\\php.exe"
 }
