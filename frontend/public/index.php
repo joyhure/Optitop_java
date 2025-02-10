@@ -1,9 +1,3 @@
-<?php
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-  header('Location: Dashboard.php');
-  exit();
-}
-?>
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -20,19 +14,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
 <body class="mt-10">
   <main class="form-signin w-25 m-auto">
-    <form class="d-flex justify-content-center flex-column" method="POST" action="index.php">
+    <form class="d-flex justify-content-center flex-column" onsubmit="handleLogin(event)">
       <div class="d-flex justify-content-center">
         <img class="mb-4" src="assets/images/logo_optitop.png" alt="Optitop logo" width="300" height="128">
       </div>
       <h1 class="h3 mb-3 fw-normal text-center">Connexion</h1>
 
       <div class="form-floating mb-1">
-        <input type="text" class="form-control" id="floatingInput" name="login" placeholder="Identifiant" required>
+        <input type="text" class="form-control" id="login" name="login" placeholder="Identifiant" required>
         <label for="floatingInput">Identifiant</label>
       </div>
 
       <div class="form-floating">
-        <input type="password" class="form-control" id="floatingPassword" name="password" placeholder="Password" required>
+        <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
         <label for="floatingPassword">Mot de Passe</label>
       </div>
 
@@ -43,6 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </form>
   </main>
   <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/js/login.js"></script>
 </body>
 
 </html>
