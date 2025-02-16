@@ -122,5 +122,35 @@
     fill: #6c757d;
 }
 
+.bg-role-admin {
+    background-color: #FFDCD3 !important;
+}
 
+.bg-role-collaborator {
+    background-color: #E9F6E9 !important;
+}
+
+.bg-role-manager {
+    background-color: #D5EFFF !important;
+}
+
+.bg-role-supermanager {
+    background-color: #8EC8F6 !important;
+}
+
+.bg-role-admin .nav-link:hover {
+    color: #D13415 !important;
+}
+
+.bg-role-collaborator .nav-link:hover {
+    color: #198754 !important;
+}
+
+.bg-role-manager .nav-link:hover {
+    color: #2989DD !important;
+}
+
+.bg-role-supermanager .nav-link:hover {
+    color:  #0D4597 !important;
+}
 

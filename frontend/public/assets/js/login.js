@@ -1,3 +1,7 @@
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('loginForm').addEventListener('submit', handleLogin);
+});
+
 async function handleLogin(event) {
     event.preventDefault();
     
@@ -19,12 +23,15 @@ async function handleLogin(event) {
 
         if (response.ok) {
             const userData = await response.json();
-            // Stockage des données utilisateur en session
-            sessionStorage.setItem('user', JSON.stringify(userData));
-            // Redirection vers le dashboard
+            const userSession = {
+                id: userData.id,
+                firstname: userData.firstname,
+                role: userData.role
+            };
+            sessionStorage.setItem('user', JSON.stringify(userSession));
+            document.getElementById('loginForm').reset();
             window.location.href = 'dashboard.php';
         } else {
-            // Afficher un message d'erreur à l'utilisateur
             alert('Identifiants incorrects');
         }
     } catch (error) {

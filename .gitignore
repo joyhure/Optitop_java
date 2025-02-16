@@ -1,0 +1,12 @@
+# Dependencies
+node_modules/
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Original CSV files
+Ressources/Fichiers .csv/Originaux/*.csv
