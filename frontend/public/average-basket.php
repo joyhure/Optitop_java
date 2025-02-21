@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Devis Optiques</title>
+  <title>Paniers Moyens & Primes</title>
   <meta name="author" content="Joy Huré">
   <link rel="icon" href="assets/images/favicon.png">
   <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
@@ -14,8 +14,8 @@
 
 <body>
   <?php
-  $pageTitle = "Paniers Moyens";
-  require_once 'components/header.php';
+  $pageTitle = "Paniers Moyens & Primes";
+  require_once 'components/header.html';
   require_once 'components/navbar.php';
   ?>
   <main id="main-quotations" class="d-flex flex-row justify-content-between">
@@ -169,6 +169,7 @@
   </div>
   <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
   <script src="assets/js/header.js"></script>
+  <script src="assets/js/navbar.js"></script>
 </body>
 
 </html>

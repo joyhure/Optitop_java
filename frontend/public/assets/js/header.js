@@ -28,4 +28,33 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const savedPeriod = sessionStorage.getItem('selectedPeriod') || 'Mois';
     selectedPeriod.textContent = savedPeriod;
+
+    // Sign out functionality
+    document.getElementById('signOutBtn').addEventListener('click', async function(e) {
+        e.preventDefault();
+        
+        try {
+            // Appel à l'API Spring Boot
+            const apiResponse = await fetch('http://localhost:8080/api/auth/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            // Appel au PHP pour détruire la session
+            const phpResponse = await fetch('logout.php');
+
+            // Nettoyer le sessionStorage
+            sessionStorage.clear();
+
+            // Rediriger vers la page de connexion
+            window.location.href = 'index.html';
+        } catch (error) {
+            console.error('Erreur de déconnexion:', error);
+            // En cas d'erreur, forcer la déconnexion
+            sessionStorage.clear();
+            window.location.href = 'index.html';
+        }
+    });
 });
