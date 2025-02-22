@@ -15,14 +15,14 @@ import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Service
 public class SalesService {
 
     private static final Logger logger = LoggerFactory.getLogger(SalesService.class);
+    private static final int BATCH_SIZE = 1000;
 
     @Autowired
     private InvoiceRepository invoiceRepository;
@@ -34,29 +34,45 @@ public class SalesService {
     private SellerRepository sellerRepository;
 
     @Transactional
-    public void processBatch(List<String> batch) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        Set<String> processedInvoiceRefs = new HashSet<>();
-        Set<String> processedQuotationRefs = new HashSet<>();
+    public void processBatch(List<String> lines) {
+        if (lines.isEmpty())
+            return;
 
+        // Déterminer la plage de dates du fichier
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         LocalDate minDate = LocalDate.MAX;
         LocalDate maxDate = LocalDate.MIN;
 
-        for (String line : batch) {
+        // Première passe pour déterminer la plage de dates
+        for (String line : lines) {
+            try {
+                String[] columns = line.split(";");
+                LocalDate date = LocalDate.parse(columns[0], formatter);
+                if (date.isBefore(minDate))
+                    minDate = date;
+                if (date.isAfter(maxDate))
+                    maxDate = date;
+            } catch (Exception e) {
+                logger.warn("Erreur lors de la lecture de la date : " + line);
+            }
+        }
+
+        // Supprimer toutes les données de la période
+        logger.info("Suppression des données entre " + minDate + " et " + maxDate);
+        invoiceRepository.deleteByDateBetween(minDate, maxDate);
+        quotationRepository.deleteByDateBetween(minDate, maxDate);
+
+        // Traitement par lots pour l'insertion
+        List<Invoice> invoiceBatch = new ArrayList<>();
+        List<Quotation> quotationBatch = new ArrayList<>();
+
+        for (String line : lines) {
             try {
                 String[] columns = line.split(";");
 
                 String type = columns[14].toLowerCase();
                 String sellerRef = columns[10];
                 LocalDate date = LocalDate.parse(columns[0], formatter);
-
-                // Déterminer la plage de dates
-                if (date.isBefore(minDate)) {
-                    minDate = date;
-                }
-                if (date.isAfter(maxDate)) {
-                    maxDate = date;
-                }
 
                 // Vérifier si le seller_ref existe, sinon l'ajouter
                 if (!sellerRepository.existsById(sellerRef)) {
@@ -81,28 +97,11 @@ public class SalesService {
                     invoice.setStatus(type);
                     invoice.setDateImport(LocalDate.now());
 
-                    // Vérifier si l'enregistrement existe déjà
-                    Invoice existingInvoice = invoiceRepository.findByInvoiceRef(invoice.getInvoiceRef());
-                    if (existingInvoice != null) {
-                        // Mettre à jour l'enregistrement existant
-                        existingInvoice.setDate(invoice.getDate());
-                        existingInvoice.setClientId(invoice.getClientId());
-                        existingInvoice.setClient(invoice.getClient());
-                        existingInvoice.setFamily(invoice.getFamily());
-                        existingInvoice.setQuantity(invoice.getQuantity());
-                        existingInvoice.setTotalTtc(invoice.getTotalTtc());
-                        existingInvoice.setSellerRef(invoice.getSellerRef());
-                        existingInvoice.setTotalInvoice(invoice.getTotalInvoice());
-                        existingInvoice.setPair(invoice.getPair());
-                        existingInvoice.setStatus(invoice.getStatus());
-                        existingInvoice.setDateImport(invoice.getDateImport());
-
-                        invoiceRepository.save(existingInvoice);
-                    } else {
-                        // Insérer un nouvel enregistrement
-                        invoiceRepository.save(invoice);
+                    invoiceBatch.add(invoice);
+                    if (invoiceBatch.size() >= BATCH_SIZE) {
+                        invoiceRepository.saveAll(invoiceBatch);
+                        invoiceBatch.clear();
                     }
-                    processedInvoiceRefs.add(invoice.getInvoiceRef());
                 } else if (type.contains("devis")) {
                     Quotation quotation = new Quotation();
                     quotation.setDate(date);
@@ -118,37 +117,23 @@ public class SalesService {
                     quotation.setStatus(type);
                     quotation.setDateImport(LocalDate.now());
 
-                    // Vérifier si l'enregistrement existe déjà
-                    Quotation existingQuotation = quotationRepository.findByQuotationRef(quotation.getQuotationRef());
-                    if (existingQuotation != null) {
-                        // Mettre à jour l'enregistrement existant
-                        existingQuotation.setDate(quotation.getDate());
-                        existingQuotation.setClientId(quotation.getClientId());
-                        existingQuotation.setClient(quotation.getClient());
-                        existingQuotation.setFamily(quotation.getFamily());
-                        existingQuotation.setQuantity(quotation.getQuantity());
-                        existingQuotation.setTotalTtc(quotation.getTotalTtc());
-                        existingQuotation.setSellerRef(quotation.getSellerRef());
-                        existingQuotation.setTotalQuotation(quotation.getTotalQuotation());
-                        existingQuotation.setPair(quotation.getPair());
-                        existingQuotation.setStatus(quotation.getStatus());
-                        existingQuotation.setDateImport(quotation.getDateImport());
-
-                        quotationRepository.save(existingQuotation);
-                    } else {
-                        // Insérer un nouvel enregistrement
-                        quotationRepository.save(quotation);
+                    quotationBatch.add(quotation);
+                    if (quotationBatch.size() >= BATCH_SIZE) {
+                        quotationRepository.saveAll(quotationBatch);
+                        quotationBatch.clear();
                     }
-                    processedQuotationRefs.add(quotation.getQuotationRef());
                 }
             } catch (Exception e) {
                 logger.error("Erreur lors du traitement de la ligne : " + line, e);
             }
         }
 
-        // Supprimer les enregistrements qui ne sont pas dans le fichier CSV pour la
-        // plage de dates
-        invoiceRepository.deleteByInvoiceRefNotInAndDateBetween(processedInvoiceRefs, minDate, maxDate);
-        quotationRepository.deleteByQuotationRefNotInAndDateBetween(processedQuotationRefs, minDate, maxDate);
+        // Sauvegarder les derniers lots
+        if (!invoiceBatch.isEmpty()) {
+            invoiceRepository.saveAll(invoiceBatch);
+        }
+        if (!quotationBatch.isEmpty()) {
+            quotationRepository.saveAll(quotationBatch);
+        }
     }
 }

@@ -7,13 +7,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
-import java.util.Set;
 
 @Repository
 public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
-    Invoice findByInvoiceRef(String invoiceRef);
-
     @Modifying
-    @Query("DELETE FROM Invoice i WHERE i.invoiceRef NOT IN :invoiceRefs AND i.date BETWEEN :startDate AND :endDate")
-    void deleteByInvoiceRefNotInAndDateBetween(Set<String> invoiceRefs, LocalDate startDate, LocalDate endDate);
+    @Query("DELETE FROM Invoice i WHERE i.date BETWEEN :startDate AND :endDate")
+    void deleteByDateBetween(LocalDate startDate, LocalDate endDate);
+
+    Invoice findByInvoiceRef(String invoiceRef);
 }

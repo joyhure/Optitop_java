@@ -7,13 +7,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
-import java.util.Set;
 
 @Repository
 public interface QuotationRepository extends JpaRepository<Quotation, Long> {
-    Quotation findByQuotationRef(String quotationRef);
-
     @Modifying
-    @Query("DELETE FROM Quotation q WHERE q.quotationRef NOT IN :quotationRefs AND q.date BETWEEN :startDate AND :endDate")
-    void deleteByQuotationRefNotInAndDateBetween(Set<String> quotationRefs, LocalDate startDate, LocalDate endDate);
+    @Query("DELETE FROM Quotation q WHERE q.date BETWEEN :startDate AND :endDate")
+    void deleteByDateBetween(LocalDate startDate, LocalDate endDate);
+
+    Quotation findByQuotationRef(String quotationRef);
 }
