@@ -53,14 +53,9 @@ if (!isset($_SESSION['user']) ||
     </section>
   </main>
 
-  </div>
-
-  </div>
   <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
   <script src="assets/js/header.js"></script>
   <script src="assets/js/navbar.js"></script>
   <script src="assets/js/export.js"></script>
-  
 </body>
-
 </html>

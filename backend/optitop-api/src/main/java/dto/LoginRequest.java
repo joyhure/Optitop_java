@@ -1,4 +1,4 @@
-package com.optitop.optitop_api.model;
+package dto;
 
 public class LoginRequest {
     private String login;

@@ -17,39 +17,45 @@ document.addEventListener('DOMContentLoaded', function() {
         statusDiv.className = 'alert alert-info';
         statusDiv.textContent = 'Import en cours...';
 
-        try {
-            const reader = new FileReader();
-            reader.onload = async function(e) {
-                const formData = new FormData();
-                formData.append('file', file);
-                formData.append('chunk', currentChunk);
-                formData.append('totalChunks', totalChunks);
+        const uploadChunk = async () => {
+            const start = currentChunk * chunkSize;
+            const end = Math.min(start + chunkSize, file.size);
+            const chunk = file.slice(start, end);
 
-                try {
-                    const response = await fetch('http://localhost:8080/api/sales/import', {
-                        method: 'POST',
-                        body: formData
-                    });
+            const formData = new FormData();
+            formData.append('file', chunk);
+            formData.append('chunk', currentChunk);
+            formData.append('totalChunks', totalChunks);
 
-                    if (response.ok) {
+            try {
+                const response = await fetch('http://localhost:8080/api/sales/import', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    currentChunk++;
+                    const progress = Math.round((currentChunk / totalChunks) * 100);
+                    progressBar.style.width = `${progress}%`;
+                    progressBar.textContent = `${progress}%`;
+
+                    if (currentChunk < totalChunks) {
+                        uploadChunk();
+                    } else {
                         statusDiv.className = 'alert alert-success';
                         statusDiv.textContent = 'Import réussi !';
                         form.reset();
-                    } else {
-                        throw new Error('Erreur serveur');
                     }
-                } catch (error) {
-                    statusDiv.className = 'alert alert-danger';
-                    statusDiv.textContent = 'Erreur lors de l\'import';
-                    console.error(error);
+                } else {
+                    throw new Error('Erreur serveur');
                 }
-            };
+            } catch (error) {
+                statusDiv.className = 'alert alert-danger';
+                statusDiv.textContent = 'Erreur lors de l\'import';
+                console.error(error);
+            }
+        };
 
-            reader.readAsText(file);
-        } catch (error) {
-            statusDiv.className = 'alert alert-danger';
-            statusDiv.textContent = 'Erreur lors de la lecture du fichier';
-            console.error(error);
-        }
+        uploadChunk();
     });
 });
