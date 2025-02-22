@@ -30,5 +30,6 @@
         }
     ],
    "java.compile.nullAnalysis.mode": "automatic",
-    "php.validate.executablePath": "C:\\xampp\\php\\php.exe"
+    "php.validate.executablePath": "C:\\xampp\\php\\php.exe",
+    "java.configuration.updateBuildConfiguration": "interactive"
 }

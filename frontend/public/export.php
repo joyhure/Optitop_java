@@ -39,11 +39,15 @@ if (!isset($_SESSION['user']) ||
         </div>
         <h3 class="px-4 mb-0">Exportation des données de vente</h3>
       </div>
-      <form action="import_csv.php" method="post" enctype="multipart/form-data" class="m-5">
+      <form id="importForm" class="m-5">
         <div class="mb-3">
           <label for="csvFile" class="form-label">Choisir un fichier CSV</label>
           <input type="file" class="form-control" id="csvFile" name="csvFile" accept=".csv" required>
         </div>
+        <div class="progress mb-3 d-none" id="uploadProgress">
+          <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+        </div>
+        <div id="importStatus" class="alert d-none"></div>
         <button type="submit" class="btn btn-primary">Importer</button>
       </form>
     </section>
@@ -55,6 +59,7 @@ if (!isset($_SESSION['user']) ||
   <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
   <script src="assets/js/header.js"></script>
   <script src="assets/js/navbar.js"></script>
+  <script src="assets/js/export.js"></script>
   
 </body>
 
