@@ -37,16 +37,24 @@ public class SalesController {
             logger.info("Début de l'importation du fichier : " + file.getOriginalFilename());
             logger.info("Chunk : " + chunk + " / " + totalChunks);
 
-            // Lecture du fichier avec BufferedReader pour gérer la mémoire
+            // Lecture du fichier avec BufferedReader pour gérer la mémoire et l'encodage
+            // UTF-8
             try (BufferedReader br = new BufferedReader(
-                    new InputStreamReader(file.getInputStream(), "ISO-8859-1"))) {
+                    new InputStreamReader(file.getInputStream(), "UTF-8"))) {
 
                 List<String> batch = new ArrayList<>();
                 String line;
 
+                // Ignorer le BOM s'il existe
+                line = br.readLine();
+                if (line != null) {
+                    line = line.replace("\uFEFF", "");
+                    batch.add(line);
+                }
+
                 while ((line = br.readLine()) != null) {
                     batch.add(line);
-                    logger.info("Ligne lue : " + line);
+                    logger.debug("Ligne lue : " + line); // Changé en debug pour réduire les logs
                 }
 
                 salesService.processBatch(batch);
