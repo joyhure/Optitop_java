@@ -98,6 +98,10 @@
     width: 40%;
 }
 
+.w-30 {
+    width: 30%;
+}
+
 /*colors*/
 .link-body-emphasis:hover {
     background-color: #e9ecef;

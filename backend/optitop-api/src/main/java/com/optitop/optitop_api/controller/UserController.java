@@ -35,4 +35,31 @@ public class UserController {
         }
         return ResponseEntity.notFound().build();
     }
+
+    @GetMapping("/{id}/created-at")
+    public ResponseEntity<String> getUserCreatedAt(@PathVariable Integer id) {
+        User user = userRepository.findById(id).orElse(null);
+        if (user != null && user.getCreatedAt() != null) {
+            return ResponseEntity.ok(user.getCreatedAt().toString());
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/{id}/email")
+    public ResponseEntity<String> getUserEmail(@PathVariable Integer id) {
+        User user = userRepository.findById(id).orElse(null);
+        if (user != null) {
+            return ResponseEntity.ok(user.getEmail());
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/{id}/login")
+    public ResponseEntity<String> getUserLogin(@PathVariable Integer id) {
+        User user = userRepository.findById(id).orElse(null);
+        if (user != null) {
+            return ResponseEntity.ok(user.getLogin());
+        }
+        return ResponseEntity.notFound().build();
+    }
 }
