@@ -8,9 +8,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 @RestController
 @RequestMapping("/api/users")
+@CrossOrigin(origins = "http://localhost")
 public class UserController {
 
     @Autowired
@@ -21,6 +23,15 @@ public class UserController {
         User user = userRepository.findByLogin(login);
         if (user != null) {
             return ResponseEntity.ok(user);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/{id}/lastname")
+    public ResponseEntity<String> getUserLastname(@PathVariable Integer id) {
+        User user = userRepository.findById(id).orElse(null);
+        if (user != null) {
+            return ResponseEntity.ok(user.getLastname());
         }
         return ResponseEntity.notFound().build();
     }

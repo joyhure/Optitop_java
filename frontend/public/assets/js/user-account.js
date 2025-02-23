@@ -60,4 +60,27 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Rôle mis à jour :', translatedRole);
         }
     }
+
+    // Fonction pour récupérer et afficher le nom complet
+    const displayFullName = async () => {
+        const profileFirstname = document.getElementById('profileFirstname');
+        
+        if (profileFirstname && userSession?.id) {
+            try {
+                const response = await fetch(`http://localhost:8080/api/users/${userSession.id}/lastname`);
+                if (response.ok) {
+                    const lastname = await response.text();
+                    profileFirstname.textContent = `${userSession.firstname} ${lastname}`;
+                    console.log('Nom complet mis à jour');
+                }
+            } catch (error) {
+                console.error('Erreur lors de la récupération du nom :', error);
+                // Afficher au moins le prénom si erreur
+                profileFirstname.textContent = userSession.firstname;
+            }
+        }
+    };
+
+    // Appeler la fonction
+    displayFullName();
 });
