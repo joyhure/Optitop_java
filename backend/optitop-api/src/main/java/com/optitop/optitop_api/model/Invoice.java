@@ -47,9 +47,6 @@ public class Invoice {
     @Column(nullable = false)
     private String status;
 
-    @Column(nullable = false)
-    private LocalDate dateImport;
-
     // Getters et setters
     public Long getId() {
         return id;
@@ -145,13 +142,5 @@ public class Invoice {
 
     public void setStatus(String status) {
         this.status = status;
-    }
-
-    public LocalDate getDateImport() {
-        return dateImport;
-    }
-
-    public void setDateImport(LocalDate dateImport) {
-        this.dateImport = dateImport;
     }
 }

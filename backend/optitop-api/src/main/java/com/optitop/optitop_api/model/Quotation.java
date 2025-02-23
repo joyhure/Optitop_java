@@ -50,9 +50,6 @@ public class Quotation {
     @Column(nullable = true)
     private String comment;
 
-    @Column(nullable = false)
-    private LocalDate dateImport;
-
     // Getters and setters
     public Long getId() {
         return id;
@@ -156,13 +153,5 @@ public class Quotation {
 
     public void setComment(String comment) {
         this.comment = comment;
-    }
-
-    public LocalDate getDateImport() {
-        return dateImport;
-    }
-
-    public void setDateImport(LocalDate dateImport) {
-        this.dateImport = dateImport;
     }
 }

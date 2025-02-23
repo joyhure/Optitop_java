@@ -95,7 +95,6 @@ public class SalesService {
                     invoice.setTotalInvoice(Double.parseDouble(columns[12].replace(",", ".")));
                     invoice.setPair(columns[13].isEmpty() ? null : Integer.parseInt(columns[13]));
                     invoice.setStatus(type);
-                    invoice.setDateImport(LocalDate.now());
 
                     invoiceBatch.add(invoice);
                     if (invoiceBatch.size() >= BATCH_SIZE) {
@@ -115,7 +114,6 @@ public class SalesService {
                     quotation.setTotalQuotation(Double.parseDouble(columns[12].replace(",", ".")));
                     quotation.setPair(columns[13].isEmpty() ? null : Integer.parseInt(columns[13]));
                     quotation.setStatus(type);
-                    quotation.setDateImport(LocalDate.now());
 
                     quotationBatch.add(quotation);
                     if (quotationBatch.size() >= BATCH_SIZE) {
