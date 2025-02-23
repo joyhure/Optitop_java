@@ -47,6 +47,9 @@
     width: 250px;
 }
 
+#userDropdown {
+    padding-inline-end: 0px;
+}
 /*tables*/
 .table-col-date {
     width: 12%;
@@ -89,6 +92,10 @@
 /*sizes*/
 .mt-10 {
     margin-top: 10rem;
+}
+
+.w-40 {
+    width: 40%;
 }
 
 /*colors*/
