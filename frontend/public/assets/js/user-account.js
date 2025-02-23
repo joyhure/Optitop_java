@@ -11,9 +11,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const roleTranslations = {
             'admin': 'Administrateur',
             'collaborator': 'Collaborateur',
-            // Pour les autres rôles, on retourne le rôle tel quel
+            // Pour les autres rôles, on capitalise la première lettre
         };
-        return roleTranslations[role.toLowerCase()] || role;
+        return roleTranslations[role.toLowerCase()] || 
+               role.charAt(0).toUpperCase() + role.slice(1).toLowerCase();
     };
 
     // Mettre à jour tous les éléments avec les données utilisateur
