@@ -15,7 +15,7 @@
 <body>
   <?php
   $pageTitle = "Synthèse";
-  require_once 'components/header.php';
+  require_once 'components/header.html';
   require_once 'components/navbar.php';
   ?>
   <main id="main-quotations" class="d-flex flex-row justify-content-between">
@@ -147,6 +147,7 @@
   </div>
   <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
   <script src="assets/js/header.js"></script>
+  <script src="assets/js/navbar.js"></script>
 </body>
 
 </html>

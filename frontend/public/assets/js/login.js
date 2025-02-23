@@ -5,31 +5,38 @@ document.addEventListener('DOMContentLoaded', function() {
 async function handleLogin(event) {
     event.preventDefault();
     
-    const login = document.getElementById('login').value;
-    const password = document.getElementById('password').value;
-
-    console.log('Tentative de connexion...');
-
     try {
+        // Appel à l'API Spring Boot
         const response = await fetch('http://localhost:8080/api/auth/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ login, password })
+            body: JSON.stringify({
+                login: document.getElementById('login').value,
+                password: document.getElementById('password').value
+            })
         });
-
-        console.log('Réponse du serveur:', response.status);
 
         if (response.ok) {
             const userData = await response.json();
-            const userSession = {
+            
+            // Stocker dans sessionStorage
+            sessionStorage.setItem('user', JSON.stringify({
                 id: userData.id,
                 firstname: userData.firstname,
                 role: userData.role
-            };
-            sessionStorage.setItem('user', JSON.stringify(userSession));
-            document.getElementById('loginForm').reset();
+            }));
+
+            // Synchroniser avec la session PHP
+            await fetch('login.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(userData)
+            });
+
             window.location.href = 'dashboard.php';
         } else {
             alert('Identifiants incorrects');

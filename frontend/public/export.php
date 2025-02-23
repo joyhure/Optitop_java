@@ -1,10 +1,21 @@
+<?php
+session_start();
+
+// Vérification PHP principale
+if (!isset($_SESSION['user']) || 
+    !isset($_SESSION['user']['role']) || 
+    !in_array($_SESSION['user']['role'], ['admin', 'supermanager'])) {
+    header('Location: dashboard.php');
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="fr">
 
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Synthèse</title>
+  <title>Exportation</title>
   <meta name="author" content="Joy Huré">
   <link rel="icon" href="assets/images/favicon.png">
   <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
@@ -15,7 +26,7 @@
 <body>
   <?php
   $pageTitle = "Exportation";
-  require_once 'components/header.php';
+  require_once 'components/header.html';
   require_once 'components/navbar.php';
   ?>
   <main id="main-quotations" class="d-flex flex-row justify-content-between">
@@ -28,21 +39,23 @@
         </div>
         <h3 class="px-4 mb-0">Exportation des données de vente</h3>
       </div>
-      <form action="import_csv.php" method="post" enctype="multipart/form-data" class="m-5">
+      <form id="importForm" class="m-5">
         <div class="mb-3">
           <label for="csvFile" class="form-label">Choisir un fichier CSV</label>
           <input type="file" class="form-control" id="csvFile" name="csvFile" accept=".csv" required>
         </div>
+        <div class="progress mb-3 d-none" id="uploadProgress">
+          <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+        </div>
+        <div id="importStatus" class="alert d-none"></div>
         <button type="submit" class="btn btn-primary">Importer</button>
       </form>
     </section>
   </main>
 
-  </div>
-
-  </div>
   <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
   <script src="assets/js/header.js"></script>
+  <script src="assets/js/navbar.js"></script>
+  <script src="assets/js/export.js"></script>
 </body>
-
 </html>

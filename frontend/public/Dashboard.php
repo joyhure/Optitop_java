@@ -15,7 +15,7 @@
 <body>
   <?php
   $pageTitle = "Dashboard";
-  require_once 'components/header.php';
+  require_once 'components/header.html';
   require_once 'components/navbar.php'; 
   ?>
   <main id="main-dashboard" class="d-flex justify-content-around flex-wrap my-3">
@@ -173,6 +173,7 @@
   </div>
   <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
   <script src="assets/js/header.js"></script>
+  <script src="assets/js/navbar.js"></script>
 </body>
 
 </html>

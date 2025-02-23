@@ -31,7 +31,7 @@ CREATE TABLE pending_accounts (
 CREATE TABLE invoice (
     id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT NOT NULL,
     date DATE NOT NULL,
-    client_id INT UNSIGNED NOT NULL,
+    client_id VARCHAR(10) NOT NULL,
     client VARCHAR(255) NOT NULL,
     invoice_ref VARCHAR(255) NOT NULL,
     family VARCHAR(10) NULL,
@@ -41,7 +41,6 @@ CREATE TABLE invoice (
     total_invoice DECIMAL(10, 2) NOT NULL,
     pair INT NULL,
     status ENUM('facture', 'avoir') NOT NULL,
-    date_import DATE NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (seller_ref) REFERENCES seller(seller_ref)
 );
@@ -49,7 +48,7 @@ CREATE TABLE invoice (
 CREATE TABLE quotation (
     id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT NOT NULL,
     date DATE NOT NULL,
-    client_id INT UNSIGNED NOT NULL,
+    client_id VARCHAR(10) NOT NULL,
     client VARCHAR(255) NOT NULL,
     quotation_ref VARCHAR(255) NOT NULL,
     family VARCHAR(10) NULL,
@@ -60,7 +59,6 @@ CREATE TABLE quotation (
     pair INT NULL,
     status ENUM('validé', 'non validé') NOT NULL,
     comment TEXT NULL,
-    date_import DATE NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (seller_ref) REFERENCES seller(seller_ref)
 );
