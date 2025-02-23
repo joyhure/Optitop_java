@@ -109,11 +109,11 @@
                                 <div class="text-center">
                                     <button type="submit" class="btn btn-primary">Changer le mot de passe</button>
                                 </div>
-                            </form><!-- End Change Password Form -->
+                            </form>
 
                         </div>
 
-                    </div><!-- End Bordered Tabs -->
+                    </div>
 
                 </div>
             </div>
