@@ -5,8 +5,8 @@
         <img src="assets/images/logo_optitop.png" alt="Optitop Logo" width="112px" height="48px"
           class="d-flex align-items-center my-2 my-lg-0 me-lg-auto text-white text-decoration-none">
 
-        <ul class="nav col-12 col-lg-auto my-2 justify-content-between my-md-0 text-small w-25">
-          <div class="d-flex flex-wrap align-items-center justify-content-center">
+        <ul class="nav col-12 col-lg-auto my-2 justify-content-between my-md-0 text-small w-auto">
+          <div class="d-flex flex-wrap align-items-center justify-content-center mx-5" id="period-container">
             <li class="nav-item dropdown">
               <a class="nav-link text-dark dropdown-toggle text-dark" href="#" id="periodDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="bi bi-table d-block mx-auto mb-1 fs-4 text-center"></i>
@@ -32,6 +32,26 @@
                   <a class="dropdown-item d-flex gap-2 align-items-center text-muted small" href="#" data-period="Année -1">
                     Année -1
                   </a>
+                </li>
+                <li>
+                    <a class="dropdown-item d-flex gap-2 align-items-center text-muted small" href="#" data-period="Personnalisée" id="customDateBtn">
+                        <span>Personnalisée</span>
+                    </a>
+                </li>
+                <li class="position-relative">
+                    <div class="date-range-container px-3 py-2 d-none" id="dateRangeContainer">
+                        <div class="mb-2">
+                            <label class="small">Du :</label>
+                            <input type="date" class="form-control form-control-sm" id="startDate">
+                        </div>
+                        <div class="mb-2">
+                            <label class="small">Au :</label>
+                            <input type="date" class="form-control form-control-sm" id="endDate">
+                        </div>
+                        <div class="text-center">
+                            <button class="btn btn-sm btn-primary" id="applyDateRange">Valider</button>
+                        </div>
+                    </div>
                 </li>
               </ul>
             </li>
