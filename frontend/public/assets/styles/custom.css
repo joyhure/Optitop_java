@@ -186,3 +186,37 @@
     font-size: 0.875rem;
 }
 
+.nav-link.active {
+    background-color: #2989DD !important;
+    color: #f8f9fa !important;
+    pointer-events: none !important;
+}
+
+/* Navigation styles */
+.nav-pills .nav-link {
+    border-radius: 0 !important;
+}
+
+.nav-pills .nav-item:first-child .nav-link {
+    border-top-left-radius: 0 !important;
+    border-top-right-radius: 0 !important;
+}
+
+.nav-pills .nav-item:last-child .nav-link {
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+}
+
+.nav-pills,
+.nav-pills .nav-link,
+.nav-pills .nav-item,
+.nav-pills .nav-item .nav-link,
+.nav-pills > .nav-item > .nav-link {
+    border-radius: 0 !important;
+}
+
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
+    border-radius: 0 !important;
+}
+

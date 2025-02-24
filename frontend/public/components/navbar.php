@@ -6,7 +6,7 @@
 </section>
 <div class="d-flex flex-row justify-content-between">
     <nav class="d-flex flex-column flex-shrink-0 sidebar">
-        <ul class="nav nav-pills flex-column bg-body-tertiary rounded">
+        <ul class="nav nav-pills flex-column bg-body-tertiary">
         </ul>
         <hr class="m-0">
     </nav>

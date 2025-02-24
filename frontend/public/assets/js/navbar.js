@@ -20,11 +20,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Récupérer la session utilisateur
     const userSession = JSON.parse(sessionStorage.getItem('user'));
 
+    // Obtenir le nom du fichier actuel
+    const currentFile = window.location.pathname.split('/').pop();
+
     // Générer les liens de navigation
     navItems.forEach(item => {
-        // Skip si c'est la page courante
-        if (item.title === currentPage) return;
-
         // Skip si l'item requiert un rôle spécifique et l'utilisateur n'a pas les droits
         if (item.requiresRole && (!userSession || 
             !userSession.role || 
@@ -32,10 +32,13 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
+        // Vérifier si c'est la page active
+        const isActive = currentFile === item.href;
+
         // Créer l'élément de navigation
         const li = document.createElement('li');
         li.innerHTML = `
-            <a href="${item.href}" class="nav-link link-body-emphasis px-4">
+            <a href="${item.href}" class="nav-link link-body-emphasis px-4 ${isActive ? 'active' : ''}">
                 ${item.title}
             </a>
         `;
