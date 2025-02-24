@@ -6,6 +6,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Column;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 public class Invoice {
@@ -46,6 +47,9 @@ public class Invoice {
 
     @Column(nullable = false)
     private String status;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
     // Getters et setters
     public Long getId() {
@@ -142,5 +146,13 @@ public class Invoice {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 }
