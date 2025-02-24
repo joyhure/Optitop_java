@@ -165,6 +165,86 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
+    // Gestion du changement de mot de passe
+    const initPasswordChange = () => {
+        const form = document.getElementById('passwordChangeForm');
+        const newPassword = document.getElementById('newPassword');
+        const renewPassword = document.getElementById('renewPassword');
+        const resultDiv = document.getElementById('passwordChangeResult');
+    
+        // Fonction de validation du mot de passe
+        const isPasswordValid = (password) => {
+            const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}$/;
+            return regex.test(password);
+        };
+    
+        // Validation en temps réel du nouveau mot de passe
+        newPassword.addEventListener('input', () => {
+            if (!isPasswordValid(newPassword.value)) {
+                newPassword.classList.add('is-invalid');
+            } else {
+                newPassword.classList.remove('is-invalid');
+            }
+        });
+    
+        // Validation en temps réel de la confirmation
+        renewPassword.addEventListener('input', () => {
+            if (renewPassword.value !== newPassword.value) {
+                renewPassword.classList.add('is-invalid');
+            } else {
+                renewPassword.classList.remove('is-invalid');
+            }
+        });
+    
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const currentPassword = document.getElementById('currentPassword').value;
+        
+            // Validation du nouveau mot de passe
+            if (!isPasswordValid(newPassword.value)) {
+                newPassword.classList.add('is-invalid');
+                return;
+            }
+        
+            // Validation de la confirmation
+            if (newPassword.value !== renewPassword.value) {
+                renewPassword.classList.add('is-invalid');
+                return;
+            }
+        
+            try {
+                const response = await fetch(`http://localhost:8080/api/users/${userSession.id}/change-password`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        currentPassword: currentPassword,
+                        newPassword: newPassword.value
+                    })
+                });
+        
+                resultDiv.classList.remove('d-none', 'alert-success', 'alert-danger');
+                
+                if (response.ok) {
+                    resultDiv.classList.add('alert-success');
+                    resultDiv.textContent = 'Mot de passe modifié avec succès';
+                    form.reset();
+                } else {
+                    const errorMessage = await response.text();
+                    resultDiv.classList.add('alert-danger');
+                    resultDiv.textContent = errorMessage || 'Erreur lors du changement de mot de passe';
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                resultDiv.classList.remove('d-none');
+                resultDiv.classList.add('alert-danger');
+                resultDiv.textContent = 'Erreur lors de la communication avec le serveur';
+            }
+        });
+    };
+
+
     // Mettre à jour le profil utilisateur
     if (userSession) {
         // Appeler la fonction pour récupérer le nom complet
@@ -186,5 +266,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Appeler la fonction de mise à jour des détails utilisateur
         displayUserDetails();
+
+        // Appeler la fonction d'initialisation du changement de mot de passe
+        initPasswordChange();
     }
 });

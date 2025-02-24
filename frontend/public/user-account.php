@@ -83,32 +83,44 @@
                         </div>
 
                         <div class="tab-pane fade pt-3" id="profile-change-password" role="tabpanel">
-                            <form>
-
+                            <form id="passwordChangeForm" method="POST" novalidate>
                                 <div class="row mb-3">
                                     <label for="currentPassword" class="col-md-4 col-lg-3 col-form-label w-30">Actuel :</label>
                                     <div class="col-md-8 col-lg-9">
-                                        <input name="password" type="password" class="form-control" id="currentPassword">
+                                        <input name="password" type="password" class="form-control" id="currentPassword" required>
+                                        <div class="invalid-feedback">Veuillez saisir votre mot de passe actuel</div>
                                     </div>
                                 </div>
 
                                 <div class="row mb-3">
                                     <label for="newPassword" class="col-md-4 col-lg-3 col-form-label w-30">Nouveau :</label>
                                     <div class="col-md-8 col-lg-9">
-                                        <input name="newpassword" type="password" class="form-control" id="newPassword">
+                                        <input name="newpassword" type="password" class="form-control" id="newPassword" 
+                                               pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{12,}$" required>
+                                        <div class="invalid-feedback">
+                                            Le mot de passe doit contenir au moins 12 caractères avec :
+                                            <ul>
+                                                <li>Une majuscule</li>
+                                                <li>Une minuscule</li>
+                                                <li>Un chiffre</li>
+                                                <li>Un caractère spécial (@$!%*?&)</li>
+                                            </ul>
+                                        </div>
                                     </div>
                                 </div>
 
                                 <div class="row mb-3">
                                     <label for="renewPassword" class="col-md-4 col-lg-3 col-form-label w-30">Confirmation :</label>
                                     <div class="col-md-8 col-lg-9">
-                                        <input name="renewpassword" type="password" class="form-control" id="renewPassword">
+                                        <input name="renewpassword" type="password" class="form-control" id="renewPassword" required>
+                                        <div class="invalid-feedback">Les mots de passe ne correspondent pas</div>
                                     </div>
                                 </div>
 
                                 <div class="text-center">
                                     <button type="submit" class="btn btn-primary">Changer le mot de passe</button>
                                 </div>
+                                <div id="passwordChangeResult" class="alert mt-3 d-none"></div>
                             </form>
 
                         </div>
@@ -117,8 +129,6 @@
 
                 </div>
             </div>
-
-
             </div>
         </section>
 
