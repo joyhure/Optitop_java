@@ -43,6 +43,13 @@
     width: 100%;
 }
 
+#period-container {
+    width: 250px;
+}
+
+#userDropdown {
+    padding-inline-end: 0px;
+}
 /*tables*/
 .table-col-date {
     width: 12%;
@@ -85,6 +92,14 @@
 /*sizes*/
 .mt-10 {
     margin-top: 10rem;
+}
+
+.w-40 {
+    width: 40%;
+}
+
+.w-30 {
+    width: 30%;
 }
 
 /*colors*/
@@ -152,5 +167,22 @@
 
 .bg-role-supermanager .nav-link:hover {
     color:  #0D4597 !important;
+}
+
+.date-range-container {
+    min-width: 250px;
+    background-color: white;
+    border-radius: 0.25rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    position: absolute;
+    z-index: 1000;
+}
+
+.date-range-container.show {
+    display: block !important;
+}
+
+.date-range-container input[type="date"] {
+    font-size: 0.875rem;
 }
 

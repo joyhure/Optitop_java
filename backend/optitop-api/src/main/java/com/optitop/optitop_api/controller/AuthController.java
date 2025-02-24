@@ -27,11 +27,16 @@ public class AuthController {
     private UserRepository userRepository;
 
     @PostMapping("/login")
-    public ResponseEntity<User> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequest loginRequest) {
         User user = userRepository.findByLogin(loginRequest.getLogin());
 
         if (user != null && user.getPassword().equals(loginRequest.getPassword())) {
-            return ResponseEntity.ok(user);
+            Map<String, Object> response = new HashMap<>();
+            response.put("id", user.getId());
+            response.put("firstname", user.getFirstname());
+            response.put("lastname", user.getLastname());
+            response.put("role", user.getRole());
+            return ResponseEntity.ok(response);
         }
 
         return ResponseEntity.notFound().build();

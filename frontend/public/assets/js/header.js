@@ -29,6 +29,63 @@ document.addEventListener('DOMContentLoaded', function() {
     const savedPeriod = sessionStorage.getItem('selectedPeriod') || 'Mois';
     selectedPeriod.textContent = savedPeriod;
 
+    // Custom date range functionality
+    const customDateBtn = document.getElementById('customDateBtn');
+    const dateRangeContainer = document.getElementById('dateRangeContainer');
+    const startDateInput = document.getElementById('startDate');
+    const endDateInput = document.getElementById('endDate');
+    const applyDateRange = document.getElementById('applyDateRange');
+
+    // Format date as dd/mm/yyyy
+    function formatDate(date) {
+        const d = new Date(date);
+        const day = String(d.getDate()).padStart(2, '0');
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const year = d.getFullYear();
+        return `${day}/${month}/${year}`;
+    }
+
+    customDateBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        dateRangeContainer.classList.toggle('d-none');
+        dateRangeContainer.classList.toggle('show');
+    });
+
+    applyDateRange.addEventListener('click', function(e) {
+        e.preventDefault();
+        const startDate = startDateInput.value;
+        const endDate = endDateInput.value;
+        
+        if (startDate && endDate) {
+            const formattedRange = `${formatDate(startDate)} au ${formatDate(endDate)}`;
+            selectedPeriod.textContent = formattedRange;
+            sessionStorage.setItem('selectedPeriod', formattedRange);
+            sessionStorage.setItem('startDate', startDate);
+            sessionStorage.setItem('endDate', endDate);
+            dateRangeContainer.classList.add('d-none');
+            dateRangeContainer.classList.remove('show');
+        }
+    });
+
+    // Close date range container when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!dateRangeContainer.contains(e.target) && 
+            !customDateBtn.contains(e.target) && 
+            !dateRangeContainer.classList.contains('d-none')) {
+            dateRangeContainer.classList.add('d-none');
+            dateRangeContainer.classList.remove('show');
+        }
+    });
+
+    // Restore saved dates if they exist
+    const savedStartDate = sessionStorage.getItem('startDate');
+    const savedEndDate = sessionStorage.getItem('endDate');
+    if (savedStartDate && savedEndDate) {
+        startDateInput.value = savedStartDate;
+        endDateInput.value = savedEndDate;
+    }
+
     // Sign out functionality
     document.getElementById('signOutBtn').addEventListener('click', async function(e) {
         e.preventDefault();
