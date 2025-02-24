@@ -44,4 +44,35 @@ document.addEventListener('DOMContentLoaded', function() {
         `;
         navList.appendChild(li);
     });
+
+    updateLastUpdateDate();
 });
+
+// Fonction pour formater la date
+const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+
+    return `${day}/${month}/${year} à ${hours}:${minutes}`;
+};
+
+// Fonction pour récupérer la dernière mise à jour
+const updateLastUpdateDate = async () => {
+    try {
+        const response = await fetch('http://localhost:8080/api/updates/last');
+        if (response.ok) {
+            const lastUpdate = await response.text();
+            const formattedDate = formatDate(lastUpdate);
+            const updateElement = document.querySelector('#lastUpdate');
+            if (updateElement) {
+                updateElement.textContent = `Mis à jour le ${formattedDate}`;
+            }
+        }
+    } catch (error) {
+        console.error('Erreur lors de la récupération de la date de mise à jour:', error);
+    }
+};

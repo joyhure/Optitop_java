@@ -7,12 +7,15 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 @Repository
-public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
+public interface InvoiceRepository extends JpaRepository<Invoice, Integer> {
     @Modifying
     @Query("DELETE FROM Invoice i WHERE i.date BETWEEN :startDate AND :endDate")
     void deleteByDateBetween(LocalDate startDate, LocalDate endDate);
 
     Invoice findByInvoiceRef(String invoiceRef);
+
+    Optional<Invoice> findTopByOrderByCreatedAtDesc();
 }

@@ -6,6 +6,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Column;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 public class Quotation {
@@ -49,6 +50,9 @@ public class Quotation {
 
     @Column(nullable = true)
     private String comment;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
     // Getters and setters
     public Long getId() {
@@ -153,5 +157,13 @@ public class Quotation {
 
     public void setComment(String comment) {
         this.comment = comment;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 }
