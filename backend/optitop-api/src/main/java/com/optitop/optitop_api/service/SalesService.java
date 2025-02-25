@@ -23,8 +23,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -170,77 +168,41 @@ public class SalesService {
 
     private void createQuotationsEntries(LocalDate startDate, LocalDate endDate) {
         try {
-            // Récupérer tous les devis importés pour la période
             List<QuotationImport> imports = quotationImportRepository
                     .findByDateBetweenAndFamilyIn(startDate, endDate, Arrays.asList("VER", "MON"));
 
-            // Récupérer toutes les entrées quotations existantes pour la période
-            List<Quotations> existingQuotations = quotationsRepository.findByDateBetween(startDate, endDate);
-
-            // Créer un Set des paires clientId/date des imports pour une recherche efficace
-            Set<String> importPairs = imports.stream()
-                    .map(qi -> qi.getClientId() + "_" + qi.getDate())
-                    .collect(Collectors.toSet());
-
-            // Supprimer les entrées qui n'ont plus de correspondance
-            List<Quotations> toDelete = existingQuotations.stream()
-                    .filter(q -> !importPairs.contains(q.getClientId() + "_" + q.getDate()))
-                    .collect(Collectors.toList());
-
-            if (!toDelete.isEmpty()) {
-                logger.info("Suppression de " + toDelete.size() + " entrées obsolètes dans quotations");
-                quotationsRepository.deleteAll(toDelete);
-            }
-
-            // Regrouper les imports par clientId et date
+            // Grouper par clientId et date
             Map<String, Map<LocalDate, List<QuotationImport>>> groupedQuotations = imports.stream()
                     .collect(Collectors.groupingBy(QuotationImport::getClientId,
                             Collectors.groupingBy(QuotationImport::getDate)));
 
-            List<Quotations> newQuotations = new ArrayList<>();
+            // Créer les entrées dans quotations
+            List<Quotations> quotationsList = new ArrayList<>();
 
             groupedQuotations.forEach((clientId, dateMap) -> {
                 dateMap.forEach((date, quotationImports) -> {
-                    Optional<Quotations> existingQuotation = quotationsRepository
-                            .findByClientIdAndDate(clientId, date);
+                    // Vérifier si au moins un devis est validé
+                    boolean hasValidatedQuotation = quotationImports.stream()
+                            .anyMatch(q -> "devis validé".equals(q.getStatus()));
 
-                    if (existingQuotation.isPresent()) {
-                        // Mise à jour uniquement du status si nécessaire
-                        Quotations quotation = existingQuotation.get();
-                        boolean hasValidatedQuotation = quotationImports.stream()
-                                .anyMatch(q -> "devis validé".equals(q.getStatus().toLowerCase()));
+                    // Créer l'entrée dans quotations
+                    Quotations quotation = new Quotations();
+                    quotation.setDate(date);
+                    quotation.setClientId(clientId);
+                    quotation.setClient(quotationImports.get(0).getClient());
+                    quotation.setSellerRef(quotationImports.get(0).getSellerRef());
+                    quotation.setStatus(hasValidatedQuotation ? "Validé" : "Non validé");
+                    quotation.setCreatedAt(LocalDateTime.now());
 
-                        if (hasValidatedQuotation && !"Validé".equals(quotation.getStatus())) {
-                            // Ne pas toucher aux champs comment et action
-                            quotation.setStatus("Validé");
-                            quotationsRepository.save(quotation);
-                        }
-                    } else {
-                        // Création d'une nouvelle entrée uniquement si elle n'existe pas
-                        boolean hasValidatedQuotation = quotationImports.stream()
-                                .anyMatch(q -> "devis validé".equals(q.getStatus().toLowerCase()));
-
-                        Quotations newQuotation = new Quotations();
-                        newQuotation.setDate(date);
-                        newQuotation.setClientId(clientId);
-                        newQuotation.setClient(quotationImports.get(0).getClient());
-                        newQuotation.setSellerRef(quotationImports.get(0).getSellerRef());
-                        newQuotation.setStatus(hasValidatedQuotation ? "Validé" : "Non validé");
-                        newQuotation.setCreatedAt(LocalDateTime.now());
-                        // Initialiser action et comment à null pour les nouvelles entrées
-                        newQuotation.setAction(null);
-                        newQuotation.setComment(null);
-
-                        newQuotations.add(newQuotation);
-                    }
+                    quotationsList.add(quotation);
                 });
             });
 
             // Sauvegarder les nouvelles entrées par lots
-            if (!newQuotations.isEmpty()) {
-                for (int i = 0; i < newQuotations.size(); i += BATCH_SIZE) {
-                    int end = Math.min(i + BATCH_SIZE, newQuotations.size());
-                    quotationsRepository.saveAll(newQuotations.subList(i, end));
+            if (!quotationsList.isEmpty()) {
+                for (int i = 0; i < quotationsList.size(); i += BATCH_SIZE) {
+                    int end = Math.min(i + BATCH_SIZE, quotationsList.size());
+                    quotationsRepository.saveAll(quotationsList.subList(i, end));
                 }
             }
         } catch (Exception e) {

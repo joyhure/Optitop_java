@@ -46,57 +46,226 @@ document.addEventListener('DOMContentLoaded', function() {
         return new Date(year, month - 1, day);
     }
 
-    // Fonction pour charger les devis
-    async function loadQuotations() {
+    // Ajouter cette fonction avant loadUnvalidatedQuotations
+    function updateSortIcons(field, order) {
+        // Réinitialiser toutes les icônes
+        document.querySelectorAll('.sort-icon').forEach(icon => {
+            icon.classList.remove('active');
+            icon.dataset.order = 'asc';
+            icon.querySelector('use').setAttribute('xlink:href', '../node_modules/bootstrap-icons/bootstrap-icons.svg#sort-down');
+        });
+
+        // Mettre à jour l'icône du champ trié
+        const activeIcon = document.querySelector(`.sort-icon[data-sort="${field}"]`);
+        if (activeIcon) {
+            activeIcon.classList.add('active');
+            activeIcon.dataset.order = order;
+            activeIcon.querySelector('use').setAttribute('xlink:href', 
+                `../node_modules/bootstrap-icons/bootstrap-icons.svg#sort-${order === 'asc' ? 'down' : 'up'}`
+            );
+        }
+    }
+
+    let availableActions = [];
+
+    // Ajouter cette fonction pour charger les actions disponibles
+    async function loadAvailableActions() {
         try {
+            const response = await fetch('http://localhost:8080/api/quotations/actions');
+            if (response.ok) {
+                availableActions = await response.json();
+            }
+        } catch (error) {
+            console.error('Erreur lors du chargement des actions:', error);
+        }
+    }
+
+    const QUOTATION_ACTIONS = {
+        VOIR_OPTICIEN: "Voir opticien",
+        NON_VALIDE: "Non validé",
+        ATTENTE_MUTUELLE: "Attente mutuelle",
+        A_RELANCER: "À relancer",
+        ATTENTE_RETOUR: "Attente de retour"
+    };
+
+    // Modifier la fonction createQuotationRow pour inclure le select avec les actions
+    function createQuotationRow(quotation) {
+        const row = document.createElement('tr');
+        row.dataset.quotationId = quotation.id;
+        row.innerHTML = `
+            <td>${formatDate(quotation.date)}</td>
+            <td class="text-center">${getInitials(quotation.sellerRef)}</td>
+            <td>${quotation.client}</td>
+            <td>
+                <select class="form-select form-select-sm action-select" data-original-value="${quotation.action || ''}">
+                    <option value="">Sélectionner une action</option>
+                    ${Object.entries(QUOTATION_ACTIONS).map(([key, label]) => `
+                        <option value="${key}" ${quotation.action === key ? 'selected' : ''}>
+                            ${label}
+                        </option>
+                    `).join('')}
+                </select>
+            </td>
+            <td>
+                <input type="text" class="form-control form-control-sm comment-input" 
+                    value="${quotation.comment || ''}" 
+                    data-original-value="${quotation.comment || ''}"
+                    placeholder="Ajouter un commentaire">
+            </td>
+        `;
+        return row;
+    }
+
+    // Ajouter le bouton de sauvegarde après le tableau
+    function addSaveButton() {
+        const tableSection = document.getElementById('table-quotations-section');
+        const saveButton = document.createElement('button');
+        saveButton.className = 'btn btn-primary mt-3';
+        saveButton.id = 'save-changes-button';
+        saveButton.textContent = 'Enregistrer les modifications';
+        saveButton.disabled = true;
+        tableSection.appendChild(saveButton);
+
+        // Gérer l'état du bouton
+        const tbody = document.querySelector('#table-quotations-section table tbody');
+        tbody.addEventListener('change', (e) => {
+            if (e.target.classList.contains('action-select') || 
+                e.target.classList.contains('comment-input')) {
+                updateSaveButtonState();
+            }
+        });
+
+        tbody.addEventListener('input', (e) => {
+            if (e.target.classList.contains('comment-input')) {
+                updateSaveButtonState();
+            }
+        });
+
+        // Gestionnaire de sauvegarde
+        saveButton.addEventListener('click', saveChanges);
+    }
+
+    // Vérifier s'il y a des modifications à sauvegarder
+    function updateSaveButtonState() {
+        const saveButton = document.getElementById('save-changes-button');
+        const hasChanges = Array.from(document.querySelectorAll('tr[data-quotation-id]')).some(row => {
+            const actionSelect = row.querySelector('.action-select');
+            const commentInput = row.querySelector('.comment-input');
+            return actionSelect.value !== actionSelect.dataset.originalValue ||
+                commentInput.value !== commentInput.dataset.originalValue;
+        });
+        saveButton.disabled = !hasChanges;
+    }
+
+    // Fonction de sauvegarde des modifications
+    async function saveChanges() {
+        const updatedQuotations = [];
+        const rows = document.querySelectorAll('tr[data-quotation-id]');
+
+        rows.forEach(row => {
+            const quotationId = row.dataset.quotationId;
+            const actionSelect = row.querySelector('.action-select');
+            const commentInput = row.querySelector('.comment-input');
+
+            if (actionSelect.value !== actionSelect.dataset.originalValue ||
+                commentInput.value !== commentInput.dataset.originalValue) {
+                updatedQuotations.push({
+                    id: quotationId,
+                    action: actionSelect.value || null,
+                    comment: commentInput.value
+                });
+            }
+        });
+
+        if (updatedQuotations.length > 0) {
+            try {
+                const response = await fetch('http://localhost:8080/api/quotations/batch-update', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(updatedQuotations)
+                });
+
+                if (response.ok) {
+                    // Mettre à jour les valeurs originales
+                    updatedQuotations.forEach(update => {
+                        const row = document.querySelector(`tr[data-quotation-id="${update.id}"]`);
+                        const actionSelect = row.querySelector('.action-select');
+                        const commentInput = row.querySelector('.comment-input');
+                        
+                        actionSelect.dataset.originalValue = actionSelect.value;
+                        commentInput.dataset.originalValue = commentInput.value;
+                    });
+
+                    // Désactiver le bouton de sauvegarde
+                    document.getElementById('save-changes-button').disabled = true;
+                    
+                    // Afficher un message de succès
+                    alert('Modifications enregistrées avec succès');
+                } else {
+                    throw new Error('Erreur lors de la sauvegarde');
+                }
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert('Erreur lors de la sauvegarde des modifications');
+            }
+        }
+    }
+
+    async function loadUnvalidatedQuotations() {
+        try {
+            // Charger les actions si pas encore fait
+            if (availableActions.length === 0) {
+                await loadAvailableActions();
+            }
+
             const startDate = sessionStorage.getItem('startDate');
             const endDate = sessionStorage.getItem('endDate');
             
-            console.log('Chargement des devis pour la période:', startDate, 'à', endDate);
+            console.log('Chargement des devis non validés pour la période:', startDate, 'à', endDate);
 
             const response = await fetch(`http://localhost:8080/api/quotations/unvalidated?startDate=${startDate}&endDate=${endDate}`);
             
             if (response.ok) {
                 const quotations = await response.json();
-                console.log('Devis reçus:', quotations); // Debug
+                console.log('Devis non validés reçus:', quotations);
 
-                // Tri par défaut
+                // Tri par défaut par date décroissante
                 const sortedQuotations = sortQuotations(quotations, 'date', 'desc');
-                console.log('Devis triés:', sortedQuotations); // Debug
                 
                 const tbody = document.querySelector('#table-quotations-section table tbody');
                 tbody.innerHTML = '';
 
-                sortedQuotations.forEach(quotation => {
+                if (sortedQuotations.length === 0) {
                     const row = document.createElement('tr');
                     row.innerHTML = `
-                        <td>${formatDate(quotation.date)}</td>
-                        <td class="text-center">${getInitials(quotation.sellerRef)}</td>
-                        <td>${quotation.client}</td>
-                        <td>${quotation.action || ''}</td>
-                        <td>${quotation.comment || ''}</td>
+                        <td colspan="5" class="text-center">Aucun devis non validé pour cette période</td>
                     `;
                     tbody.appendChild(row);
-                });
-
-                // Réinitialiser les icônes de tri
-                document.querySelectorAll('.sort-icon').forEach(icon => {
-                    icon.classList.remove('active');
-                    icon.dataset.order = 'asc';
-                    icon.querySelector('use').setAttribute('xlink:href', '../node_modules/bootstrap-icons/bootstrap-icons.svg#sort-down');
-                });
-
-                // Activer l'icône de tri par date
-                const dateIcon = document.querySelector('.sort-icon[data-sort="date"]');
-                if (dateIcon) {
-                    dateIcon.classList.add('active');
-                    dateIcon.dataset.order = 'desc';
-                    dateIcon.querySelector('use').setAttribute('xlink:href', '../node_modules/bootstrap-icons/bootstrap-icons.svg#sort-up');
+                } else {
+                    sortedQuotations.forEach(quotation => {
+                        tbody.appendChild(createQuotationRow(quotation));
+                    });
                 }
+
+                // Mettre à jour les icônes de tri
+                updateSortIcons('date', 'desc');
             }
         } catch (error) {
-            console.error('Erreur lors du chargement des devis:', error);
+            console.error('Erreur lors du chargement des devis non validés:', error);
+            const tbody = document.querySelector('#table-quotations-section table tbody');
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="text-center text-danger">
+                        Erreur lors du chargement des devis non validés
+                    </td>
+                </tr>
+            `;
         }
+
+        // Ajouter après le chargement des données
+        addSaveButton();
     }
 
     // Fonction de tri modifiée
@@ -198,20 +367,20 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Charger les devis initialement
-    loadQuotations();
+    // Mettre à jour les appels à loadQuotations :
+    // Chargement initial
+    loadUnvalidatedQuotations();
 
-    // Écouter les changements de période depuis le header
+    // Dans les écouteurs d'événements
     window.addEventListener('storage', function(e) {
         if (e.key === 'startDate' || e.key === 'endDate') {
-            console.log('Période modifiée, rechargement des devis');
-            loadQuotations();
+            console.log('Période modifiée, rechargement des devis non validés');
+            loadUnvalidatedQuotations();
         }
     });
 
-    // Écouter un événement personnalisé pour la mise à jour des dates
     document.addEventListener('datesUpdated', function() {
         console.log('Événement datesUpdated reçu');
-        loadQuotations();
+        loadUnvalidatedQuotations();
     });
 });

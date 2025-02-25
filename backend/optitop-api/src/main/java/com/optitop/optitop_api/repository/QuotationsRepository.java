@@ -8,14 +8,16 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface QuotationsRepository extends JpaRepository<Quotations, Long> {
-    @Query("SELECT q FROM Quotations q WHERE q.date BETWEEN :startDate AND :endDate")
-    List<Quotations> findByDateBetween(
+    @Query("SELECT q FROM Quotations q WHERE q.date BETWEEN :startDate AND :endDate AND q.status = 'Non validé'")
+    List<Quotations> findUnvalidatedByDateBetween(
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate);
 
-    Optional<Quotations> findByClientIdAndDate(String clientId, LocalDate date);
+    @Query("SELECT q FROM Quotations q WHERE q.clientId = :clientId AND q.date = :date")
+    List<Quotations> findByClientIdAndDate(
+            @Param("clientId") String clientId,
+            @Param("date") LocalDate date);
 }

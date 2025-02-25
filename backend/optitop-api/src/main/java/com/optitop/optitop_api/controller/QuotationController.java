@@ -30,7 +30,8 @@ public class QuotationController {
             LocalDate start = LocalDate.parse(startDate);
             LocalDate end = LocalDate.parse(endDate);
 
-            List<Quotations> quotations = quotationsRepository.findByDateBetween(start, end);
+            List<Quotations> quotations = quotationsRepository.findUnvalidatedByDateBetween(start, end);
+            
             List<QuotationDTO> dtos = quotations.stream()
                     .map(this::convertToDTO)
                     .collect(Collectors.toList());
