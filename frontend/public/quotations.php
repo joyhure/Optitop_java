@@ -112,7 +112,7 @@
         </tbody>
       </table>
     </section>
-    <section id="summary" class="d-flex flex-column justify-content-center align-items-center gap-3">
+    <section id="summary" class="d-flex flex-column justify-content-center align-items-center gap-3" data-requires-role="admin,manager,supermanager">
       <div id="quotation" class="card px-1 py-2 w-100">
         <div class="feature-icon d-inline-flex align-items-center justify-content-center fs-2">
           <svg class="bi svg-feature rounded" width="1em" height="1em">
@@ -171,6 +171,7 @@
   <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
   <script src="assets/js/header.js"></script>
   <script src="assets/js/navbar.js"></script>
+  <script src="assets/js/quotations.js"></script>
 </body>
 
 </html>
