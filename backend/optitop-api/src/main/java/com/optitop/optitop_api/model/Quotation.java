@@ -5,10 +5,14 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Column;
+import jakarta.persistence.Table;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "quotation")
 public class Quotation {
 
     @Id
@@ -53,6 +57,28 @@ public class Quotation {
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    public enum QuotationAction {
+        VOIR_OPTICIEN("voir opticien"),
+        NON_VALIDE("Non validé"),
+        ATTENTE_MUTUELLE("Attente mutuelle"),
+        A_RELANCER("à relancer"),
+        ATTENTE_RETOUR("attente de retour");
+
+        private final String value;
+
+        QuotationAction(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+    }
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "action")
+    private QuotationAction action;
 
     // Getters and setters
     public Long getId() {
@@ -165,5 +191,13 @@ public class Quotation {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public QuotationAction getAction() {
+        return action;
+    }
+
+    public void setAction(QuotationAction action) {
+        this.action = action;
     }
 }

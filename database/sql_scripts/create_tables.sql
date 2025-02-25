@@ -57,8 +57,9 @@ CREATE TABLE quotation (
     seller_ref VARCHAR(50) NOT NULL,
     total_quotation DECIMAL(10, 2) NOT NULL,
     pair INT NULL,
-    status ENUM('validé', 'non validé') NOT NULL,
+    status VARCHAR(50) NOT NULL,
     comment TEXT NULL,
+    action ENUM('voir opticien', 'Non validé', 'Attente mutuelle', 'à relancer', 'attente de retour') NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (seller_ref) REFERENCES seller(seller_ref)
 );
