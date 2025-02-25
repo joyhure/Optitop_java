@@ -6,14 +6,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Column;
 import jakarta.persistence.Table;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.EnumType;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "quotation")
-public class Quotation {
+@Table(name = "quotations_import")
+public class QuotationImport {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -52,33 +50,8 @@ public class Quotation {
     @Column(nullable = false)
     private String status;
 
-    @Column(nullable = true)
-    private String comment;
-
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-
-    public enum QuotationAction {
-        VOIR_OPTICIEN("voir opticien"),
-        NON_VALIDE("Non validé"),
-        ATTENTE_MUTUELLE("Attente mutuelle"),
-        A_RELANCER("à relancer"),
-        ATTENTE_RETOUR("attente de retour");
-
-        private final String value;
-
-        QuotationAction(String value) {
-            this.value = value;
-        }
-
-        public String getValue() {
-            return value;
-        }
-    }
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "action")
-    private QuotationAction action;
 
     // Getters and setters
     public Long getId() {
@@ -177,27 +150,11 @@ public class Quotation {
         this.status = status;
     }
 
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
-
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
-    }
-
-    public QuotationAction getAction() {
-        return action;
-    }
-
-    public void setAction(QuotationAction action) {
-        this.action = action;
     }
 }
