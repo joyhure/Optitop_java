@@ -26,10 +26,10 @@
 }
 
 #summary {
-    width: 10%;
+    width: auto;
     margin-top: 2rem;
     position: fixed;
-    top: 68%;
+    top: 71%;
     left: 16.5%;
     transform: translate(-50%, -50%);
 }
