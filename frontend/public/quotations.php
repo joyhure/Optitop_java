@@ -31,15 +31,33 @@
       <table class="table table-striped table-sm">
         <thead>
           <tr>
-            <th scope="col" class="table-col-date">Date</th>
-            <th scope="col" class="table-col-w4">Nom</th>
+            <th scope="col" class="table-col-date">
+              <div class="d-flex align-items-center">
+                Date
+                <div class="ms-2 sort-icons">
+                  <svg class="bi sort-icon" width="1em" height="1em" data-sort="date" data-order="asc">
+                    <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#sort-down"></use>
+                  </svg>
+                </div>
+              </div>
+            </th>
+            <th scope="col" class="table-col-w4">
+              <div class="d-flex align-items-center">
+                Nom
+                <div class="ms-2 sort-icons">
+                  <svg class="bi sort-icon" width="1em" height="1em" data-sort="name" data-order="asc">
+                    <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#sort-down"></use>
+                  </svg>
+                </div>
+              </div>
+            </th>
             <th scope="col" class="table-col-client">Client</th>
-            <th scope="col" class="table-col-w15">Statut</th>
+            <th scope="col" class="table-col-w15">Action</th>
             <th scope="col" class="table-col-commentaire">Commentaire</th>
           </tr>
         </thead>
-        <tbody id="quotations-tbody">
-          <!-- Les lignes de devis seront insérées ici par JavaScript -->
+        <tbody>
+          <!-- Les données seront injectées ici par JavaScript -->
         </tbody>
       </table>
     </section>
