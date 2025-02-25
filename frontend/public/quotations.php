@@ -38,77 +38,8 @@
             <th scope="col" class="table-col-commentaire">Commentaire</th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td>dd/mm/yyyy</td>
-            <td class="text-center">IR</td>
-            <td>[NOM PRENOM]</td>
-            <td>Voir opticien</td>
-            <td>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Itaque rerum vel consectetur numquam consequuntur minima quisquam saepe, eum aliquid et odit ut inventore ratione laborum necessitatibus excepturi dolorum repudiandae. Obcaecati?</td>
-          </tr>
-          <tr>
-            <td>dd/mm/yyyy</td>
-            <td class="text-center">IH</td>
-            <td>[NOM PRENOM]</td>
-            <td>Attente de retour</td>
-            <td>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Itaque rerum vel consectetur numquam consequuntur minima quisquam saepe, eum aliquid et odit ut inventore ratione laborum necessitatibus excepturi dolorum repudiandae. Obcaecati?</td>
-          </tr>
-          <tr>
-            <td>dd/mm/yyyy</td>
-            <td class="text-center">BD</td>
-            <td>[NOM PRENOM]</td>
-            <td>Attente Mutuelle</td>
-            <td>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Itaque rerum vel consectetur numquam consequuntur minima quisquam saepe, eum aliquid et odit ut inventore ratione laborum necessitatibus excepturi dolorum repudiandae. Obcaecati?</td>
-          </tr>
-          <tr>
-            <td>dd/mm/yyyy</td>
-            <td class="text-center">EG</td>
-            <td>[NOM PRENOM]</td>
-            <td>Non Validé</td>
-            <td>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Itaque rerum vel consectetur numquam consequuntur minima quisquam saepe, eum aliquid et odit ut inventore ratione laborum necessitatibus excepturi dolorum repudiandae. Obcaecati?</td>
-          </tr>
-          <tr>
-            <td>dd/mm/yyyy</td>
-            <td class="text-center">EG</td>
-            <td>[NOM PRENOM]</td>
-            <td>A Relancer</td>
-            <td>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Itaque rerum vel consectetur numquam consequuntur minima quisquam saepe, eum aliquid et odit ut inventore ratione laborum necessitatibus excepturi dolorum repudiandae. Obcaecati?</td>
-          </tr>
-          <tr>
-            <td>dd/mm/yyyy</td>
-            <td class="text-center">IR</td>
-            <td>[NOM PRENOM]</td>
-            <td>Voir opticien</td>
-            <td>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Itaque rerum vel consectetur numquam consequuntur minima quisquam saepe, eum aliquid et odit ut inventore ratione laborum necessitatibus excepturi dolorum repudiandae. Obcaecati?</td>
-          </tr>
-          <tr>
-            <td>dd/mm/yyyy</td>
-            <td class="text-center">IH</td>
-            <td>[NOM PRENOM]</td>
-            <td>Attente de retour</td>
-            <td>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Itaque rerum vel consectetur numquam consequuntur minima quisquam saepe, eum aliquid et odit ut inventore ratione laborum necessitatibus excepturi dolorum repudiandae. Obcaecati?</td>
-          </tr>
-          <tr>
-            <td>dd/mm/yyyy</td>
-            <td class="text-center">BD</td>
-            <td>[NOM PRENOM]</td>
-            <td>Attente Mutuelle</td>
-            <td>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Itaque rerum vel consectetur numquam consequuntur minima quisquam saepe, eum aliquid et odit ut inventore ratione laborum necessitatibus excepturi dolorum repudiandae. Obcaecati?</td>
-          </tr>
-          <tr>
-            <td>dd/mm/yyyy</td>
-            <td class="text-center">EG</td>
-            <td>[NOM PRENOM]</td>
-            <td>Non Validé</td>
-            <td>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Itaque rerum vel consectetur numquam consequuntur minima quisquam saepe, eum aliquid et odit ut inventore ratione laborum necessitatibus excepturi dolorum repudiandae. Obcaecati?</td>
-          </tr>
-          <tr>
-            <td>dd/mm/yyyy</td>
-            <td class="text-center">EG</td>
-            <td>[NOM PRENOM]</td>
-            <td>A Relancer</td>
-            <td>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Itaque rerum vel consectetur numquam consequuntur minima quisquam saepe, eum aliquid et odit ut inventore ratione laborum necessitatibus excepturi dolorum repudiandae. Obcaecati?</td>
-          </tr>
+        <tbody id="quotations-tbody">
+          <!-- Les lignes de devis seront insérées ici par JavaScript -->
         </tbody>
       </table>
     </section>

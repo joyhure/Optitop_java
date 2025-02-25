@@ -9,37 +9,12 @@
           <div class="d-flex flex-wrap align-items-center justify-content-center mx-5" id="period-container">
             <li class="nav-item dropdown">
               <a class="nav-link text-dark dropdown-toggle text-dark" href="#" id="periodDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="bi bi-table d-block mx-auto mb-1 fs-4 text-center"></i>
-                <span id="selectedPeriod">Mois</span>
+                <i class="bi bi-calendar-range d-block mx-auto mb-1 fs-4 text-center"></i>
+                <span id="selectedPeriod">Sélectionner une période</span>
               </a>
               <ul class="dropdown-menu position-absolute mx-0 shadow w-220px gap-1" aria-labelledby="periodDropdown">
-                <li>
-                  <a class="dropdown-item d-flex gap-2 align-items-center text-muted small" href="#" data-period="Mois">
-                    Mois
-                  </a>
-                </li>
-                <li>
-                <a class="dropdown-item d-flex gap-2 align-items-center text-muted small" href="#" data-period="Mois -1">
-                    Mois -1
-                  </a>
-                </li>
-                <li>
-                  <a class="dropdown-item d-flex gap-2 align-items-center text-muted small" href="#" data-period="Année">
-                    Année
-                  </a>
-                </li>
-                <li>
-                  <a class="dropdown-item d-flex gap-2 align-items-center text-muted small" href="#" data-period="Année -1">
-                    Année -1
-                  </a>
-                </li>
-                <li>
-                    <a class="dropdown-item d-flex gap-2 align-items-center text-muted small" href="#" data-period="Personnalisée" id="customDateBtn">
-                        <span>Personnalisée</span>
-                    </a>
-                </li>
                 <li class="position-relative">
-                    <div class="date-range-container px-3 py-2 d-none" id="dateRangeContainer">
+                    <div class="date-range-container px-3 py-2" id="dateRangeContainer">
                         <div class="mb-2">
                             <label class="small">Du :</label>
                             <input type="date" class="form-control form-control-sm" id="startDate">
@@ -54,7 +29,6 @@
                     </div>
                 </li>
               </ul>
-            </li>
             </li>
           </div>
           <li>
