@@ -11,13 +11,18 @@ import java.util.List;
 
 @Repository
 public interface QuotationsRepository extends JpaRepository<Quotations, Long> {
-    @Query("SELECT q FROM Quotations q WHERE q.date BETWEEN :startDate AND :endDate AND q.status = 'Non validé'")
-    List<Quotations> findUnvalidatedByDateBetween(
-            @Param("startDate") LocalDate startDate,
-            @Param("endDate") LocalDate endDate);
+        List<Quotations> findByClientIdAndDate(String clientId, LocalDate date);
 
-    @Query("SELECT q FROM Quotations q WHERE q.clientId = :clientId AND q.date = :date")
-    List<Quotations> findByClientIdAndDate(
-            @Param("clientId") String clientId,
-            @Param("date") LocalDate date);
+        /**
+         * Trouve tous les devis non validés entre deux dates
+         * 
+         * @param startDate date de début
+         * @param endDate   date de fin
+         * @return liste des devis non validés
+         */
+        @Query("SELECT q FROM Quotations q WHERE q.date BETWEEN :startDate AND :endDate " +
+                        "AND (q.status IS NULL OR q.status != 'Validé')")
+        List<Quotations> findUnvalidatedByDateBetween(
+                        @Param("startDate") LocalDate startDate,
+                        @Param("endDate") LocalDate endDate);
 }

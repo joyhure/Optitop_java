@@ -171,34 +171,45 @@ public class SalesService {
             List<QuotationImport> imports = quotationImportRepository
                     .findByDateBetweenAndFamilyIn(startDate, endDate, Arrays.asList("VER", "MON"));
 
-            // Grouper par clientId et date
+            // Grouper les imports par clientId et date
             Map<String, Map<LocalDate, List<QuotationImport>>> groupedQuotations = imports.stream()
                     .collect(Collectors.groupingBy(QuotationImport::getClientId,
                             Collectors.groupingBy(QuotationImport::getDate)));
 
-            // Créer les entrées dans quotations
             List<Quotations> quotationsList = new ArrayList<>();
 
             groupedQuotations.forEach((clientId, dateMap) -> {
                 dateMap.forEach((date, quotationImports) -> {
-                    // Vérifier si au moins un devis est validé
-                    boolean hasValidatedQuotation = quotationImports.stream()
-                            .anyMatch(q -> "devis validé".equals(q.getStatus()));
+                    List<Quotations> existingQuotations = quotationsRepository.findByClientIdAndDate(clientId, date);
 
-                    // Créer l'entrée dans quotations
-                    Quotations quotation = new Quotations();
-                    quotation.setDate(date);
-                    quotation.setClientId(clientId);
-                    quotation.setClient(quotationImports.get(0).getClient());
-                    quotation.setSellerRef(quotationImports.get(0).getSellerRef());
-                    quotation.setStatus(hasValidatedQuotation ? "Validé" : "Non validé");
-                    quotation.setCreatedAt(LocalDateTime.now());
+                    if (!existingQuotations.isEmpty()) {
+                        // Mise à jour des devis existants si nécessaire
+                        boolean hasValidatedQuotation = quotationImports.stream()
+                                .anyMatch(q -> "devis validé".equalsIgnoreCase(q.getStatus()));
 
-                    quotationsList.add(quotation);
+                        existingQuotations.forEach(quotation -> {
+                            quotation.setStatus(hasValidatedQuotation ? "Validé" : "Non validé");
+                            quotationsRepository.save(quotation);
+                        });
+                    } else {
+                        // Création d'un nouveau devis
+                        Quotations quotation = new Quotations();
+                        quotation.setDate(date);
+                        quotation.setClientId(clientId);
+                        quotation.setClient(quotationImports.get(0).getClient());
+                        quotation.setSellerRef(quotationImports.get(0).getSellerRef());
+
+                        boolean hasValidatedQuotation = quotationImports.stream()
+                                .anyMatch(q -> "devis validé".equalsIgnoreCase(q.getStatus()));
+                        quotation.setStatus(hasValidatedQuotation ? "Validé" : "Non validé");
+
+                        quotation.setCreatedAt(LocalDateTime.now());
+                        quotationsList.add(quotation);
+                    }
                 });
             });
 
-            // Sauvegarder les nouvelles entrées par lots
+            // Sauvegarder les nouveaux devis par lots
             if (!quotationsList.isEmpty()) {
                 for (int i = 0; i < quotationsList.size(); i += BATCH_SIZE) {
                     int end = Math.min(i + BATCH_SIZE, quotationsList.size());

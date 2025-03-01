@@ -121,6 +121,26 @@
   <script src="assets/js/header.js"></script>
   <script src="assets/js/navbar.js"></script>
   <script src="assets/js/quotations.js"></script>
+
+  <div class="toast-container position-fixed top-0 end-0 p-3">
+    <div id="successToast" class="toast align-items-center text-bg-success" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                Modifications enregistrées avec succès
+            </div>
+            <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+
+    <div id="errorToast" class="toast align-items-center text-bg-danger" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                Erreur lors de l'enregistrement des modifications
+            </div>
+            <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+  </div>
 </body>
 
 </html>

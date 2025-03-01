@@ -119,13 +119,22 @@ document.addEventListener('DOMContentLoaded', function() {
     // Ajouter le bouton de sauvegarde après le tableau
     function addSaveButton() {
         const tableSection = document.getElementById('table-quotations-section');
+        
+        // Créer le conteneur pour le bouton
+        const buttonContainer = document.createElement('div');
+        buttonContainer.className = 'save-button-container';
+    
+        // Créer le bouton
         const saveButton = document.createElement('button');
-        saveButton.className = 'btn btn-primary mt-3';
+        saveButton.className = 'btn row-blueperso';
         saveButton.id = 'save-changes-button';
-        saveButton.textContent = 'Enregistrer les modifications';
+        saveButton.textContent = 'Enregistrer';
         saveButton.disabled = true;
-        tableSection.appendChild(saveButton);
-
+    
+        // Ajouter le bouton au conteneur puis au tableau
+        buttonContainer.appendChild(saveButton);
+        tableSection.appendChild(buttonContainer);
+    
         // Gérer l'état du bouton
         const tbody = document.querySelector('#table-quotations-section table tbody');
         tbody.addEventListener('change', (e) => {
@@ -134,13 +143,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateSaveButtonState();
             }
         });
-
+    
         tbody.addEventListener('input', (e) => {
             if (e.target.classList.contains('comment-input')) {
                 updateSaveButtonState();
             }
         });
-
+    
         // Gestionnaire de sauvegarde
         saveButton.addEventListener('click', saveChanges);
     }
@@ -159,26 +168,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Fonction de sauvegarde des modifications
     async function saveChanges() {
-        const updatedQuotations = [];
-        const rows = document.querySelectorAll('tr[data-quotation-id]');
+        try {
+            // Récupérer toutes les lignes modifiées
+            const updatedQuotations = [];
+            const rows = document.querySelectorAll('tr[data-quotation-id]');
 
-        rows.forEach(row => {
-            const quotationId = row.dataset.quotationId;
-            const actionSelect = row.querySelector('.action-select');
-            const commentInput = row.querySelector('.comment-input');
+            rows.forEach(row => {
+                const quotationId = row.dataset.quotationId;
+                const actionSelect = row.querySelector('.action-select');
+                const commentInput = row.querySelector('.comment-input');
 
-            if (actionSelect.value !== actionSelect.dataset.originalValue ||
-                commentInput.value !== commentInput.dataset.originalValue) {
-                updatedQuotations.push({
-                    id: quotationId,
-                    action: actionSelect.value || null,
-                    comment: commentInput.value
-                });
-            }
-        });
+                // Vérifier si la ligne a été modifiée
+                if (actionSelect.value !== actionSelect.dataset.originalValue ||
+                    commentInput.value !== commentInput.dataset.originalValue) {
+                    
+                    updatedQuotations.push({
+                        id: quotationId,
+                        action: actionSelect.value,
+                        comment: commentInput.value
+                    });
+                }
+            });
 
-        if (updatedQuotations.length > 0) {
-            try {
+            if (updatedQuotations.length > 0) {
                 const response = await fetch('http://localhost:8080/api/quotations/batch-update', {
                     method: 'PUT',
                     headers: {
@@ -198,18 +210,20 @@ document.addEventListener('DOMContentLoaded', function() {
                         commentInput.dataset.originalValue = commentInput.value;
                     });
 
-                    // Désactiver le bouton de sauvegarde
+                    // Désactiver le bouton
                     document.getElementById('save-changes-button').disabled = true;
-                    
-                    // Afficher un message de succès
-                    alert('Modifications enregistrées avec succès');
+
+                    // Notification de succès
+                    const toast = new bootstrap.Toast(document.getElementById('successToast'));
+                    toast.show();
                 } else {
                     throw new Error('Erreur lors de la sauvegarde');
                 }
-            } catch (error) {
-                console.error('Erreur:', error);
-                alert('Erreur lors de la sauvegarde des modifications');
             }
+        } catch (error) {
+            console.error('Erreur lors de la sauvegarde:', error);
+            const toast = new bootstrap.Toast(document.getElementById('errorToast'));
+            toast.show();
         }
     }
 
