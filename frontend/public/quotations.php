@@ -60,6 +60,12 @@
           <!-- Les données seront injectées ici par JavaScript -->
         </tbody>
       </table>
+
+      <div id="save-button-container" class="mt-3">
+        <button id="save-changes-button" class="btn row-blueperso" disabled>
+            Enregistrer
+        </button>
+      </div>
     </section>
     <section id="summary" class="d-flex flex-column justify-content-center align-items-center gap-3" data-requires-role="admin,manager,supermanager">
       <div id="quotation" class="card px-1 py-2 w-100">

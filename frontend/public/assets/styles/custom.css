@@ -254,10 +254,10 @@ th {
 }
 
 /* Styles pour le bouton de sauvegarde */
-.save-button-container {
+#save-button-container {
     position: fixed;
     right: 30px;
-    top: 32%;
+    top: 30% !important;
     transform: translateY(-50%, -50%);
     z-index: 1000;
 }
