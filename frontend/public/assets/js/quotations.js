@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // 3. État de l'application
     const STATE = {
         userSession: JSON.parse(sessionStorage.getItem('user')),
-        availableActions: {},  // Sera rempli dynamiquement
+        availableActions: {},
         currentSort: {
             field: 'date',
             order: 'desc'
@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
         },
 
         getInitials(sellerRef) {
-            return sellerRef?.substring(0, 2).toUpperCase() || '';
+            return sellerRef?.substring(0, 2).toUpperCase() || 'XX';
         },
 
         parseFrenchDate(dateStr) {
@@ -67,6 +67,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 const response = await utils.fetchApi(`/quotations/unvalidated?startDate=${startDate}&endDate=${endDate}`);
                 const quotations = await response.json();
+                console.log(quotations);
                 
                 return sortManager.sortQuotations(quotations, STATE.currentSort.field, STATE.currentSort.order);
             } catch (error) {

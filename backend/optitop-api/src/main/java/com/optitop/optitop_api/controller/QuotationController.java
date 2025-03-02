@@ -73,9 +73,8 @@ public class QuotationController {
         try {
             Map<String, String> actions = Arrays.stream(QuotationAction.values())
                     .collect(Collectors.toMap(
-                            Enum::name, // Clé : nom de l'enum (ex: "VOIR_OPTICIEN")
-                            QuotationAction::getValue // Valeur : label (ex: "voir opticien")
-                    ));
+                            Enum::name,
+                            QuotationAction::getValue));
 
             return ResponseEntity.ok(actions);
         } catch (Exception e) {
@@ -85,7 +84,7 @@ public class QuotationController {
     }
 
     private QuotationDTO convertToDTO(Quotations quotation) {
-        QuotationDTO dto = new QuotationDTO();
+        QuotationDTO dto = new QuotationDTO(quotation.getId());
         dto.setDate(quotation.getDate());
         dto.setSellerRef(quotation.getSellerRef());
         dto.setClient(quotation.getClient());

@@ -3,13 +3,23 @@ package dto;
 import java.time.LocalDate;
 
 public class QuotationDTO {
+    private final Long id;
     private LocalDate date;
     private String sellerRef;
     private String client;
     private String action;
     private String comment;
 
-    // Getters
+    // Constructeur avec id obligatoire
+    public QuotationDTO(Long id) {
+        this.id = id;
+    }
+
+    // Getter pour id (pas de setter)
+    public Long getId() {
+        return id;
+    }
+
     public LocalDate getDate() {
         return date;
     }
