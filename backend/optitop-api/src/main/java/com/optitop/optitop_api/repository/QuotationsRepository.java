@@ -25,4 +25,14 @@ public interface QuotationsRepository extends JpaRepository<Quotations, Long> {
         List<Quotations> findUnvalidatedByDateBetween(
                         @Param("startDate") LocalDate startDate,
                         @Param("endDate") LocalDate endDate);
+
+        /**
+         * Récupère toutes les valeurs possibles de l'enum action
+         */
+        @Query(value = "SELECT SUBSTRING(COLUMN_TYPE, 6, LENGTH(COLUMN_TYPE) - 6) " +
+                        "FROM information_schema.COLUMNS " +
+                        "WHERE TABLE_SCHEMA = DATABASE() " +
+                        "AND TABLE_NAME = 'quotations' " +
+                        "AND COLUMN_NAME = 'action'", nativeQuery = true)
+        String getActionEnumValues();
 }

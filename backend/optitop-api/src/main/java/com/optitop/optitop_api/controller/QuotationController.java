@@ -3,7 +3,9 @@ package com.optitop.optitop_api.controller;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.Arrays;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.optitop.optitop_api.model.Quotations;
+import com.optitop.optitop_api.model.Quotations.QuotationAction;
 import com.optitop.optitop_api.repository.QuotationsRepository;
 import com.optitop.optitop_api.service.QuotationService;
 
@@ -62,6 +65,22 @@ public class QuotationController {
         } catch (Exception e) {
             logger.error("Erreur lors de la mise à jour des devis", e);
             return ResponseEntity.internalServerError().body("Erreur lors de la mise à jour des devis");
+        }
+    }
+
+    @GetMapping("/actions")
+    public ResponseEntity<Map<String, String>> getActions() {
+        try {
+            Map<String, String> actions = Arrays.stream(QuotationAction.values())
+                    .collect(Collectors.toMap(
+                            Enum::name, // Clé : nom de l'enum (ex: "VOIR_OPTICIEN")
+                            QuotationAction::getValue // Valeur : label (ex: "voir opticien")
+                    ));
+
+            return ResponseEntity.ok(actions);
+        } catch (Exception e) {
+            logger.error("Erreur lors de la récupération des actions possibles", e);
+            return ResponseEntity.internalServerError().build();
         }
     }
 

@@ -45,11 +45,11 @@ public class Quotations {
     private String comment;
 
     public enum QuotationAction {
-        VOIR_OPTICIEN("voir opticien"),
+        VOIR_OPTICIEN("Voir opticien"),
         NON_VALIDE("Non validé"),
         ATTENTE_MUTUELLE("Attente mutuelle"),
-        A_RELANCER("à relancer"),
-        ATTENTE_RETOUR("attente de retour");
+        A_RELANCER("A relancer"),
+        ATTENTE_RETOUR("Attente de retour");
 
         private final String value;
 

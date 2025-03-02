@@ -1,14 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     // 1. Configuration
     const CONFIG = {
-        API_BASE_URL: 'http://localhost:8080/api',
-        QUOTATION_ACTIONS: {
-            VOIR_OPTICIEN: "Voir opticien",
-            NON_VALIDE: "Non validé",
-            ATTENTE_MUTUELLE: "Attente mutuelle",
-            A_RELANCER: "À relancer",
-            ATTENTE_RETOUR: "Attente de retour"
-        }
+        API_BASE_URL: 'http://localhost:8080/api'
     };
 
     // 2. Sélecteurs DOM
@@ -25,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // 3. État de l'application
     const STATE = {
         userSession: JSON.parse(sessionStorage.getItem('user')),
-        availableActions: [],
+        availableActions: {},  // Sera rempli dynamiquement
         currentSort: {
             field: 'date',
             order: 'desc'
@@ -139,9 +132,21 @@ document.addEventListener('DOMContentLoaded', function() {
     // 7. Gestionnaire d'interface utilisateur
     const uiManager = {
         async init() {
+            await this.loadAvailableActions();
             this.setupRoleBasedAccess();
             this.setupEventListeners();
             await this.refreshQuotations();
+        },
+
+        async loadAvailableActions() {
+            try {
+                const response = await utils.fetchApi('/quotations/actions');
+                if (response.ok) {
+                    STATE.availableActions = await response.json();
+                }
+            } catch (error) {
+                console.error('Erreur lors du chargement des actions:', error);
+            }
         },
 
         setupRoleBasedAccess() {
@@ -210,7 +215,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <select class="form-select form-select-sm action-select" 
                                 data-original-value="${quotation.action || ''}">
                             <option value="">Sélectionner une action</option>
-                            ${Object.entries(CONFIG.QUOTATION_ACTIONS)
+                            ${Object.entries(STATE.availableActions)
                                 .map(([key, label]) => `
                                     <option value="${key}" ${quotation.action === key ? 'selected' : ''}>
                                         ${label}
