@@ -1,400 +1,312 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const userSession = JSON.parse(sessionStorage.getItem('user'));
-    const summarySection = document.getElementById('summary');
-    
-    console.log('Session utilisateur :', userSession);
-
-    // Gestion de la section summary
-    if (summarySection) {
-        const requiredRoles = summarySection.dataset.requiresRole.split(',');
-        if (!userSession?.role || !requiredRoles.includes(userSession.role.toLowerCase())) {
-            summarySection.classList.add('d-none');
+    // 1. Configuration
+    const CONFIG = {
+        API_BASE_URL: 'http://localhost:8080/api',
+        QUOTATION_ACTIONS: {
+            VOIR_OPTICIEN: "Voir opticien",
+            NON_VALIDE: "Non validé",
+            ATTENTE_MUTUELLE: "Attente mutuelle",
+            A_RELANCER: "À relancer",
+            ATTENTE_RETOUR: "Attente de retour"
         }
-    }
-
-    // Gestion de la colonne "Nom" pour les collaborateurs
-    if (userSession?.role?.toLowerCase() === 'collaborator') {
-        // Masquer l'en-tête de la colonne
-        const nameHeader = document.querySelector('th.table-col-w4');
-        if (nameHeader) {
-            nameHeader.style.display = 'none';
-        }
-
-        // Masquer les cellules correspondantes
-        const nameCells = document.querySelectorAll('td.text-center');
-        nameCells.forEach(cell => {
-            if (cell.textContent.length === 2) { // Pour les initiales (2 caractères)
-                cell.style.display = 'none';
-            }
-        });
-    }
-
-    // Fonction pour formater la date
-    function formatDate(dateString) {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('fr-FR');
-    }
-
-    // Fonction pour extraire les initiales
-    function getInitials(sellerRef) {
-        return sellerRef.substring(0, 2).toUpperCase();
-    }
-
-    // Fonction pour convertir une date française en date JS
-    function parseFrenchDate(dateStr) {
-        const [day, month, year] = dateStr.split('/').map(Number);
-        return new Date(year, month - 1, day);
-    }
-
-    // Ajouter cette fonction avant loadUnvalidatedQuotations
-    function updateSortIcons(field, order) {
-        // Réinitialiser toutes les icônes
-        document.querySelectorAll('.sort-icon').forEach(icon => {
-            icon.classList.remove('active');
-            icon.dataset.order = 'asc';
-            icon.querySelector('use').setAttribute('xlink:href', '../node_modules/bootstrap-icons/bootstrap-icons.svg#sort-down');
-        });
-
-        // Mettre à jour l'icône du champ trié
-        const activeIcon = document.querySelector(`.sort-icon[data-sort="${field}"]`);
-        if (activeIcon) {
-            activeIcon.classList.add('active');
-            activeIcon.dataset.order = order;
-            activeIcon.querySelector('use').setAttribute('xlink:href', 
-                `../node_modules/bootstrap-icons/bootstrap-icons.svg#sort-${order === 'asc' ? 'down' : 'up'}`
-            );
-        }
-    }
-
-    let availableActions = [];
-
-    // Ajouter cette fonction pour charger les actions disponibles
-    async function loadAvailableActions() {
-        try {
-            const response = await fetch('http://localhost:8080/api/quotations/actions');
-            if (response.ok) {
-                availableActions = await response.json();
-            }
-        } catch (error) {
-            console.error('Erreur lors du chargement des actions:', error);
-        }
-    }
-
-    const QUOTATION_ACTIONS = {
-        VOIR_OPTICIEN: "Voir opticien",
-        NON_VALIDE: "Non validé",
-        ATTENTE_MUTUELLE: "Attente mutuelle",
-        A_RELANCER: "À relancer",
-        ATTENTE_RETOUR: "Attente de retour"
     };
 
-    // Modifier la fonction createQuotationRow pour inclure le select avec les actions
-    function createQuotationRow(quotation) {
-        const row = document.createElement('tr');
-        row.dataset.quotationId = quotation.id;
-        row.innerHTML = `
-            <td>${formatDate(quotation.date)}</td>
-            <td class="text-center">${getInitials(quotation.sellerRef)}</td>
-            <td>${quotation.client}</td>
-            <td>
-                <select class="form-select form-select-sm action-select" data-original-value="${quotation.action || ''}">
-                    <option value="">Sélectionner une action</option>
-                    ${Object.entries(QUOTATION_ACTIONS).map(([key, label]) => `
-                        <option value="${key}" ${quotation.action === key ? 'selected' : ''}>
-                            ${label}
-                        </option>
-                    `).join('')}
-                </select>
-            </td>
-            <td>
-                <input type="text" class="form-control form-control-sm comment-input" 
-                    value="${quotation.comment || ''}" 
-                    data-original-value="${quotation.comment || ''}"
-                    placeholder="Ajouter un commentaire">
-            </td>
-        `;
-        return row;
-    }
+    // 2. Sélecteurs DOM
+    const DOM = {
+        tbody: document.querySelector('#table-quotations-section table tbody'),
+        saveButton: document.getElementById('save-changes-button'),
+        saveContainer: document.querySelector('.save-button-container'),
+        summarySection: document.getElementById('summary'),
+        successToast: document.getElementById('successToast'),
+        errorToast: document.getElementById('errorToast'),
+        sortIcons: document.querySelectorAll('.sort-icon')
+    };
 
-    // Ajouter le bouton de sauvegarde après le tableau
-    function addSaveButton() {
-        const tableSection = document.getElementById('table-quotations-section');
-        
-        // Créer le conteneur pour le bouton
-        const buttonContainer = document.createElement('div');
-        buttonContainer.className = 'save-button-container';
-    
-        // Créer le bouton
-        const saveButton = document.createElement('button');
-        saveButton.className = 'btn row-blueperso';
-        saveButton.id = 'save-changes-button';
-        saveButton.textContent = 'Enregistrer';
-        saveButton.disabled = true;
-    
-        // Ajouter le bouton au conteneur puis au tableau
-        buttonContainer.appendChild(saveButton);
-        tableSection.appendChild(buttonContainer);
-    
-        // Gérer l'état du bouton
-        const tbody = document.querySelector('#table-quotations-section table tbody');
-        tbody.addEventListener('change', (e) => {
-            if (e.target.classList.contains('action-select') || 
-                e.target.classList.contains('comment-input')) {
-                updateSaveButtonState();
+    // 3. État de l'application
+    const STATE = {
+        userSession: JSON.parse(sessionStorage.getItem('user')),
+        availableActions: [],
+        currentSort: {
+            field: 'date',
+            order: 'desc'
+        }
+    };
+
+    // 4. Fonctions utilitaires
+    const utils = {
+        formatDate(dateString) {
+            return new Date(dateString).toLocaleDateString('fr-FR');
+        },
+
+        getInitials(sellerRef) {
+            return sellerRef?.substring(0, 2).toUpperCase() || '';
+        },
+
+        parseFrenchDate(dateStr) {
+            const [day, month, year] = dateStr.split('/').map(Number);
+            return new Date(year, month - 1, day);
+        },
+
+        async fetchApi(endpoint, options = {}) {
+            const response = await fetch(`${CONFIG.API_BASE_URL}${endpoint}`, {
+                ...options,
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...options.headers
+                }
+            });
+            if (!response.ok) throw new Error(`Erreur API: ${response.status}`);
+            return response;
+        },
+
+        showToast(type = 'success') {
+            const toast = new bootstrap.Toast(type === 'success' ? DOM.successToast : DOM.errorToast);
+            toast.show();
+        }
+    };
+
+    // 5. Gestion des données
+    const dataManager = {
+        async loadUnvalidatedQuotations() {
+            try {
+                const startDate = sessionStorage.getItem('startDate');
+                const endDate = sessionStorage.getItem('endDate');
+                
+                const response = await utils.fetchApi(`/quotations/unvalidated?startDate=${startDate}&endDate=${endDate}`);
+                const quotations = await response.json();
+                
+                return sortManager.sortQuotations(quotations, STATE.currentSort.field, STATE.currentSort.order);
+            } catch (error) {
+                console.error('Erreur chargement:', error);
+                return [];
             }
-        });
-    
-        tbody.addEventListener('input', (e) => {
-            if (e.target.classList.contains('comment-input')) {
-                updateSaveButtonState();
+        },
+
+        async saveChanges(updates) {
+            try {
+                const response = await utils.fetchApi('/quotations/batch-update', {
+                    method: 'PUT',
+                    body: JSON.stringify(updates)
+                });
+                
+                if (response.ok) {
+                    utils.showToast('success');
+                    return true;
+                }
+            } catch (error) {
+                console.error('Erreur sauvegarde:', error);
+                utils.showToast('error');
+                return false;
             }
-        });
-    
-        // Gestionnaire de sauvegarde
-        saveButton.addEventListener('click', saveChanges);
-    }
+        }
+    };
 
-    // Vérifier s'il y a des modifications à sauvegarder
-    function updateSaveButtonState() {
-        const saveButton = document.getElementById('save-changes-button');
-        const hasChanges = Array.from(document.querySelectorAll('tr[data-quotation-id]')).some(row => {
-            const actionSelect = row.querySelector('.action-select');
-            const commentInput = row.querySelector('.comment-input');
-            return actionSelect.value !== actionSelect.dataset.originalValue ||
-                commentInput.value !== commentInput.dataset.originalValue;
-        });
-        saveButton.disabled = !hasChanges;
-    }
+    // 6. Gestionnaire de tri
+    const sortManager = {
+        sortQuotations(data, field, order) {
+            return [...data].sort((a, b) => {
+                let valueA, valueB;
+                
+                switch (field) {
+                    case 'date':
+                        valueA = new Date(a.date).getTime();
+                        valueB = new Date(b.date).getTime();
+                        break;
+                    case 'name':
+                        valueA = utils.getInitials(a.sellerRef).toLowerCase();
+                        valueB = utils.getInitials(b.sellerRef).toLowerCase();
+                        break;
+                    default:
+                        return 0;
+                }
 
-    // Fonction de sauvegarde des modifications
-    async function saveChanges() {
-        try {
-            // Récupérer toutes les lignes modifiées
-            const updatedQuotations = [];
-            const rows = document.querySelectorAll('tr[data-quotation-id]');
+                return order === 'asc' ? valueA - valueB : valueB - valueA;
+            });
+        },
 
-            rows.forEach(row => {
-                const quotationId = row.dataset.quotationId;
-                const actionSelect = row.querySelector('.action-select');
-                const commentInput = row.querySelector('.comment-input');
+        updateSortIcons(field, order) {
+            DOM.sortIcons.forEach(icon => {
+                const isActive = icon.dataset.sort === field;
+                icon.classList.toggle('active', isActive);
+                icon.dataset.order = isActive ? order : 'asc';
+                icon.querySelector('use').setAttribute('xlink:href', 
+                    `../node_modules/bootstrap-icons/bootstrap-icons.svg#sort-${isActive ? (order === 'asc' ? 'down' : 'up') : 'down'}`
+                );
+            });
+        }
+    };
 
-                // Vérifier si la ligne a été modifiée
-                if (actionSelect.value !== actionSelect.dataset.originalValue ||
-                    commentInput.value !== commentInput.dataset.originalValue) {
-                    
-                    updatedQuotations.push({
-                        id: quotationId,
-                        action: actionSelect.value,
-                        comment: commentInput.value
-                    });
+    // 7. Gestionnaire d'interface utilisateur
+    const uiManager = {
+        async init() {
+            this.setupRoleBasedAccess();
+            this.setupEventListeners();
+            await this.refreshQuotations();
+        },
+
+        setupRoleBasedAccess() {
+            if (DOM.summarySection && STATE.userSession?.role) {
+                const requiredRoles = DOM.summarySection.dataset.requiresRole.split(',');
+                DOM.summarySection.classList.toggle('d-none', 
+                    !requiredRoles.includes(STATE.userSession.role.toLowerCase())
+                );
+            }
+
+            if (STATE.userSession?.role?.toLowerCase() === 'collaborator') {
+                this.hideSellerColumn();
+            }
+        },
+
+        hideSellerColumn() {
+            const nameHeader = document.querySelector('th.table-col-w4');
+            if (nameHeader) nameHeader.style.display = 'none';
+            
+            document.querySelectorAll('td.text-center').forEach(cell => {
+                if (cell.textContent.length === 2) cell.style.display = 'none';
+            });
+        },
+
+        setupEventListeners() {
+            // Tri
+            DOM.sortIcons.forEach(icon => {
+                icon.addEventListener('click', this.handleSort.bind(this));
+            });
+
+            // Sauvegarde
+            DOM.tbody.addEventListener('change', this.updateSaveButtonState);
+            DOM.tbody.addEventListener('input', this.updateSaveButtonState);
+            DOM.saveButton?.addEventListener('click', this.handleSave.bind(this));
+
+            // Mise à jour des dates
+            window.addEventListener('storage', e => {
+                if (e.key === 'startDate' || e.key === 'endDate') {
+                    this.refreshQuotations();
                 }
             });
 
-            if (updatedQuotations.length > 0) {
-                const response = await fetch('http://localhost:8080/api/quotations/batch-update', {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(updatedQuotations)
-                });
+            document.addEventListener('datesUpdated', this.refreshQuotations.bind(this));
+        },
 
-                if (response.ok) {
-                    // Mettre à jour les valeurs originales
-                    updatedQuotations.forEach(update => {
-                        const row = document.querySelector(`tr[data-quotation-id="${update.id}"]`);
-                        const actionSelect = row.querySelector('.action-select');
-                        const commentInput = row.querySelector('.comment-input');
-                        
-                        actionSelect.dataset.originalValue = actionSelect.value;
-                        commentInput.dataset.originalValue = commentInput.value;
-                    });
+        async refreshQuotations() {
+            const quotations = await dataManager.loadUnvalidatedQuotations();
+            this.renderQuotations(quotations);
+        },
 
-                    // Désactiver le bouton
-                    document.getElementById('save-changes-button').disabled = true;
+        renderQuotations(quotations) {
+            if (!DOM.tbody) return;
 
-                    // Notification de succès
-                    const toast = new bootstrap.Toast(document.getElementById('successToast'));
-                    toast.show();
-                } else {
-                    throw new Error('Erreur lors de la sauvegarde');
-                }
-            }
-        } catch (error) {
-            console.error('Erreur lors de la sauvegarde:', error);
-            const toast = new bootstrap.Toast(document.getElementById('errorToast'));
-            toast.show();
-        }
-    }
+            DOM.tbody.innerHTML = quotations.length === 0 
+                ? this.createEmptyRow() 
+                : quotations.map(q => this.createQuotationRow(q)).join('');
+        },
 
-    async function loadUnvalidatedQuotations() {
-        try {
-            // Charger les actions si pas encore fait
-            if (availableActions.length === 0) {
-                await loadAvailableActions();
-            }
-
-            const startDate = sessionStorage.getItem('startDate');
-            const endDate = sessionStorage.getItem('endDate');
-            
-            console.log('Chargement des devis non validés pour la période:', startDate, 'à', endDate);
-
-            const response = await fetch(`http://localhost:8080/api/quotations/unvalidated?startDate=${startDate}&endDate=${endDate}`);
-            
-            if (response.ok) {
-                const quotations = await response.json();
-                console.log('Devis non validés reçus:', quotations);
-
-                // Tri par défaut par date décroissante
-                const sortedQuotations = sortQuotations(quotations, 'date', 'desc');
-                
-                const tbody = document.querySelector('#table-quotations-section table tbody');
-                tbody.innerHTML = '';
-
-                if (sortedQuotations.length === 0) {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td colspan="5" class="text-center">Aucun devis non validé pour cette période</td>
-                    `;
-                    tbody.appendChild(row);
-                } else {
-                    sortedQuotations.forEach(quotation => {
-                        tbody.appendChild(createQuotationRow(quotation));
-                    });
-                }
-
-                // Mettre à jour les icônes de tri
-                updateSortIcons('date', 'desc');
-            }
-        } catch (error) {
-            console.error('Erreur lors du chargement des devis non validés:', error);
-            const tbody = document.querySelector('#table-quotations-section table tbody');
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="5" class="text-center text-danger">
-                        Erreur lors du chargement des devis non validés
+        createQuotationRow(quotation) {
+            return `
+                <tr data-quotation-id="${quotation.id}">
+                    <td>${utils.formatDate(quotation.date)}</td>
+                    <td class="text-center">${utils.getInitials(quotation.sellerRef)}</td>
+                    <td>${quotation.client}</td>
+                    <td>
+                        <select class="form-select form-select-sm action-select" 
+                                data-original-value="${quotation.action || ''}">
+                            <option value="">Sélectionner une action</option>
+                            ${Object.entries(CONFIG.QUOTATION_ACTIONS)
+                                .map(([key, label]) => `
+                                    <option value="${key}" ${quotation.action === key ? 'selected' : ''}>
+                                        ${label}
+                                    </option>
+                                `).join('')}
+                        </select>
+                    </td>
+                    <td>
+                        <input type="text" class="form-control form-control-sm comment-input" 
+                            value="${quotation.comment || ''}" 
+                            data-original-value="${quotation.comment || ''}"
+                            placeholder="Ajouter un commentaire">
                     </td>
                 </tr>
             `;
-        }
+        },
 
-        // Ajouter après le chargement des données
-        addSaveButton();
-    }
+        createEmptyRow() {
+            return `
+                <tr>
+                    <td colspan="5" class="text-center">
+                        Aucun devis non validé pour cette période
+                    </td>
+                </tr>
+            `;
+        },
 
-    // Fonction de tri modifiée
-    function sortQuotations(data, field, order) {
-        return [...data].sort((a, b) => {
-            let valueA, valueB;
-            
-            switch (field) {
-                case 'date':
-                    // Pour les données du serveur
-                    if (typeof a.date === 'string') {
-                        valueA = new Date(a.date).getTime();
-                        valueB = new Date(b.date).getTime();
-                    } 
-                    // Pour les données du DOM
-                    else {
-                        valueA = a.date.getTime();
-                        valueB = b.date.getTime();
-                    }
-                    break;
-                case 'name':
-                    // Pour les données du serveur
-                    if (a.sellerRef && typeof a.sellerRef === 'string') {
-                        valueA = getInitials(a.sellerRef).toLowerCase();
-                        valueB = getInitials(b.sellerRef).toLowerCase();
-                    } 
-                    // Pour les données du DOM
-                    else {
-                        valueA = a.sellerRef.toLowerCase();
-                        valueB = b.sellerRef.toLowerCase();
-                    }
-                    break;
-                default:
-                    return 0;
+        async handleSort(event) {
+            const icon = event.currentTarget;
+            const field = icon.dataset.sort;
+            const order = icon.dataset.order === 'asc' ? 'desc' : 'asc';
+
+            STATE.currentSort = { field, order };
+            sortManager.updateSortIcons(field, order);
+            await this.refreshQuotations();
+        },
+
+        async handleSave() {
+            const updates = this.getModifiedQuotations();
+            if (updates.length === 0) return;
+
+            if (await dataManager.saveChanges(updates)) {
+                this.updateOriginalValues(updates);
+                DOM.saveButton.disabled = true;
             }
+        },
 
-            if (valueA === valueB) return 0;
-            if (order === 'asc') {
-                return valueA < valueB ? -1 : 1;
-            } else {
-                return valueA > valueB ? -1 : 1;
-            }
-        });
-    }
+        getModifiedQuotations() {
+            return Array.from(document.querySelectorAll('tr[data-quotation-id]'))
+                .map(row => {
+                    const id = row.dataset.quotationId;
+                    const actionSelect = row.querySelector('.action-select');
+                    const commentInput = row.querySelector('.comment-input');
 
-    // Gestionnaire de tri modifié
-    document.querySelectorAll('.sort-icon').forEach(icon => {
-        icon.addEventListener('click', function() {
-            const field = this.dataset.sort;
-            let order = this.dataset.order;
+                    if (actionSelect.value === actionSelect.dataset.originalValue &&
+                        commentInput.value === commentInput.dataset.originalValue) {
+                        return null;
+                    }
 
-            // Réinitialiser toutes les icônes
-            document.querySelectorAll('.sort-icon').forEach(i => {
-                i.classList.remove('active');
-                i.dataset.order = 'asc';
-                i.querySelector('use').setAttribute('xlink:href', '../node_modules/bootstrap-icons/bootstrap-icons.svg#sort-down');
+                    return {
+                        id,
+                        action: actionSelect.value,
+                        comment: commentInput.value
+                    };
+                })
+                .filter(Boolean);
+        },
+
+        updateOriginalValues(updates) {
+            updates.forEach(update => {
+                const row = document.querySelector(`tr[data-quotation-id="${update.id}"]`);
+                if (!row) return;
+
+                const actionSelect = row.querySelector('.action-select');
+                const commentInput = row.querySelector('.comment-input');
+                
+                actionSelect.dataset.originalValue = update.action;
+                commentInput.dataset.originalValue = update.comment;
             });
+        },
 
-            // Inverser l'ordre pour l'icône cliquée
-            order = order === 'asc' ? 'desc' : 'asc';
-            this.dataset.order = order;
-            this.classList.add('active');
+        updateSaveButtonState() {
+            if (!DOM.saveButton) return;
 
-            // Mettre à jour l'icône
-            this.querySelector('use').setAttribute('xlink:href', 
-                `../node_modules/bootstrap-icons/bootstrap-icons.svg#sort-${order === 'asc' ? 'down' : 'up'}`
-            );
+            const hasChanges = Array.from(document.querySelectorAll('tr[data-quotation-id]'))
+                .some(row => {
+                    const actionSelect = row.querySelector('.action-select');
+                    const commentInput = row.querySelector('.comment-input');
+                    return actionSelect.value !== actionSelect.dataset.originalValue ||
+                        commentInput.value !== commentInput.dataset.originalValue;
+                });
 
-            // Récupérer et trier les données
-            const tbody = document.querySelector('#table-quotations-section table tbody');
-            const rows = Array.from(tbody.querySelectorAll('tr'));
-            const data = rows.map(row => {
-                const dateCell = row.cells[0].textContent;
-                return {
-                    rawDate: dateCell, // Garder la date formatée
-                    date: parseFrenchDate(dateCell), // Date pour le tri
-                    sellerRef: row.cells[1].textContent,
-                    client: row.cells[2].textContent,
-                    action: row.cells[3].textContent,
-                    comment: row.cells[4].textContent
-                };
-            });
-
-            const sortedData = sortQuotations(data, field, order);
-
-            // Mettre à jour l'affichage avec les données triées
-            tbody.innerHTML = '';
-            sortedData.forEach(quotation => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${quotation.rawDate}</td>
-                    <td class="text-center">${quotation.sellerRef}</td>
-                    <td>${quotation.client}</td>
-                    <td>${quotation.action || ''}</td>
-                    <td>${quotation.comment || ''}</td>
-                `;
-                tbody.appendChild(row);
-            });
-        });
-    });
-
-    // Mettre à jour les appels à loadQuotations :
-    // Chargement initial
-    loadUnvalidatedQuotations();
-
-    // Dans les écouteurs d'événements
-    window.addEventListener('storage', function(e) {
-        if (e.key === 'startDate' || e.key === 'endDate') {
-            console.log('Période modifiée, rechargement des devis non validés');
-            loadUnvalidatedQuotations();
+            DOM.saveButton.disabled = !hasChanges;
         }
-    });
+    };
 
-    document.addEventListener('datesUpdated', function() {
-        console.log('Événement datesUpdated reçu');
-        loadUnvalidatedQuotations();
-    });
+    // 8. Initialisation
+    uiManager.init().catch(console.error);
 });
