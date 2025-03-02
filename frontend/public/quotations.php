@@ -51,8 +51,8 @@
                 </div>
               </div>
             </th>
-            <th scope="col" class="table-col-client">Client</th>
-            <th scope="col" class="table-col-w15">Action</th>
+            <th scope="col" class="table-col-w20">Client</th>
+            <th scope="col" class="table-col-w20">Action</th>
             <th scope="col" class="table-col-commentaire">Commentaire</th>
           </tr>
         </thead>

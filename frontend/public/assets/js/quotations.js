@@ -206,7 +206,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <td>
                         <select class="form-select form-select-sm action-select" 
                                 data-original-value="${quotation.action || ''}">
-                            <option value="">Sélectionner une action</option>
+                            <option value="">${quotation.action || 'Sélectionner'}</option>
                             ${Object.entries(STATE.availableActions)
                                 .map(([key, label]) => `
                                     <option value="${key}" ${quotation.action === key ? 'selected' : ''}>
@@ -218,8 +218,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     <td>
                         <input type="text" class="form-control form-control-sm comment-input" 
                             value="${quotation.comment || ''}" 
-                            data-original-value="${quotation.comment || ''}"
-                            placeholder="Ajouter un commentaire">
+                            data-original-value="${quotation.comment || ''}">
+                            
                     </td>
                 </tr>
             `;
