@@ -98,24 +98,15 @@ document.addEventListener('DOMContentLoaded', function() {
     // 6. Gestionnaire de tri
     const sortManager = {
         sortQuotations(data, field, order) {
-            return [...data].sort((a, b) => {
-                let valueA, valueB;
-                
-                switch (field) {
-                    case 'date':
-                        valueA = new Date(a.date).getTime();
-                        valueB = new Date(b.date).getTime();
-                        break;
-                    case 'name':
-                        valueA = utils.getInitials(a.sellerRef).toLowerCase();
-                        valueB = utils.getInitials(b.sellerRef).toLowerCase();
-                        break;
-                    default:
-                        return 0;
-                }
+            const sortFunctions = {
+                date: (a, b) => new Date(a.date) - new Date(b.date),
+                name: (a, b) => (a.sellerRef || '').localeCompare(b.sellerRef || '')
+            };
 
-                return order === 'asc' ? valueA - valueB : valueB - valueA;
-            });
+            const sortFunction = sortFunctions[field] || (() => 0);
+            const sortedData = [...data].sort(sortFunction);
+            
+            return order === 'desc' ? sortedData.reverse() : sortedData;
         },
 
         updateSortIcons(field, order) {
