@@ -92,6 +92,55 @@ document.addEventListener('DOMContentLoaded', function() {
                 utils.showToast('error');
                 return false;
             }
+        },
+
+        async loadQuotationStats() {
+            try {
+                const startDate = sessionStorage.getItem('startDate');
+                const endDate = sessionStorage.getItem('endDate');
+                
+                const response = await utils.fetchApi(`/quotations/stats?startDate=${startDate}&endDate=${endDate}`);
+                if (response.ok) {
+                    const stats = await response.json();
+                    this.updateStatsDisplay(stats);
+                }
+            } catch (error) {
+                console.error('Erreur lors du chargement des statistiques:', error);
+            }
+        },
+
+        updateStatsDisplay(stats) {
+            // Mise à jour du taux global
+            if (stats.concretizationRate !== undefined) {
+                document.getElementById('store-concretization-rate').textContent = 
+                    `${stats.concretizationRate.toFixed(1)}%`;
+                console.log("taux de concret :", stats.concretizationRate);
+            }
+
+            // Mise à jour des nombres de devis
+            if (stats.totalQuotations !== undefined && stats.unvalidatedQuotations !== undefined) {
+                document.getElementById('quotations-numbers').innerHTML = `
+                    Nb : ${stats.totalQuotations}<br>
+                    Non validés : ${stats.unvalidatedQuotations}
+                `;
+                console.log("nombre de devis :", stats.totalQuotations);
+                console.log("nombre de devis non validés :", stats.unvalidatedQuotations);
+            }
+
+            // Mise à jour du tableau des vendeurs
+            const tbody = document.querySelector('#summary table tbody');
+            if (tbody && stats.sellerStats) {  // Vérification que sellerStats existe
+                tbody.innerHTML = stats.sellerStats.map(seller => `
+                    <tr class="text-center">
+                        <td>${seller.initials}</td>
+                        <td>${seller.total}</td>
+                        <td>${seller.unvalidated}</td>
+                        <td>${seller.rate.toFixed(1)}%</td>
+                    </tr>
+                `).join('');
+            } else {
+                console.log("Pas de statistiques par vendeur disponibles");
+            }
         }
     };
 
@@ -124,7 +173,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // 7. Gestionnaire d'interface utilisateur
     const uiManager = {
         async init() {
-            await this.loadAvailableActions();
+            await Promise.all([
+                this.loadAvailableActions(),
+                dataManager.loadQuotationStats()
+            ]);
             this.setupRoleBasedAccess();
             this.setupEventListeners();
             await this.refreshQuotations();

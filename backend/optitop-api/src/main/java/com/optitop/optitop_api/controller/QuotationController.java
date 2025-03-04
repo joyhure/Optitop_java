@@ -20,6 +20,7 @@ import com.optitop.optitop_api.service.QuotationService;
 
 import dto.QuotationDTO;
 import dto.QuotationUpdateDTO;
+import dto.QuotationStatsDTO;
 
 @RestController
 @RequestMapping("/api/quotations")
@@ -79,6 +80,26 @@ public class QuotationController {
             return ResponseEntity.ok(actions);
         } catch (Exception e) {
             logger.error("Erreur lors de la récupération des actions possibles", e);
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @GetMapping("/stats")
+    public ResponseEntity<QuotationStatsDTO> getQuotationStats(
+            @RequestParam String startDate,
+            @RequestParam String endDate) {
+        try {
+            LocalDate start = LocalDate.parse(startDate);
+            LocalDate end = LocalDate.parse(endDate);
+
+            Long total = quotationsRepository.countQuotationsBetween(start, end);
+            Long validated = quotationsRepository.countValidatedQuotationsBetween(start, end);
+            Long unvalidated = quotationsRepository.countUnvalidatedQuotationsBetween(start, end);
+
+            QuotationStatsDTO stats = new QuotationStatsDTO(total, validated, unvalidated);
+            return ResponseEntity.ok(stats);
+        } catch (Exception e) {
+            logger.error("Erreur lors du calcul des statistiques", e);
             return ResponseEntity.internalServerError().build();
         }
     }

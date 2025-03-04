@@ -74,9 +74,9 @@
             <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#clipboard2"></use>
           </svg>
         </div>
-        <h2 class="text-center pt-2">100%</h2>
-        <p class="text-center mb-0">Nb :<br>
-          Non validés : [5]
+        <h2 id="store-concretization-rate" class="text-center pt-2"></h2>
+        <p id="quotations-numbers" class="text-center mb-0"><br>
+         
         </p>
       </div>
       <div class="table-responsive card small w-100">

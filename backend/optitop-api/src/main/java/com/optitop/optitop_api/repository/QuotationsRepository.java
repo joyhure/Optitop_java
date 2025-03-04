@@ -35,4 +35,15 @@ public interface QuotationsRepository extends JpaRepository<Quotations, Long> {
                         "AND TABLE_NAME = 'quotations' " +
                         "AND COLUMN_NAME = 'action'", nativeQuery = true)
         String getActionEnumValues();
+
+        @Query("SELECT COUNT(q) FROM Quotations q WHERE q.date BETWEEN :startDate AND :endDate")
+        Long countQuotationsBetween(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+
+        @Query("SELECT COUNT(q) FROM Quotations q WHERE q.date BETWEEN :startDate AND :endDate AND q.status = 'Validé'")
+        Long countValidatedQuotationsBetween(@Param("startDate") LocalDate startDate,
+                        @Param("endDate") LocalDate endDate);
+
+        @Query("SELECT COUNT(q) FROM Quotations q WHERE q.date BETWEEN :startDate AND :endDate AND (q.status IS NULL OR q.status != 'Validé')")
+        Long countUnvalidatedQuotationsBetween(@Param("startDate") LocalDate startDate,
+                        @Param("endDate") LocalDate endDate);
 }
