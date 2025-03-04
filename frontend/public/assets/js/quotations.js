@@ -134,9 +134,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     .map(seller => `
                         <tr class="text-center">
                             <td>${utils.getInitials(seller.sellerRef)}</td>
-                            <td>[25]</td>
-                            <td>[1]</td>
-                            <td>[%]</td>
+                            <td>${seller.totalQuotations}</td>
+                            <td>${seller.unvalidatedQuotations}</td>
+                            <td>${seller.concretizationRate.toFixed(1)}%</td>
                         </tr>
                     `)
                     .join('');
