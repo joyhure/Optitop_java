@@ -128,18 +128,18 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             // Mise à jour du tableau des vendeurs
-            const tbody = document.querySelector('#summary table tbody');
-            if (tbody && stats.sellerStats) {  // Vérification que sellerStats existe
-                tbody.innerHTML = stats.sellerStats.map(seller => `
-                    <tr class="text-center">
-                        <td>${seller.initials}</td>
-                        <td>${seller.total}</td>
-                        <td>${seller.unvalidated}</td>
-                        <td>${seller.rate.toFixed(1)}%</td>
-                    </tr>
-                `).join('');
-            } else {
-                console.log("Pas de statistiques par vendeur disponibles");
+            const tbody = document.querySelector('#seller-stats-tbody');
+            if (tbody && stats.sellerStats) {
+                tbody.innerHTML = stats.sellerStats
+                    .map(seller => `
+                        <tr class="text-center">
+                            <td>${utils.getInitials(seller.sellerRef)}</td>
+                            <td>[25]</td>
+                            <td>[1]</td>
+                            <td>[%]</td>
+                        </tr>
+                    `)
+                    .join('');
             }
         }
     };

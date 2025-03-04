@@ -20,6 +20,7 @@ import com.optitop.optitop_api.service.QuotationService;
 
 import dto.QuotationDTO;
 import dto.QuotationUpdateDTO;
+import dto.SellerStatsDTO;
 import dto.QuotationStatsDTO;
 
 @RestController
@@ -92,11 +93,24 @@ public class QuotationController {
             LocalDate start = LocalDate.parse(startDate);
             LocalDate end = LocalDate.parse(endDate);
 
+            // Statistiques globales
             Long total = quotationsRepository.countQuotationsBetween(start, end);
             Long validated = quotationsRepository.countValidatedQuotationsBetween(start, end);
             Long unvalidated = quotationsRepository.countUnvalidatedQuotationsBetween(start, end);
 
             QuotationStatsDTO stats = new QuotationStatsDTO(total, validated, unvalidated);
+
+            // Récupération des statistiques par vendeur
+            List<Object[]> sellerStats = quotationsRepository.getSellerStats(start, end);
+            List<SellerStatsDTO> sellerStatsDTOs = sellerStats.stream()
+                    .map(row -> new SellerStatsDTO(
+                            (String) row[0], // sellerRef
+                            (Long) row[1], // total
+                            (Long) row[2] // unvalidated
+                    ))
+                    .collect(Collectors.toList());
+
+            stats.setSellerStats(sellerStatsDTOs);
             return ResponseEntity.ok(stats);
         } catch (Exception e) {
             logger.error("Erreur lors du calcul des statistiques", e);

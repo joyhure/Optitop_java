@@ -46,4 +46,21 @@ public interface QuotationsRepository extends JpaRepository<Quotations, Long> {
         @Query("SELECT COUNT(q) FROM Quotations q WHERE q.date BETWEEN :startDate AND :endDate AND (q.status IS NULL OR q.status != 'Validé')")
         Long countUnvalidatedQuotationsBetween(@Param("startDate") LocalDate startDate,
                         @Param("endDate") LocalDate endDate);
+
+        @Query("SELECT DISTINCT q.sellerRef FROM Quotations q " +
+                        "WHERE q.date BETWEEN :startDate AND :endDate " +
+                        "ORDER BY q.sellerRef")
+        List<String> findDistinctSellersBetweenDates(
+                        @Param("startDate") LocalDate startDate,
+                        @Param("endDate") LocalDate endDate);
+
+        @Query("SELECT q.sellerRef, " +
+                        "COUNT(q) as total, " +
+                        "COUNT(CASE WHEN q.status != 'Validé' OR q.status IS NULL THEN 1 END) as unvalidated " +
+                        "FROM Quotations q " +
+                        "WHERE q.date BETWEEN :startDate AND :endDate " +
+                        "GROUP BY q.sellerRef " +
+                        "ORDER BY q.sellerRef")
+        List<Object[]> getSellerStats(@Param("startDate") LocalDate startDate,
+                        @Param("endDate") LocalDate endDate);
 }

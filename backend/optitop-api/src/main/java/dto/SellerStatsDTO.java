@@ -1,33 +1,34 @@
 package dto;
 
 public class SellerStatsDTO {
-    private String initials;
-    private Long total;
-    private Long unvalidated;
-    private Double rate;
+    private String sellerRef;
+    private Long totalQuotations;
+    private Long unvalidatedQuotations;
+    private Double concretizationRate;
 
-    // Constructeur
-    public SellerStatsDTO(String initials, Long total, Long unvalidated) {
-        this.initials = initials;
-        this.total = total;
-        this.unvalidated = unvalidated;
-        this.rate = total > 0 ? ((total - unvalidated) * 100.0) / total : 0.0;
+    public SellerStatsDTO(String sellerRef, Long totalQuotations, Long unvalidatedQuotations) {
+        this.sellerRef = sellerRef;
+        this.totalQuotations = totalQuotations;
+        this.unvalidatedQuotations = unvalidatedQuotations;
+        this.concretizationRate = totalQuotations > 0
+                ? ((totalQuotations - unvalidatedQuotations) * 100.0) / totalQuotations
+                : 0.0;
     }
 
-    // Getters et Setters
-    public String getInitials() {
-        return initials;
+    // Getters
+    public String getSellerRef() {
+        return sellerRef;
     }
 
-    public Long getTotal() {
-        return total;
+    public Long getTotalQuotations() {
+        return totalQuotations;
     }
 
-    public Long getUnvalidated() {
-        return unvalidated;
+    public Long getUnvalidatedQuotations() {
+        return unvalidatedQuotations;
     }
 
-    public Double getRate() {
-        return rate;
+    public Double getConcretizationRate() {
+        return concretizationRate;
     }
 }

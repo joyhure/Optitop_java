@@ -89,31 +89,8 @@
               <th scope="col" class="row-blueperso">Taux</th>
             </tr>
           </thead>
-          <tbody>
-            <tr class="text-center">
-              <td>BS</td>
-              <td>[25]</td>
-              <td>[1]</td>
-              <td>[%]</td>
-            </tr>
-            <tr class="text-center">
-              <td>EG</td>
-              <td>[31]</td>
-              <td>[2]</td>
-              <td>[%]</td>
-            </tr>
-            <tr class="text-center">
-              <td>IH</td>
-              <td>[18]</td>
-              <td>[1]</td>
-              <td>[%]</td>
-            </tr>
-            <tr class="text-center">
-              <td>IR</td>
-              <td>[29]</td>
-              <td>[1]</td>
-              <td>[%]</td>
-            </tr>
+          <tbody id="seller-stats-tbody">
+            <!-- Les données seront injectées ici par JavaScript -->
           </tbody>
         </table>
       </div>
