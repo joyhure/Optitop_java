@@ -149,7 +149,8 @@ document.addEventListener('DOMContentLoaded', function() {
         sortQuotations(data, field, order) {
             const sortFunctions = {
                 date: (a, b) => new Date(a.date) - new Date(b.date),
-                name: (a, b) => (a.sellerRef || '').localeCompare(b.sellerRef || '')
+                name: (a, b) => (a.sellerRef || '').localeCompare(b.sellerRef || ''),
+                client: (a, b) => (a.client || '').localeCompare(b.client || '')
             };
 
             const sortFunction = sortFunctions[field] || (() => 0);

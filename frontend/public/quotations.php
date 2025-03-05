@@ -51,7 +51,16 @@
                 </div>
               </div>
             </th>
-            <th scope="col" class="table-col-w20">Client</th>
+            <th scope="col" class="table-col-w20">
+              <div class="d-flex align-items-center">
+                Client
+                <div class="ms-2 sort-icons">
+                  <svg class="bi sort-icon" width="1em" height="1em" data-sort="client" data-order="asc">
+                    <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#sort-down"></use>
+                  </svg>
+                </div>
+              </div>
+            </th>
             <th scope="col" class="table-col-w20">Action</th>
             <th scope="col" class="table-col-commentaire">Commentaire</th>
           </tr>
