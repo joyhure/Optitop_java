@@ -25,7 +25,8 @@ async function handleLogin(event) {
             sessionStorage.setItem('user', JSON.stringify({
                 id: userData.id,
                 firstname: userData.firstname,
-                role: userData.role
+                role: userData.role,
+                sellerRef: userData.sellerRef
             }));
 
             // Synchroniser avec la session PHP

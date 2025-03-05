@@ -64,10 +64,18 @@ document.addEventListener('DOMContentLoaded', function() {
             try {
                 const startDate = sessionStorage.getItem('startDate');
                 const endDate = sessionStorage.getItem('endDate');
+                const userRole = STATE.userSession?.role?.toLowerCase();
+                const userSellerRef = STATE.userSession?.sellerRef;
+
+                let url = `/quotations/unvalidated?startDate=${startDate}&endDate=${endDate}`;
                 
-                const response = await utils.fetchApi(`/quotations/unvalidated?startDate=${startDate}&endDate=${endDate}`);
+                // Ajouter les paramètres utilisateur si c'est un collaborateur
+                if (userRole === 'collaborator') {
+                    url += `&userRole=${userRole}&userSellerRef=${userSellerRef}`;
+                }
+                
+                const response = await utils.fetchApi(url);
                 const quotations = await response.json();
-                console.log(quotations);
                 
                 return sortManager.sortQuotations(quotations, STATE.currentSort.field, STATE.currentSort.order);
             } catch (error) {

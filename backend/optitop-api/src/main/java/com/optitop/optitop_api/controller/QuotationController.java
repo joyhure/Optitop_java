@@ -1,7 +1,6 @@
 package com.optitop.optitop_api.controller;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -39,20 +38,29 @@ public class QuotationController {
     @GetMapping("/unvalidated")
     public ResponseEntity<List<QuotationDTO>> getUnvalidatedQuotations(
             @RequestParam String startDate,
-            @RequestParam String endDate) {
+            @RequestParam String endDate,
+            @RequestParam(required = false) String userRole,
+            @RequestParam(required = false) String userSellerRef) {
         try {
             LocalDate start = LocalDate.parse(startDate);
             LocalDate end = LocalDate.parse(endDate);
 
-            List<Quotations> quotations = quotationsRepository.findUnvalidatedByDateBetween(start, end);
-            List<QuotationDTO> dtos = quotations.stream()
-                    .map(this::convertToDTO)
-                    .collect(Collectors.toList());
+            // Ajout de logs pour déboguer
+            logger.debug("Requête reçue - Role: {}, SellerRef: {}", userRole, userSellerRef);
 
-            return ResponseEntity.ok(dtos);
-        } catch (DateTimeParseException e) {
-            logger.error("Format de date invalide", e);
-            return ResponseEntity.badRequest().build();
+            List<Quotations> quotations;
+            if ("collaborator".equalsIgnoreCase(userRole)) {
+                quotations = quotationsRepository.findUnvalidatedByDateBetweenAndSellerRef(
+                        start, end, userSellerRef);
+            } else {
+                quotations = quotationsRepository.findUnvalidatedByDateBetween(start, end);
+            }
+
+            logger.debug("Nombre de devis trouvés: {}", quotations.size());
+
+            return ResponseEntity.ok(quotations.stream()
+                    .map(this::convertToDTO)
+                    .collect(Collectors.toList()));
         } catch (Exception e) {
             logger.error("Erreur lors de la récupération des devis non validés", e);
             return ResponseEntity.internalServerError().build();

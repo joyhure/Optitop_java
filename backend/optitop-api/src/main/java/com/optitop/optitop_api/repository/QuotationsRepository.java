@@ -26,6 +26,14 @@ public interface QuotationsRepository extends JpaRepository<Quotations, Long> {
                         @Param("startDate") LocalDate startDate,
                         @Param("endDate") LocalDate endDate);
 
+        @Query("SELECT q FROM Quotations q WHERE q.date BETWEEN :startDate AND :endDate " +
+                        "AND (q.status IS NULL OR q.status != 'Validé') " +
+                        "AND q.sellerRef = :sellerRef")
+        List<Quotations> findUnvalidatedByDateBetweenAndSellerRef(
+                        @Param("startDate") LocalDate startDate,
+                        @Param("endDate") LocalDate endDate,
+                        @Param("sellerRef") String sellerRef);
+
         /**
          * Récupère toutes les valeurs possibles de l'enum action
          */
