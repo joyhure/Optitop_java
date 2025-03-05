@@ -196,23 +196,11 @@ document.addEventListener('DOMContentLoaded', function() {
         setupRoleBasedAccess() {
             if (DOM.summarySection && STATE.userSession?.role) {
                 const requiredRoles = DOM.summarySection.dataset.requiresRole.split(',');
-                DOM.summarySection.classList.toggle('d-none', 
-                    !requiredRoles.includes(STATE.userSession.role.toLowerCase())
-                );
+                // Si l'utilisateur a le rôle requis, on retire la classe d-none
+                if (requiredRoles.includes(STATE.userSession.role.toLowerCase())) {
+                    DOM.summarySection.classList.remove('d-none');
+                }
             }
-
-            if (STATE.userSession?.role?.toLowerCase() === 'collaborator') {
-                this.hideSellerColumn();
-            }
-        },
-
-        hideSellerColumn() {
-            const nameHeader = document.querySelector('th.table-col-w4');
-            if (nameHeader) nameHeader.style.display = 'none';
-            
-            document.querySelectorAll('td.text-center').forEach(cell => {
-                if (cell.textContent.length === 2) cell.style.display = 'none';
-            });
         },
 
         setupEventListeners() {
