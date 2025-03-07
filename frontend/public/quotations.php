@@ -77,8 +77,7 @@
       </div>
     </section>
     <section id="summary" 
-             class="d-none d-flex flex-column justify-content-center align-items-center gap-3" 
-             data-requires-role="admin,manager,supermanager">
+             class="d-flex flex-column justify-content-center align-items-center gap-3">
       <div id="quotation" class="card px-1 py-2 w-100">
         <div class="feature-icon d-inline-flex align-items-center justify-content-center fs-2">
           <svg class="bi svg-feature rounded" width="1em" height="1em">
@@ -90,7 +89,9 @@
          
         </p>
       </div>
-      <div class="table-responsive card small w-100">
+      <div id="card-table-collaborators" 
+           class="table-responsive card small w-100 d-none"
+           data-requires-role="admin,manager,supermanager">
         <table class="table table-striped table-sm mb-0">
           <thead>
             <tr class="text-center">

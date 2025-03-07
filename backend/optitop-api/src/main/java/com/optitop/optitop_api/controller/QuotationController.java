@@ -45,9 +45,6 @@ public class QuotationController {
             LocalDate start = LocalDate.parse(startDate);
             LocalDate end = LocalDate.parse(endDate);
 
-            // Ajout de logs pour déboguer
-            logger.debug("Requête reçue - Role: {}, SellerRef: {}", userRole, userSellerRef);
-
             List<Quotations> quotations;
             if ("collaborator".equalsIgnoreCase(userRole)) {
                 quotations = quotationsRepository.findUnvalidatedByDateBetweenAndSellerRef(

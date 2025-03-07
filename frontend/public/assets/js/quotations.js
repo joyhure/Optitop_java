@@ -9,10 +9,10 @@ document.addEventListener('DOMContentLoaded', function() {
         tbody: document.querySelector('#table-quotations-section table tbody'),
         saveButton: document.getElementById('save-changes-button'),
         saveContainer: document.querySelector('.save-button-container'),
-        summarySection: document.getElementById('summary'),
         successToast: document.getElementById('successToast'),
         errorToast: document.getElementById('errorToast'),
-        sortIcons: document.querySelectorAll('.sort-icon')
+        sortIcons: document.querySelectorAll('.sort-icon'),
+        collaboratorsTable: document.getElementById('card-table-collaborators')
     };
 
     // 3. État de l'application
@@ -203,11 +203,12 @@ document.addEventListener('DOMContentLoaded', function() {
         },
 
         setupRoleBasedAccess() {
-            if (DOM.summarySection && STATE.userSession?.role) {
-                const requiredRoles = DOM.summarySection.dataset.requiresRole.split(',');
-                // Si l'utilisateur a le rôle requis, on retire la classe d-none
+            // Gérer l'affichage du tableau des collaborateurs selon le rôle
+            const collaboratorsTable = document.getElementById('card-table-collaborators');
+            if (collaboratorsTable && STATE.userSession?.role) {
+                const requiredRoles = collaboratorsTable.dataset.requiresRole.split(',');
                 if (requiredRoles.includes(STATE.userSession.role.toLowerCase())) {
-                    DOM.summarySection.classList.remove('d-none');
+                    collaboratorsTable.classList.remove('d-none');
                 }
             }
         },
