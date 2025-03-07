@@ -18,13 +18,13 @@ public class Invoice {
     @Column(nullable = false)
     private LocalDate date;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "client_id")
     private String clientId;
 
     @Column(nullable = false)
     private String client;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "invoice_ref")
     private String invoiceRef;
 
     @Column(nullable = true)
@@ -33,13 +33,13 @@ public class Invoice {
     @Column(nullable = false)
     private Integer quantity;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "total_ttc")
     private Double totalTtc;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "seller_ref")
     private String sellerRef;
 
-    @Column(nullable = false)
+    @Column(nullable = false, name = "total_invoice")
     private Double totalInvoice;
 
     @Column(nullable = true)
