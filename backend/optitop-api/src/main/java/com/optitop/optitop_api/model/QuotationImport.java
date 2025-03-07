@@ -5,11 +5,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Column;
+import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
-public class Quotation {
+@Table(name = "quotations_import")
+public class QuotationImport {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,9 +49,6 @@ public class Quotation {
 
     @Column(nullable = false)
     private String status;
-
-    @Column(nullable = true)
-    private String comment;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -149,14 +148,6 @@ public class Quotation {
 
     public void setStatus(String status) {
         this.status = status;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
     }
 
     public LocalDateTime getCreatedAt() {

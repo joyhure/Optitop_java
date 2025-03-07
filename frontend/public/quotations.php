@@ -31,100 +31,67 @@
       <table class="table table-striped table-sm">
         <thead>
           <tr>
-            <th scope="col" class="table-col-date">Date</th>
-            <th scope="col" class="table-col-w4">Nom</th>
-            <th scope="col" class="table-col-client">Client</th>
-            <th scope="col" class="table-col-w15">Statut</th>
+            <th scope="col" class="table-col-date">
+              <div class="d-flex align-items-center">
+                Date
+                <div class="ms-2 sort-icons">
+                  <svg class="bi sort-icon" width="1em" height="1em" data-sort="date" data-order="asc">
+                    <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#sort-down"></use>
+                  </svg>
+                </div>
+              </div>
+            </th>
+            <th scope="col" class="table-col-w4">
+              <div class="d-flex align-items-center">
+                Nom
+                <div class="ms-2 sort-icons">
+                  <svg class="bi sort-icon" width="1em" height="1em" data-sort="name" data-order="asc">
+                    <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#sort-down"></use>
+                  </svg>
+                </div>
+              </div>
+            </th>
+            <th scope="col" class="table-col-w20">
+              <div class="d-flex align-items-center">
+                Client
+                <div class="ms-2 sort-icons">
+                  <svg class="bi sort-icon" width="1em" height="1em" data-sort="client" data-order="asc">
+                    <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#sort-down"></use>
+                  </svg>
+                </div>
+              </div>
+            </th>
+            <th scope="col" class="table-col-w20">Action</th>
             <th scope="col" class="table-col-commentaire">Commentaire</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>dd/mm/yyyy</td>
-            <td class="text-center">IR</td>
-            <td>[NOM PRENOM]</td>
-            <td>Voir opticien</td>
-            <td>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Itaque rerum vel consectetur numquam consequuntur minima quisquam saepe, eum aliquid et odit ut inventore ratione laborum necessitatibus excepturi dolorum repudiandae. Obcaecati?</td>
-          </tr>
-          <tr>
-            <td>dd/mm/yyyy</td>
-            <td class="text-center">IH</td>
-            <td>[NOM PRENOM]</td>
-            <td>Attente de retour</td>
-            <td>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Itaque rerum vel consectetur numquam consequuntur minima quisquam saepe, eum aliquid et odit ut inventore ratione laborum necessitatibus excepturi dolorum repudiandae. Obcaecati?</td>
-          </tr>
-          <tr>
-            <td>dd/mm/yyyy</td>
-            <td class="text-center">BD</td>
-            <td>[NOM PRENOM]</td>
-            <td>Attente Mutuelle</td>
-            <td>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Itaque rerum vel consectetur numquam consequuntur minima quisquam saepe, eum aliquid et odit ut inventore ratione laborum necessitatibus excepturi dolorum repudiandae. Obcaecati?</td>
-          </tr>
-          <tr>
-            <td>dd/mm/yyyy</td>
-            <td class="text-center">EG</td>
-            <td>[NOM PRENOM]</td>
-            <td>Non Validé</td>
-            <td>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Itaque rerum vel consectetur numquam consequuntur minima quisquam saepe, eum aliquid et odit ut inventore ratione laborum necessitatibus excepturi dolorum repudiandae. Obcaecati?</td>
-          </tr>
-          <tr>
-            <td>dd/mm/yyyy</td>
-            <td class="text-center">EG</td>
-            <td>[NOM PRENOM]</td>
-            <td>A Relancer</td>
-            <td>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Itaque rerum vel consectetur numquam consequuntur minima quisquam saepe, eum aliquid et odit ut inventore ratione laborum necessitatibus excepturi dolorum repudiandae. Obcaecati?</td>
-          </tr>
-          <tr>
-            <td>dd/mm/yyyy</td>
-            <td class="text-center">IR</td>
-            <td>[NOM PRENOM]</td>
-            <td>Voir opticien</td>
-            <td>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Itaque rerum vel consectetur numquam consequuntur minima quisquam saepe, eum aliquid et odit ut inventore ratione laborum necessitatibus excepturi dolorum repudiandae. Obcaecati?</td>
-          </tr>
-          <tr>
-            <td>dd/mm/yyyy</td>
-            <td class="text-center">IH</td>
-            <td>[NOM PRENOM]</td>
-            <td>Attente de retour</td>
-            <td>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Itaque rerum vel consectetur numquam consequuntur minima quisquam saepe, eum aliquid et odit ut inventore ratione laborum necessitatibus excepturi dolorum repudiandae. Obcaecati?</td>
-          </tr>
-          <tr>
-            <td>dd/mm/yyyy</td>
-            <td class="text-center">BD</td>
-            <td>[NOM PRENOM]</td>
-            <td>Attente Mutuelle</td>
-            <td>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Itaque rerum vel consectetur numquam consequuntur minima quisquam saepe, eum aliquid et odit ut inventore ratione laborum necessitatibus excepturi dolorum repudiandae. Obcaecati?</td>
-          </tr>
-          <tr>
-            <td>dd/mm/yyyy</td>
-            <td class="text-center">EG</td>
-            <td>[NOM PRENOM]</td>
-            <td>Non Validé</td>
-            <td>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Itaque rerum vel consectetur numquam consequuntur minima quisquam saepe, eum aliquid et odit ut inventore ratione laborum necessitatibus excepturi dolorum repudiandae. Obcaecati?</td>
-          </tr>
-          <tr>
-            <td>dd/mm/yyyy</td>
-            <td class="text-center">EG</td>
-            <td>[NOM PRENOM]</td>
-            <td>A Relancer</td>
-            <td>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Itaque rerum vel consectetur numquam consequuntur minima quisquam saepe, eum aliquid et odit ut inventore ratione laborum necessitatibus excepturi dolorum repudiandae. Obcaecati?</td>
-          </tr>
+          <!-- Les données seront injectées ici par JavaScript -->
         </tbody>
       </table>
+
+      <div id="save-button-container" class="mt-3">
+        <button id="save-changes-button" class="btn row-blueperso" disabled>
+            Enregistrer
+        </button>
+      </div>
     </section>
-    <section id="summary" class="d-flex flex-column justify-content-center align-items-center gap-5">
-      <div id="quotation" class="card px-1 py-3 w-100">
+    <section id="summary" 
+             class="d-flex flex-column justify-content-center align-items-center gap-3">
+      <div id="quotation" class="card px-1 py-2 w-100">
         <div class="feature-icon d-inline-flex align-items-center justify-content-center fs-2">
           <svg class="bi svg-feature rounded" width="1em" height="1em">
             <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#clipboard2"></use>
           </svg>
         </div>
-        <h2 class="text-center pt-2">100%</h2>
-        <p class="text-center mb-0">Nb :<br>
-          Non validés : [5]
+        <h2 id="store-concretization-rate" class="text-center pt-2"></h2>
+        <p id="quotations-numbers" class="text-center mb-0"><br>
+         
         </p>
       </div>
-      <div class="table-responsive card small w-100">
+      <div id="card-table-collaborators" 
+           class="table-responsive card small w-100 d-none"
+           data-requires-role="admin,manager,supermanager">
         <table class="table table-striped table-sm mb-0">
           <thead>
             <tr class="text-center">
@@ -134,31 +101,8 @@
               <th scope="col" class="row-blueperso">Taux</th>
             </tr>
           </thead>
-          <tbody>
-            <tr class="text-center">
-              <td>BS</td>
-              <td>[25]</td>
-              <td>[1]</td>
-              <td>[%]</td>
-            </tr>
-            <tr class="text-center">
-              <td>EG</td>
-              <td>[31]</td>
-              <td>[2]</td>
-              <td>[%]</td>
-            </tr>
-            <tr class="text-center">
-              <td>IH</td>
-              <td>[18]</td>
-              <td>[1]</td>
-              <td>[%]</td>
-            </tr>
-            <tr class="text-center">
-              <td>IR</td>
-              <td>[29]</td>
-              <td>[1]</td>
-              <td>[%]</td>
-            </tr>
+          <tbody id="seller-stats-tbody">
+            <!-- Les données seront injectées ici par JavaScript -->
           </tbody>
         </table>
       </div>
@@ -171,6 +115,27 @@
   <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
   <script src="assets/js/header.js"></script>
   <script src="assets/js/navbar.js"></script>
+  <script src="assets/js/quotations.js"></script>
+
+  <div class="toast-container position-fixed top-0 end-0 p-3">
+    <div id="successToast" class="toast align-items-center text-bg-success" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                Modifications enregistrées avec succès
+            </div>
+            <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+
+    <div id="errorToast" class="toast align-items-center text-bg-danger" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                Erreur lors de l'enregistrement des modifications
+            </div>
+            <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+  </div>
 </body>
 
 </html>

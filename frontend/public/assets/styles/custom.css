@@ -26,10 +26,10 @@
 }
 
 #summary {
-    width: 10%;
+    width: auto;
     margin-top: 2rem;
     position: fixed;
-    top: 68%;
+    top: 71%;
     left: 16.5%;
     transform: translate(-50%, -50%);
 }
@@ -59,7 +59,7 @@
     width: 4%;
 }
 
-.table-col-client {
+.table-col-w20 {
     width: 20%;
 }
 
@@ -218,5 +218,62 @@
 .nav-pills .nav-link.active,
 .nav-pills .show > .nav-link {
     border-radius: 0 !important;
+}
+
+.sort-icons {
+  cursor: pointer;
+}
+
+.sort-icon {
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
+
+.sort-icon:hover {
+  opacity: 1;
+}
+
+.sort-icon.active {
+  opacity: 1;
+  color: var(--bs-primary);
+}
+
+th {
+  cursor: pointer;
+}
+
+.action-select {
+    min-width: 120px;
+    max-width: 200px;
+    font-size: 0.875rem;
+}
+
+.action-select:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+}
+
+/* Styles pour le bouton de sauvegarde */
+#save-button-container {
+    position: fixed;
+    right: 30px;
+    top: 30% !important;
+    transform: translateY(-50%, -50%);
+    z-index: 1000;
+}
+
+#save-changes-button {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+#save-changes-button:disabled {
+    opacity: 0.6;
+    box-shadow: none;
+}
+
+#save-changes-button:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
