@@ -12,15 +12,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.optitop.optitop_api.dto.QuotationDTO;
+import com.optitop.optitop_api.dto.QuotationStatsDTO;
+import com.optitop.optitop_api.dto.QuotationUpdateDTO;
+import com.optitop.optitop_api.dto.SellerStatsDTO;
 import com.optitop.optitop_api.model.Quotations;
 import com.optitop.optitop_api.model.Quotations.QuotationAction;
 import com.optitop.optitop_api.repository.QuotationsRepository;
 import com.optitop.optitop_api.service.QuotationService;
-
-import dto.QuotationDTO;
-import dto.QuotationUpdateDTO;
-import dto.SellerStatsDTO;
-import dto.QuotationStatsDTO;
 
 @RestController
 @RequestMapping("/api/quotations")

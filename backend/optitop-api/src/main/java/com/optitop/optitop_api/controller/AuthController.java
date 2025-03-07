@@ -1,10 +1,9 @@
 package com.optitop.optitop_api.controller;
 
+import com.optitop.optitop_api.dto.LoginRequest;
 // Modèles et repositories
 import com.optitop.optitop_api.model.User;
 import com.optitop.optitop_api.repository.UserRepository;
-
-import dto.LoginRequest;
 
 // Spring Framework
 import org.springframework.beans.factory.annotation.Autowired;

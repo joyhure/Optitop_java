@@ -7,11 +7,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.optitop.optitop_api.dto.QuotationUpdateDTO;
 import com.optitop.optitop_api.model.Quotations;
 import com.optitop.optitop_api.model.Quotations.QuotationAction;
 import com.optitop.optitop_api.repository.QuotationsRepository;
 
-import dto.QuotationUpdateDTO;
 import jakarta.transaction.Transactional;
 
 @Service

@@ -23,7 +23,7 @@ public class UpdateController {
 
     @Autowired
     private QuotationImportRepository quotationImportRepository;
-    
+
     @Autowired
     private InvoiceRepository invoiceRepository;
 

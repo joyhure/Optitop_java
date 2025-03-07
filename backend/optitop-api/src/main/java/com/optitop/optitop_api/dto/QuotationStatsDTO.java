@@ -1,4 +1,4 @@
-package dto;
+package com.optitop.optitop_api.dto;
 
 import java.util.List;
 
@@ -7,7 +7,7 @@ public class QuotationStatsDTO {
     private Long validatedQuotations;
     private Long unvalidatedQuotations;
     private Double concretizationRate;
-    private List<SellerStatsDTO> sellerStats; // Nouvelle propriété
+    private List<SellerStatsDTO> sellerStats;
 
     // Constructeur
     public QuotationStatsDTO(Long total, Long validated, Long unvalidated) {
