@@ -53,8 +53,30 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
                         " AND sub.date BETWEEN :startDate AND :endDate " +
                         " AND sub.family = 'MON' " +
                         " AND sub.pair = 1), 0), 0) as avgFramesP1, " +
-                        "AVG(CASE WHEN i.family = 'P1_LENSES' THEN i.totalTtc ELSE 0 END) as avgLensesP1, " +
-                        "AVG(CASE WHEN i.family = 'P2' THEN i.totalTtc ELSE 0 END) as avgP2 " +
+                        "COALESCE(" +
+                        "(SELECT SUM(CASE WHEN sub.status = 'facture' THEN sub.totalTtc " +
+                        "            WHEN sub.status = 'avoir' THEN -sub.totalTtc ELSE 0 END) " +
+                        " FROM Invoice sub " +
+                        " WHERE sub.sellerRef = i.sellerRef " +
+                        " AND sub.date BETWEEN :startDate AND :endDate " +
+                        " AND sub.family = 'VER' " +
+                        " AND sub.pair = 1) / " +
+                        "NULLIF((SELECT COUNT(*) FROM Invoice sub " +
+                        " WHERE sub.sellerRef = i.sellerRef " +
+                        " AND sub.date BETWEEN :startDate AND :endDate " +
+                        " AND sub.family = 'VER' " +
+                        " AND sub.pair = 1), 0), 0) as avgLensesP1, " +
+                        "COALESCE(" +
+                        "(SELECT SUM(CASE WHEN sub.status = 'facture' THEN sub.totalTtc " +
+                        "            WHEN sub.status = 'avoir' THEN -sub.totalTtc ELSE 0 END) " +
+                        " FROM Invoice sub " +
+                        " WHERE sub.sellerRef = i.sellerRef " +
+                        " AND sub.date BETWEEN :startDate AND :endDate " +
+                        " AND sub.pair = 2) / " +
+                        "NULLIF((SELECT COUNT(*) FROM Invoice sub " +
+                        " WHERE sub.sellerRef = i.sellerRef " +
+                        " AND sub.date BETWEEN :startDate AND :endDate " +
+                        " AND sub.pair = 2), 0), 0) as avgP2 " +
                         "FROM Invoice i " +
                         "WHERE i.date BETWEEN :startDate AND :endDate " +
                         "AND i.family = 'VER' " +

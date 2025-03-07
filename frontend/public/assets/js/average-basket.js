@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const dataManager = {
         async loadAverageBaskets() {
             try {
-                console.log('Config:', CONFIG);  // Debug
+                console.log('Config:', CONFIG);
                 console.log('Dates:', { startDate: STATE.startDate, endDate: STATE.endDate });
                 const stats = await utils.fetchApi(
                     `/invoices/average-baskets?startDate=${STATE.startDate}&endDate=${STATE.endDate}`
