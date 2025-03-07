@@ -1,4 +1,4 @@
-package dto;
+package com.optitop.optitop_api.dto;
 
 import java.time.LocalDate;
 
@@ -15,7 +15,7 @@ public class QuotationDTO {
         this.id = id;
     }
 
-    // Getter pour id (pas de setter)
+    // Getter
     public Long getId() {
         return id;
     }
