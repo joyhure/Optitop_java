@@ -56,5 +56,62 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
         List<Object[]> calculateInvoiceCounts(@Param("startDate") LocalDate startDate,
                         @Param("endDate") LocalDate endDate);
 
-        // ... autres méthodes pour P1 montures, P1 verres et P2 ...
+        @Query("SELECT i.sellerRef as sellerRef, " +
+                        "SUM(CASE WHEN i.pair = 1 THEN i.totalTtc ELSE 0 END) as totalAmountP1MON " +
+                        "FROM Invoice i " +
+                        "WHERE i.date BETWEEN :startDate AND :endDate " +
+                        "AND i.family = 'MON' " +
+                        "GROUP BY i.sellerRef " +
+                        "ORDER BY i.sellerRef")
+        List<Object[]> calculateP1FramesTotalAmounts(@Param("startDate") LocalDate startDate,
+                        @Param("endDate") LocalDate endDate);
+
+        @Query("SELECT i.sellerRef as sellerRef, " +
+                        "COUNT(CASE WHEN i.pair = 1 THEN 1 ELSE null END) as countP1MON " +
+                        "FROM Invoice i " +
+                        "WHERE i.date BETWEEN :startDate AND :endDate " +
+                        "AND i.family = 'MON' " +
+                        "GROUP BY i.sellerRef " +
+                        "ORDER BY i.sellerRef")
+        List<Object[]> calculateP1FramesCounts(@Param("startDate") LocalDate startDate,
+                        @Param("endDate") LocalDate endDate);
+
+        @Query("SELECT i.sellerRef as sellerRef, " +
+                        "SUM(CASE WHEN i.pair = 1 THEN i.totalTtc ELSE 0 END) as totalAmountP1VER " +
+                        "FROM Invoice i " +
+                        "WHERE i.date BETWEEN :startDate AND :endDate " +
+                        "AND i.family = 'VER' " +
+                        "GROUP BY i.sellerRef " +
+                        "ORDER BY i.sellerRef")
+        List<Object[]> calculateP1LensesTotalAmounts(@Param("startDate") LocalDate startDate,
+                        @Param("endDate") LocalDate endDate);
+
+        @Query("SELECT i.sellerRef as sellerRef, " +
+                        "COUNT(CASE WHEN i.pair = 1 THEN 1 ELSE null END) as countP1VER " +
+                        "FROM Invoice i " +
+                        "WHERE i.date BETWEEN :startDate AND :endDate " +
+                        "AND i.family = 'VER' " +
+                        "GROUP BY i.sellerRef " +
+                        "ORDER BY i.sellerRef")
+        List<Object[]> calculateP1LensesCounts(@Param("startDate") LocalDate startDate,
+                        @Param("endDate") LocalDate endDate);
+
+        @Query("SELECT i.sellerRef as sellerRef, " +
+                        "SUM(CASE WHEN i.pair = 2 THEN i.totalTtc ELSE 0 END) as totalAmountP2 " +
+                        "FROM Invoice i " +
+                        "WHERE i.date BETWEEN :startDate AND :endDate " +
+                        "GROUP BY i.sellerRef " +
+                        "ORDER BY i.sellerRef")
+        List<Object[]> calculateP2TotalAmounts(@Param("startDate") LocalDate startDate,
+                        @Param("endDate") LocalDate endDate);
+
+        @Query("SELECT i.sellerRef as sellerRef, " +
+                        "COUNT(CASE WHEN i.pair = 2 THEN 1 ELSE null END) as countP2 " +
+                        "FROM Invoice i " +
+                        "WHERE i.date BETWEEN :startDate AND :endDate " +
+                        "GROUP BY i.sellerRef " +
+                        "ORDER BY i.sellerRef")
+        List<Object[]> calculateP2Counts(@Param("startDate") LocalDate startDate,
+                        @Param("endDate") LocalDate endDate);
+
 }

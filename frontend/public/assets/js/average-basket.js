@@ -60,14 +60,14 @@ document.addEventListener('DOMContentLoaded', function() {
             let sumBasket = 0;       
             let sumFramesP1 = 0; 
             let sumLensesP1 = 0; 
-            let sumP2 = 0;          
+            let sumP2 = 0;
 
             // Lignes des vendeurs
             const rows = stats.map(seller => {
                 totalCount += seller.invoiceCount || 0;
                 sumBasket += (seller.averageBasket || 0) * (seller.invoiceCount || 0);
-                sumFramesP1 += (seller.averageFramesP1 || 0) * (seller.invoiceCount || 0);
-                sumLensesP1 += (seller.averageLensesP1 || 0) * (seller.invoiceCount || 0);
+                sumFramesP1 += (seller.averageP1MON || 0) * (seller.invoiceCount || 0); 
+                sumLensesP1 += (seller.averageP1VER || 0) * (seller.invoiceCount || 0); 
                 sumP2 += (seller.averageP2 || 0) * (seller.invoiceCount || 0);
 
                 return `
@@ -75,14 +75,14 @@ document.addEventListener('DOMContentLoaded', function() {
                         <td class="text-center">${utils.getInitials(seller.sellerRef)}</td>
                         <td class="text-center">${utils.formatCurrency(seller.averageBasket)}</td>
                         <td class="text-center">${seller.invoiceCount}</td>
-                        <td class="text-center">${utils.formatCurrency(seller.averageFramesP1)}</td>
-                        <td class="text-center">${utils.formatCurrency(seller.averageLensesP1)}</td>
+                        <td class="text-center">${utils.formatCurrency(seller.averageP1MON)}</td>
+                        <td class="text-center">${utils.formatCurrency(seller.averageP1VER)}</td>
                         <td class="text-center">${utils.formatCurrency(seller.averageP2)}</td>
                     </tr>
                 `;
             });
 
-            // Calcul des vraies moyennes globales
+            // Calcul des moyennes globales
             const avgBasket = totalCount ? sumBasket / totalCount : 0;
             const avgFramesP1 = totalCount ? sumFramesP1 / totalCount : 0;
             const avgLensesP1 = totalCount ? sumLensesP1 / totalCount : 0;
