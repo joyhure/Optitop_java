@@ -40,11 +40,6 @@ public class InvoiceController {
     public ResponseEntity<List<FrameStatsDTO>> getFrameStats(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
-        try {
-            List<FrameStatsDTO> stats = invoiceService.getFrameStats(startDate, endDate);
-            return ResponseEntity.ok(stats);
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
-        }
+        return ResponseEntity.ok(invoiceService.getFrameStats(startDate, endDate));
     }
 }

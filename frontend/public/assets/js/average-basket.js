@@ -131,29 +131,44 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!DOM.framesBody) return;
 
             let totalFrames = 0;
+            let totalPremiumFrames = 0;
+            let totalBonus = 0;
+            const BONUS_PER_FRAME = 5;
 
             const rows = stats.map(seller => {
                 totalFrames += seller.totalFrames || 0;
+                totalPremiumFrames += seller.premiumFrames || 0;
+                const bonus = (seller.premiumFrames || 0) * BONUS_PER_FRAME;
+                totalBonus += bonus;
+
+                const percentage = seller.totalFrames > 0 
+                    ? (seller.premiumFrames * 100 / seller.totalFrames).toFixed(1) 
+                    : 0;
 
                 return `
                     <tr>
                         <td class="text-center">${utils.getInitials(seller.sellerRef)}</td>
                         <td class="text-center">${seller.totalFrames || 0}</td>
-                        <td class="text-center">-</td>
-                        <td class="text-center">-</td>
-                        <td class="text-center">-</td>
+                        <td class="text-center">${seller.premiumFrames || 0}</td>
+                        <td class="text-center">${percentage}%</td>
+                        <td class="text-center">${utils.formatCurrency(bonus)}</td>
                     </tr>
                 `;
             });
+
+            // Calcul du pourcentage total
+            const totalPercentage = totalFrames > 0 
+                ? (totalPremiumFrames * 100 / totalFrames).toFixed(1) 
+                : 0;
 
             // Ajout ligne Total
             rows.push(`
                 <tr class="fw-bold">
                     <td class="text-center">Total</td>
                     <td class="text-center">${totalFrames}</td>
-                    <td class="text-center">-</td>
-                    <td class="text-center">-</td>
-                    <td class="text-center">-</td>
+                    <td class="text-center">${totalPremiumFrames}</td>
+                    <td class="text-center">${totalPercentage}%</td>
+                    <td class="text-center">${utils.formatCurrency(totalBonus)}</td>
                 </tr>
             `);
 

@@ -102,11 +102,24 @@ public class InvoiceService {
     }
 
     public List<FrameStatsDTO> getFrameStats(LocalDate startDate, LocalDate endDate) {
-        return invoiceRepository.calculateTotalFramesCount(startDate, endDate)
+        Map<String, Long> totalFrames = invoiceRepository.calculateTotalFramesCount(startDate, endDate)
                 .stream()
-                .map(row -> new FrameStatsDTO(
-                        (String) row[0],
-                        (Long) row[1]))
+                .collect(Collectors.toMap(
+                        row -> (String) row[0],
+                        row -> (Long) row[1]));
+
+        Map<String, Long> premiumFrames = invoiceRepository.calculatePremiumFramesCount(startDate, endDate)
+                .stream()
+                .collect(Collectors.toMap(
+                        row -> (String) row[0],
+                        row -> (Long) row[1]));
+
+        return totalFrames.keySet().stream()
+                .map(sellerRef -> new FrameStatsDTO(
+                        sellerRef,
+                        totalFrames.getOrDefault(sellerRef, 0L),
+                        premiumFrames.getOrDefault(sellerRef, 0L)))
+                .sorted(Comparator.comparing(FrameStatsDTO::getSellerRef))
                 .collect(Collectors.toList());
     }
 }

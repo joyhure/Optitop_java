@@ -124,4 +124,19 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
                         "ORDER BY i.sellerRef")
         List<Object[]> calculateTotalFramesCount(@Param("startDate") LocalDate startDate,
                         @Param("endDate") LocalDate endDate);
+
+        @Query("SELECT i.sellerRef as sellerRef, " +
+                        "(SELECT COUNT(f) FROM Invoice f WHERE f.sellerRef = i.sellerRef " +
+                        "AND f.date BETWEEN :startDate AND :endDate " +
+                        "AND f.family = 'MON' AND f.totalTtc >= 200) - " +
+                        "(SELECT COUNT(a) FROM Invoice a WHERE a.sellerRef = i.sellerRef " +
+                        "AND a.date BETWEEN :startDate AND :endDate " +
+                        "AND a.family = 'MON' AND a.totalTtc <= -200) as premiumFrames " +
+                        "FROM Invoice i " +
+                        "WHERE i.date BETWEEN :startDate AND :endDate " +
+                        "AND i.family = 'MON' " +
+                        "GROUP BY i.sellerRef " +
+                        "ORDER BY i.sellerRef")
+        List<Object[]> calculatePremiumFramesCount(@Param("startDate") LocalDate startDate,
+                        @Param("endDate") LocalDate endDate);
 }
