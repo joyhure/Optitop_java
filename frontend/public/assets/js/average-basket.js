@@ -4,7 +4,9 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     const DOM = {
-        tbody: document.getElementById('table-baskets-body')
+        tbody: document.getElementById('table-baskets-body'),
+        cardPm: document.getElementById('card-pm'),
+        cardP2: document.getElementById('card-p2')
     };
 
     const STATE = {
@@ -15,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const utils = {
         formatCurrency(amount) {
             // Gestion des valeurs null ou undefined
-            if (amount === null || amount === undefined) return '0.00€';
+            if (amount === null || amount === undefined) return 'Indéfini';
             return `${amount.toFixed(2)}€`;
         },
         
@@ -55,7 +57,6 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!DOM.tbody) return;
 
             // Calcul des totaux
-            let totalBasket = 0;
             let totalCount = 0;
             let sumBasket = 0;       
             let sumFramesP1 = 0; 
@@ -87,6 +88,10 @@ document.addEventListener('DOMContentLoaded', function() {
             const avgFramesP1 = totalCount ? sumFramesP1 / totalCount : 0;
             const avgLensesP1 = totalCount ? sumLensesP1 / totalCount : 0;
             const avgP2 = totalCount ? sumP2 / totalCount : 0;
+
+            // Mise à jour des cartes de résumé
+            DOM.cardPm.textContent = utils.formatCurrency(avgBasket);
+            DOM.cardP2.textContent = utils.formatCurrency(avgP2);
 
             // Ajout de la ligne Total
             rows.push(`

@@ -120,7 +120,7 @@ if (!isset($_SESSION['user']) ||
             <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#cart4"></use>
           </svg>
         </div>
-        <h2 class="text-center pt-2">630€</h2>
+        <h2 id = "card-pm" class="text-center pt-2"></h2>
         <p class="text-center mb-0"> Panier Moyen
         </p>
       </div>
@@ -130,7 +130,7 @@ if (!isset($_SESSION['user']) ||
             <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#2-square"></use>
           </svg>
         </div>
-        <h2 class="text-center pt-2">19€</h2>
+        <h2 id = "card-p2" class="text-center pt-2"></h2>
         <p class="text-center mb-0"> Panier Moyen P2
         </p>
       </div>
