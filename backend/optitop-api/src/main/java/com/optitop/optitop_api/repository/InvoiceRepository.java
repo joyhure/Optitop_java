@@ -139,4 +139,7 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
                         "ORDER BY i.sellerRef")
         List<Object[]> calculatePremiumFramesCount(@Param("startDate") LocalDate startDate,
                         @Param("endDate") LocalDate endDate);
+
+        @Query("SELECT DISTINCT YEAR(i.date) as year FROM Invoice i ORDER BY year DESC")
+        List<Integer> findDistinctYears();
 }

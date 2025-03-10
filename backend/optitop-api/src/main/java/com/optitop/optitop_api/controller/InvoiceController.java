@@ -42,4 +42,9 @@ public class InvoiceController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         return ResponseEntity.ok(invoiceService.getFrameStats(startDate, endDate));
     }
+
+    @GetMapping("/years")
+    public ResponseEntity<List<Integer>> getDistinctYears() {
+        return ResponseEntity.ok(invoiceService.getDistinctYears());
+    }
 }
