@@ -74,42 +74,8 @@ if (!isset($_SESSION['user']) ||
             <th scope="col" class="table-col-w15 text-center">Montant</th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td class="text-center">IR</td>
-            <td class="text-center">35</td>
-            <td class="text-center">10</td>
-            <td class="text-center">35%</td>
-            <td class="text-center">70€</td>
-          </tr>
-          <tr>
-            <td class="text-center">IH</td>
-            <td class="text-center">35</td>
-            <td class="text-center">10</td>
-            <td class="text-center">35%</td>
-            <td class="text-center">70€</td>
-          </tr>
-          <tr>
-            <td class="text-center">BD</td>
-            <td class="text-center">35</td>
-            <td class="text-center">10</td>
-            <td class="text-center">35%</td>
-            <td class="text-center">70€</td>
-          </tr>
-          <tr>
-            <td class="text-center">EG</td>
-            <td class="text-center">35</td>
-            <td class="text-center">10</td>
-            <td class="text-center">35%</td>
-            <td class="text-center">70€</td>
-          </tr>
-          <tr>
-            <td class="text-center fw-bold">Total</td>
-            <td class="text-center">35</td>
-            <td class="text-center">10</td>
-            <td class="text-center">35%</td>
-            <td class="text-center">70€</td>
-          </tr>
+        <tbody id="table-frames-body">
+          <!-- Les données seront injectées ici par JavaScript -->
         </tbody>
       </table>
     </section>

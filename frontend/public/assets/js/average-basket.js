@@ -4,7 +4,8 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     const DOM = {
-        tbody: document.getElementById('table-baskets-body'),
+        basketsBody: document.getElementById('table-baskets-body'),
+        framesBody: document.getElementById('table-frames-body'),
         cardPm: document.getElementById('card-pm'),
         cardP2: document.getElementById('card-p2')
     };
@@ -39,6 +40,13 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     const dataManager = {
+        async loadAllData() {
+            await Promise.all([
+                this.loadAverageBaskets(),
+                this.loadFrameStats()
+            ]);
+        },
+
         async loadAverageBaskets() {
             try {
                 console.log('Config:', CONFIG);
@@ -54,7 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
         },
 
         updateDisplay(stats) {
-            if (!DOM.tbody) return;
+            if (!DOM.basketsBody) return;
 
             // Calcul des totaux
             let totalCount = 0;
@@ -105,10 +113,54 @@ document.addEventListener('DOMContentLoaded', function() {
                 </tr>
             `);
 
-            DOM.tbody.innerHTML = rows.join('');
+            DOM.basketsBody.innerHTML = rows.join('');
+        },
+
+        async loadFrameStats() {
+            try {
+                const stats = await utils.fetchApi(
+                    `/invoices/frame-stats?startDate=${STATE.startDate}&endDate=${STATE.endDate}`
+                );
+                this.updateFrameStats(stats);
+            } catch (error) {
+                console.error('Erreur chargement statistiques montures:', error);
+            }
+        },
+
+        updateFrameStats(stats) {
+            if (!DOM.framesBody) return;
+
+            let totalFrames = 0;
+
+            const rows = stats.map(seller => {
+                totalFrames += seller.totalFrames || 0;
+
+                return `
+                    <tr>
+                        <td class="text-center">${utils.getInitials(seller.sellerRef)}</td>
+                        <td class="text-center">${seller.totalFrames || 0}</td>
+                        <td class="text-center">-</td>
+                        <td class="text-center">-</td>
+                        <td class="text-center">-</td>
+                    </tr>
+                `;
+            });
+
+            // Ajout ligne Total
+            rows.push(`
+                <tr class="fw-bold">
+                    <td class="text-center">Total</td>
+                    <td class="text-center">${totalFrames}</td>
+                    <td class="text-center">-</td>
+                    <td class="text-center">-</td>
+                    <td class="text-center">-</td>
+                </tr>
+            `);
+
+            DOM.framesBody.innerHTML = rows.join('');
         }
     };
 
     // Initialisation
-    dataManager.loadAverageBaskets();
+    dataManager.loadAllData();
 });

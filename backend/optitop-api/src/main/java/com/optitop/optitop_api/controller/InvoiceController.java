@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.optitop.optitop_api.dto.AverageBasketDTO;
+import com.optitop.optitop_api.dto.FrameStatsDTO;
 import com.optitop.optitop_api.service.InvoiceService;
 
 import java.time.LocalDate;
@@ -29,6 +30,18 @@ public class InvoiceController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         try {
             List<AverageBasketDTO> stats = invoiceService.getAverageBaskets(startDate, endDate);
+            return ResponseEntity.ok(stats);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @GetMapping("/frame-stats")
+    public ResponseEntity<List<FrameStatsDTO>> getFrameStats(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        try {
+            List<FrameStatsDTO> stats = invoiceService.getFrameStats(startDate, endDate);
             return ResponseEntity.ok(stats);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();

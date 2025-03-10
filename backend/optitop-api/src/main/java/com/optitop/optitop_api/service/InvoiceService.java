@@ -3,6 +3,7 @@ package com.optitop.optitop_api.service;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.optitop.optitop_api.dto.AverageBasketDTO;
+import com.optitop.optitop_api.dto.FrameStatsDTO;
 import com.optitop.optitop_api.repository.InvoiceRepository;
 
 import java.time.LocalDate;
@@ -97,6 +98,15 @@ public class InvoiceService {
                         p2Amounts.getOrDefault(sellerRef, 0.0),
                         p2Counts.getOrDefault(sellerRef, 0L)))
                 .sorted(Comparator.comparing(AverageBasketDTO::getSellerRef))
+                .collect(Collectors.toList());
+    }
+
+    public List<FrameStatsDTO> getFrameStats(LocalDate startDate, LocalDate endDate) {
+        return invoiceRepository.calculateTotalFramesCount(startDate, endDate)
+                .stream()
+                .map(row -> new FrameStatsDTO(
+                        (String) row[0],
+                        (Long) row[1]))
                 .collect(Collectors.toList());
     }
 }
