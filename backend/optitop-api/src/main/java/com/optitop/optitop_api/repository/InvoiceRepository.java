@@ -158,4 +158,25 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
                             ORDER BY month
                         """, nativeQuery = true)
         List<Object[]> calculateMonthlyRevenue(@Param("year") int year);
+
+        @Query(value = """
+                            SELECT
+                                (SELECT COALESCE(SUM(total_invoice), 0)
+                                 FROM (
+                                     SELECT DISTINCT invoice_ref, total_invoice
+                                     FROM Invoice
+                                     WHERE date BETWEEN :startDate AND :endDate
+                                 ) current_period) as totalCurrentPeriod,
+                                (SELECT COALESCE(SUM(total_invoice), 0)
+                                 FROM (
+                                     SELECT DISTINCT invoice_ref, total_invoice
+                                     FROM Invoice
+                                     WHERE date BETWEEN DATE_SUB(:startDate, INTERVAL 1 YEAR)
+                                           AND DATE_SUB(:endDate, INTERVAL 1 YEAR)
+                                 ) previous_period) as totalPreviousPeriod
+                        """, nativeQuery = true)
+        List<Object[]> getTotalInvoicesForPeriodAndPreviousYear(
+                        @Param("startDate") String startDate,
+                        @Param("endDate") String endDate);
+
 }

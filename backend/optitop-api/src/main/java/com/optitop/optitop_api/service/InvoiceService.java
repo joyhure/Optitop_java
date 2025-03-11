@@ -136,4 +136,23 @@ public class InvoiceService {
                                                 (v1, v2) -> v1,
                                                 () -> new HashMap<>()));
         }
+
+        public Map<String, Object> getPeriodRevenue(LocalDate startDate, LocalDate endDate) {
+                Map<String, Object> result = new HashMap<>();
+
+                List<Object[]> data = invoiceRepository.getTotalInvoicesForPeriodAndPreviousYear(
+                                startDate.toString(),
+                                endDate.toString());
+
+                if (!data.isEmpty()) {
+                        Object[] firstRow = data.get(0);
+                        result.put("currentAmount", firstRow[0]);
+                        result.put("previousAmount", firstRow[1]);
+                } else {
+                        result.put("currentAmount", 0.0);
+                        result.put("previousAmount", 0.0);
+                }
+
+                return result;
+        }
 }

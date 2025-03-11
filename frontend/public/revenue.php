@@ -51,8 +51,8 @@ if (
             <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#currency-euro"></use>
           </svg>
         </div>
-        <h2 class="text-center pt-2">1119000€</h2>
-        <h2 class="text-center pt-2">+10%</h2>
+        <h2 id="total-revenue" class="text-center pt-2">-</h2>
+        <h2 id="total-delta-percent" class="text-center pt-2">-</h2>
       </div>
       <div class="table-responsive table-card small w-100">
         <table class="table table-striped table-sm mb-0">

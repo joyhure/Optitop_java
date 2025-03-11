@@ -54,4 +54,11 @@ public class InvoiceController {
     public ResponseEntity<Map<Integer, Double>> getMonthlyRevenue(@PathVariable int year) {
         return ResponseEntity.ok(invoiceService.getMonthlyRevenue(year));
     }
+
+    @GetMapping("/period-revenue")
+    public ResponseEntity<Map<String, Object>> getPeriodRevenue(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        return ResponseEntity.ok(invoiceService.getPeriodRevenue(startDate, endDate));
+    }
 }

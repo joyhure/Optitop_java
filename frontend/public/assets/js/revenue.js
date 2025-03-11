@@ -23,15 +23,19 @@ document.addEventListener('DOMContentLoaded', function() {
             return await this.fetchApi(`/invoices/monthly-revenue/${year}`);
         },
 
+        async getPeriodRevenue(startDate, endDate) {
+            const response = await this.fetchApi(`/invoices/period-revenue?startDate=${startDate}&endDate=${endDate}`);
+            return response;
+        },
+
         // Formatage des données
-        formatCurrency(revenue, isFutureMonth = false) {
-            if (isFutureMonth) return 'À venir';
+        formatCurrency(amount) {
             return new Intl.NumberFormat('fr-FR', {
                 style: 'currency',
                 currency: 'EUR',
                 minimumFractionDigits: 0,
                 maximumFractionDigits: 0
-            }).format(revenue);
+            }).format(amount);
         },
 
         formatDelta(delta, isFutureMonth = false) {
@@ -44,6 +48,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 maximumFractionDigits: 0,
                 signDisplay: 'always'
             }).format(delta);
+        },
+
+        formatDeltaPercent(current, previous) {
+            if (!previous) return 'N/A';
+            const percent = ((current - previous) / Math.abs(previous)) * 100;
+            return new Intl.NumberFormat('fr-FR', {
+                style: 'percent',
+                signDisplay: 'always',
+                minimumFractionDigits: 1,
+                maximumFractionDigits: 1
+            }).format(percent / 100);
         },
 
         formatDeltaPercent(currentValue, previousValue, isFutureMonth = false) {
@@ -110,6 +125,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 </section>
             `;
+        },
+
+        updateSummaryCard(data) {
+            const totalRevenueElement = document.getElementById('total-revenue');
+            const totalDeltaPercentElement = document.getElementById('total-delta-percent');
+
+            const currentAmount = data.currentAmount || 0;
+            const previousAmount = data.previousAmount || 0;
+
+            totalRevenueElement.textContent = this.formatCurrency(currentAmount);
+            totalDeltaPercentElement.textContent = this.formatDeltaPercent(currentAmount, previousAmount);
         }
     };
 
@@ -119,6 +145,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
         async initialize() {
             try {
+                const startDate = sessionStorage.getItem('startDate');
+                const endDate = sessionStorage.getItem('endDate');
+
+                const periodData = await utils.getPeriodRevenue(startDate, endDate);
+                utils.updateSummaryCard(periodData);
+
                 const years = await utils.fetchApi('/invoices/years');
                 this.displayYearSections(years);
                 await this.loadAllRevenueData(years);
