@@ -126,4 +126,14 @@ public class InvoiceService {
         public List<Integer> getDistinctYears() {
                 return invoiceRepository.findDistinctYears();
         }
+
+        public Map<Integer, Double> getMonthlyRevenue(int year) {
+                return invoiceRepository.calculateMonthlyRevenue(year)
+                                .stream()
+                                .collect(Collectors.toMap(
+                                                row -> (Integer) row[0],
+                                                row -> (Double) row[1],
+                                                (v1, v2) -> v1,
+                                                () -> new HashMap<>()));
+        }
 }

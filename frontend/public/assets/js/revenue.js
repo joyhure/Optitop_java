@@ -102,6 +102,19 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 </section>
             `;
+        },
+
+        formatCurrency(amount) {
+            return new Intl.NumberFormat('fr-FR', {
+                style: 'currency',
+                currency: 'EUR',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(amount);
+        },
+
+        async getMonthlyRevenue(year) {
+            return await this.fetchApi(`/invoices/monthly-revenue/${year}`);
         }
     };
 
@@ -109,9 +122,10 @@ document.addEventListener('DOMContentLoaded', function() {
         async initialize() {
             try {
                 const years = await utils.fetchApi('/invoices/years');
-                this.displayYearSections(years);
+                await this.displayYearSections(years);
+                await this.loadAllRevenueData(years);
             } catch (error) {
-                console.error('Erreur lors du chargement des années:', error);
+                console.error('Erreur lors du chargement des données:', error);
             }
         },
 
@@ -123,6 +137,34 @@ document.addEventListener('DOMContentLoaded', function() {
             ).join('');
 
             DOM.revenueSections.innerHTML = sections;
+        },
+
+        async loadAllRevenueData(years) {
+            for (const year of years) {
+                const monthlyRevenue = await utils.getMonthlyRevenue(year);
+                this.updateRevenueRow(year, monthlyRevenue);
+            }
+        },
+
+        updateRevenueRow(year, monthlyRevenue) {
+            const tableBody = document.querySelector(`#collapseRevenue${year} tbody`);
+            if (!tableBody) return;
+
+            const revenueRow = tableBody.querySelector('tr:first-child');
+            if (!revenueRow) return;
+
+            const cells = revenueRow.querySelectorAll('td');
+            let yearTotal = 0;
+
+            // Mise à jour des cellules mensuelles (index 1-12 pour les mois)
+            for (let month = 1; month <= 12; month++) {
+                const revenue = monthlyRevenue[month] || 0;
+                yearTotal += revenue;
+                cells[month].textContent = utils.formatCurrency(revenue);
+            }
+
+            // Mise à jour du total annuel (dernière cellule)
+            cells[13].textContent = utils.formatCurrency(yearTotal);
         }
     };
 

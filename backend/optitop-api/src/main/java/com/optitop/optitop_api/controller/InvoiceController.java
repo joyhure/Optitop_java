@@ -5,6 +5,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,6 +16,7 @@ import com.optitop.optitop_api.service.InvoiceService;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/invoices")
@@ -46,5 +48,10 @@ public class InvoiceController {
     @GetMapping("/years")
     public ResponseEntity<List<Integer>> getDistinctYears() {
         return ResponseEntity.ok(invoiceService.getDistinctYears());
+    }
+
+    @GetMapping("/monthly-revenue/{year}")
+    public ResponseEntity<Map<Integer, Double>> getMonthlyRevenue(@PathVariable int year) {
+        return ResponseEntity.ok(invoiceService.getMonthlyRevenue(year));
     }
 }
