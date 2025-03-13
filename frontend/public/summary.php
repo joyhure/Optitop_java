@@ -1,3 +1,15 @@
+<?php
+session_start();
+
+if (
+  !isset($_SESSION['user']) ||
+  !isset($_SESSION['user']['role']) ||
+  !in_array($_SESSION['user']['role'], ['admin', 'supermanager', 'manager'])
+) {
+  header('Location: dashboard.php');
+  exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -38,11 +50,11 @@
             </tr>
             <tr>
               <th class="text-center" colspan="2">
-                <h5 class="text-secondary">Du [dd/mm/yyyy] au [dd/mm/yyyy]</h5>
+                <h5 id="period-dates" class="text-secondary">Chargement...</h5>
               </th>
               <th class="bg-secondary-subtle"></th>
               <th class="text-center" colspan="2">
-                <h5 class="text-secondary">Màj le [dd/mm/yyyy] à [hh:mm]</h5>
+                <h5 id="last-update" class="text-secondary">Chargement...</h5>
               </th>
             </tr>
             <tr>
@@ -148,6 +160,7 @@
   <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
   <script src="assets/js/header.js"></script>
   <script src="assets/js/navbar.js"></script>
+  <script src="assets/js/summary.js"></script>
 </body>
 
 </html>
