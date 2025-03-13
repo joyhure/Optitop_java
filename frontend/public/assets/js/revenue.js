@@ -24,15 +24,11 @@ document.addEventListener('DOMContentLoaded', function() {
         },
 
         async getPeriodRevenue(startDate, endDate) {
-            const response = await this.fetchApi(`/invoices/period-revenue?startDate=${startDate}&endDate=${endDate}`);
-            return response;
+            return await this.fetchApi(`/invoices/period-revenue?startDate=${startDate}&endDate=${endDate}`);
         },
 
         async getSellerStats(startDate, endDate) {
-            console.log('Appel getSellerStats avec dates:', startDate, endDate);
-            const data = await this.fetchApi(`/invoices/seller-stats?startDate=${startDate}&endDate=${endDate}`);
-            console.log('Données reçues getSellerStats:', data);
-            return data;
+            return await this.fetchApi(`/invoices/seller-stats?startDate=${startDate}&endDate=${endDate}`);
         },
 
         // Formatage des données
@@ -78,12 +74,35 @@ document.addEventListener('DOMContentLoaded', function() {
         },
 
         getInitials(sellerRef) {
-            console.log('getInitials appelé avec:', sellerRef);
-            if (!sellerRef) {
-                console.warn('sellerRef est undefined ou null');
-                return 'XX';
-            }
-            return sellerRef.substring(0, 2).toUpperCase();
+            return sellerRef ? sellerRef.substring(0, 2).toUpperCase() : 'XX';
+        },
+
+        // Mises à jour UI
+        updateSummaryCard(data) {
+            const totalRevenueElement = document.getElementById('total-revenue');
+            const totalDeltaPercentElement = document.getElementById('total-delta-percent');
+
+            const currentAmount = data.currentAmount || 0;
+            const previousAmount = data.previousAmount || 0;
+
+            totalRevenueElement.textContent = this.formatCurrency(currentAmount);
+            totalDeltaPercentElement.textContent = this.formatDeltaPercent(currentAmount, previousAmount);
+        },
+
+        updateSellersTable(data) {
+            const tbody = document.getElementById('sellers-revenue-body');
+            if (!tbody || !Array.isArray(data)) return;
+            
+            tbody.innerHTML = '';
+            data.forEach(seller => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="text-center align-middle">${this.getInitials(seller.sellerRef)}</td>
+                    <td class="text-center align-middle">${this.formatCurrency(seller.amount)}</td>
+                    <td class="text-center align-middle">${this.formatPercentage(seller.percentage)}</td>
+                `;
+                tbody.appendChild(row);
+            });
         },
 
         // Génération HTML
@@ -138,45 +157,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 </section>
             `;
-        },
-
-        updateSummaryCard(data) {
-            const totalRevenueElement = document.getElementById('total-revenue');
-            const totalDeltaPercentElement = document.getElementById('total-delta-percent');
-
-            const currentAmount = data.currentAmount || 0;
-            const previousAmount = data.previousAmount || 0;
-
-            totalRevenueElement.textContent = this.formatCurrency(currentAmount);
-            totalDeltaPercentElement.textContent = this.formatDeltaPercent(currentAmount, previousAmount);
-        },
-
-        updateSellersTable(data) {
-            console.log('updateSellersTable appelé avec:', data);
-            const tbody = document.getElementById('sellers-revenue-body');
-            
-            if (!tbody) {
-                console.error('Element sellers-revenue-body non trouvé');
-                return;
-            }
-            
-            tbody.innerHTML = '';
-
-            if (!Array.isArray(data)) {
-                console.error('Les données reçues ne sont pas un tableau:', data);
-                return;
-            }
-
-            data.forEach(seller => {
-                console.log('Traitement vendeur:', seller);
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td class="text-center align-middle">${this.getInitials(seller.sellerRef)}</td>
-                    <td class="text-center align-middle">${this.formatCurrency(seller.amount)}</td>
-                    <td class="text-center align-middle">${this.formatPercentage(seller.percentage)}</td>
-                `;
-                tbody.appendChild(row);
-            });
         }
     };
 
@@ -189,15 +169,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 const startDate = sessionStorage.getItem('startDate');
                 const endDate = sessionStorage.getItem('endDate');
 
-                // Récupération des données période
-                const periodData = await utils.getPeriodRevenue(startDate, endDate);
+                const [periodData, sellerData, years] = await Promise.all([
+                    utils.getPeriodRevenue(startDate, endDate),
+                    utils.getSellerStats(startDate, endDate),
+                    utils.fetchApi('/invoices/years')
+                ]);
+
                 utils.updateSummaryCard(periodData);
-
-                // Récupération des données vendeurs
-                const sellerData = await utils.getSellerStats(startDate, endDate);
                 utils.updateSellersTable(sellerData);
-
-                const years = await utils.fetchApi('/invoices/years');
                 this.displayYearSections(years);
                 await this.loadAllRevenueData(years);
             } catch (error) {
