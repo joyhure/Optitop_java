@@ -179,4 +179,26 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
                         @Param("startDate") String startDate,
                         @Param("endDate") String endDate);
 
+        @Query(value = """
+                            SELECT
+                                sub.seller_ref,
+                                SUM(sub.total_invoice) as seller_amount,
+                                (SUM(sub.total_invoice) /
+                                    (SELECT COALESCE(SUM(total_invoice), 0)
+                                     FROM (
+                                         SELECT DISTINCT invoice_ref, total_invoice
+                                         FROM Invoice
+                                         WHERE date BETWEEN :startDate AND :endDate
+                                     ) total)) * 100 as percentage
+                            FROM (
+                                SELECT DISTINCT i.invoice_ref, i.seller_ref, i.total_invoice
+                                FROM Invoice i
+                                WHERE i.date BETWEEN :startDate AND :endDate
+                            ) sub
+                            GROUP BY sub.seller_ref
+                            ORDER BY seller_amount DESC
+                        """, nativeQuery = true)
+        List<Object[]> getSellerRevenueStats(
+                        @Param("startDate") String startDate,
+                        @Param("endDate") String endDate);
 }

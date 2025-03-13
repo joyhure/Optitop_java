@@ -63,27 +63,8 @@ if (
               <th scope="col" class="row-blueperso">% CA</th>
             </tr>
           </thead>
-          <tbody>
-            <tr class="text-center">
-              <td>BS</td>
-              <td>11506€</td>
-              <td>25%</td>
-            </tr>
-            <tr class="text-center">
-              <td>EG</td>
-              <td>110000€</td>
-              <td>51%</td>
-            </tr>
-            <tr class="text-center">
-              <td>IH</td>
-              <td>90000€</td>
-              <td>15%</td>
-            </tr>
-            <tr class="text-center">
-              <td>IR</td>
-              <td>60000€</td>
-              <td>18%</td>
-            </tr>
+          <tbody id="sellers-revenue-body">
+            <!-- Le contenu sera généré dynamiquement par JavaScript -->
           </tbody>
         </table>
       </div>

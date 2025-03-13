@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.ArrayList;
 
 @Service
 public class InvoiceService {
@@ -151,6 +152,24 @@ public class InvoiceService {
                 } else {
                         result.put("currentAmount", 0.0);
                         result.put("previousAmount", 0.0);
+                }
+
+                return result;
+        }
+
+        public List<Map<String, Object>> getSellerRevenueStats(LocalDate startDate, LocalDate endDate) {
+                List<Map<String, Object>> result = new ArrayList<>();
+
+                List<Object[]> data = invoiceRepository.getSellerRevenueStats(
+                                startDate.toString(),
+                                endDate.toString());
+
+                for (Object[] row : data) {
+                        Map<String, Object> sellerStats = new HashMap<>();
+                        sellerStats.put("sellerRef", row[0]);
+                        sellerStats.put("amount", row[1]);
+                        sellerStats.put("percentage", row[2]);
+                        result.add(sellerStats);
                 }
 
                 return result;

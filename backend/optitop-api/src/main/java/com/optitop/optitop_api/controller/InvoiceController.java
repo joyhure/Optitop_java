@@ -61,4 +61,11 @@ public class InvoiceController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         return ResponseEntity.ok(invoiceService.getPeriodRevenue(startDate, endDate));
     }
+
+    @GetMapping("/seller-stats")
+    public ResponseEntity<List<Map<String, Object>>> getSellerRevenueStats(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        return ResponseEntity.ok(invoiceService.getSellerRevenueStats(startDate, endDate));
+    }
 }

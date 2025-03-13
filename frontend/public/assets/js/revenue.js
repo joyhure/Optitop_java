@@ -28,6 +28,13 @@ document.addEventListener('DOMContentLoaded', function() {
             return response;
         },
 
+        async getSellerStats(startDate, endDate) {
+            console.log('Appel getSellerStats avec dates:', startDate, endDate);
+            const data = await this.fetchApi(`/invoices/seller-stats?startDate=${startDate}&endDate=${endDate}`);
+            console.log('Données reçues getSellerStats:', data);
+            return data;
+        },
+
         // Formatage des données
         formatCurrency(amount) {
             return new Intl.NumberFormat('fr-FR', {
@@ -50,17 +57,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }).format(delta);
         },
 
-        formatDeltaPercent(current, previous) {
-            if (!previous) return 'N/A';
-            const percent = ((current - previous) / Math.abs(previous)) * 100;
-            return new Intl.NumberFormat('fr-FR', {
-                style: 'percent',
-                signDisplay: 'always',
-                minimumFractionDigits: 1,
-                maximumFractionDigits: 1
-            }).format(percent / 100);
-        },
-
         formatDeltaPercent(currentValue, previousValue, isFutureMonth = false) {
             if (isFutureMonth) return 'À venir';
             if (currentValue === undefined || previousValue === undefined || previousValue === 0) return 'Indéfini';
@@ -71,6 +67,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 maximumFractionDigits: 1,
                 signDisplay: 'always'
             }).format(percentChange / 100);
+        },
+
+        formatPercentage(value) {
+            return new Intl.NumberFormat('fr-FR', {
+                style: 'percent',
+                minimumFractionDigits: 1,
+                maximumFractionDigits: 1
+            }).format(value / 100);
+        },
+
+        getInitials(sellerRef) {
+            console.log('getInitials appelé avec:', sellerRef);
+            if (!sellerRef) {
+                console.warn('sellerRef est undefined ou null');
+                return 'XX';
+            }
+            return sellerRef.substring(0, 2).toUpperCase();
         },
 
         // Génération HTML
@@ -136,20 +149,53 @@ document.addEventListener('DOMContentLoaded', function() {
 
             totalRevenueElement.textContent = this.formatCurrency(currentAmount);
             totalDeltaPercentElement.textContent = this.formatDeltaPercent(currentAmount, previousAmount);
+        },
+
+        updateSellersTable(data) {
+            console.log('updateSellersTable appelé avec:', data);
+            const tbody = document.getElementById('sellers-revenue-body');
+            
+            if (!tbody) {
+                console.error('Element sellers-revenue-body non trouvé');
+                return;
+            }
+            
+            tbody.innerHTML = '';
+
+            if (!Array.isArray(data)) {
+                console.error('Les données reçues ne sont pas un tableau:', data);
+                return;
+            }
+
+            data.forEach(seller => {
+                console.log('Traitement vendeur:', seller);
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="text-center align-middle">${this.getInitials(seller.sellerRef)}</td>
+                    <td class="text-center align-middle">${this.formatCurrency(seller.amount)}</td>
+                    <td class="text-center align-middle">${this.formatPercentage(seller.percentage)}</td>
+                `;
+                tbody.appendChild(row);
+            });
         }
     };
 
     // Gestionnaire de données
     const dataManager = {
-        revenueCache: new Map(), // Cache des données de CA par année
+        revenueCache: new Map(),
 
         async initialize() {
             try {
                 const startDate = sessionStorage.getItem('startDate');
                 const endDate = sessionStorage.getItem('endDate');
 
+                // Récupération des données période
                 const periodData = await utils.getPeriodRevenue(startDate, endDate);
                 utils.updateSummaryCard(periodData);
+
+                // Récupération des données vendeurs
+                const sellerData = await utils.getSellerStats(startDate, endDate);
+                utils.updateSellersTable(sellerData);
 
                 const years = await utils.fetchApi('/invoices/years');
                 this.displayYearSections(years);
