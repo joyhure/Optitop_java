@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     const CONFIG = {
-        API_BASE_URL: 'http://localhost:8080/api'  // Modification de l'URL de base
+        API_BASE_URL: 'http://localhost:8080/api'
     };
 
     const DOM = {
@@ -17,7 +17,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const utils = {
         formatCurrency(amount) {
-            // Gestion des valeurs null ou undefined
             if (amount === null || amount === undefined) return 'Indéfini';
             return `${amount.toFixed(2)}€`;
         },

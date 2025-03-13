@@ -28,14 +28,17 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
                         @Param("startDate") LocalDate startDate,
                         @Param("endDate") LocalDate endDate);
 
-        @Query("SELECT i.sellerRef as sellerRef, " +
-                        "SUM(DISTINCT CASE WHEN i.invoiceRef = i.invoiceRef THEN i.totalInvoice ELSE 0 END) as totalAmount "
-                        +
-                        "FROM Invoice i " +
-                        "WHERE i.date BETWEEN :startDate AND :endDate " +
-                        "AND i.family = 'VER' " +
-                        "GROUP BY i.sellerRef " +
-                        "ORDER BY i.sellerRef")
+        @Query(value = """
+                            SELECT sub.seller_ref, SUM(sub.total_invoice) AS totalAmount
+                            FROM (
+                                SELECT DISTINCT i.invoice_ref, i.seller_ref, i.total_invoice
+                                FROM Invoice i
+                                WHERE i.date BETWEEN :startDate AND :endDate
+                                AND i.family = 'VER'
+                            ) sub
+                            GROUP BY sub.seller_ref
+                            ORDER BY sub.seller_ref
+                        """, nativeQuery = true)
         List<Object[]> calculateTotalAmounts(@Param("startDate") LocalDate startDate,
                         @Param("endDate") LocalDate endDate);
 
@@ -139,4 +142,63 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
                         "ORDER BY i.sellerRef")
         List<Object[]> calculatePremiumFramesCount(@Param("startDate") LocalDate startDate,
                         @Param("endDate") LocalDate endDate);
+
+        @Query("SELECT DISTINCT YEAR(i.date) as year FROM Invoice i ORDER BY year DESC")
+        List<Integer> findDistinctYears();
+
+        @Query(value = """
+                            SELECT MONTH(sub.date) AS month,
+                                   SUM(sub.total_invoice) AS monthlyRevenue
+                            FROM (
+                                SELECT DISTINCT i.invoice_ref, i.date, i.total_invoice
+                                FROM Invoice i
+                                WHERE YEAR(i.date) = :year
+                            ) sub
+                            GROUP BY MONTH(sub.date)
+                            ORDER BY month
+                        """, nativeQuery = true)
+        List<Object[]> calculateMonthlyRevenue(@Param("year") int year);
+
+        @Query(value = """
+                            SELECT
+                                (SELECT COALESCE(SUM(total_invoice), 0)
+                                 FROM (
+                                     SELECT DISTINCT invoice_ref, total_invoice
+                                     FROM Invoice
+                                     WHERE date BETWEEN :startDate AND :endDate
+                                 ) current_period) as totalCurrentPeriod,
+                                (SELECT COALESCE(SUM(total_invoice), 0)
+                                 FROM (
+                                     SELECT DISTINCT invoice_ref, total_invoice
+                                     FROM Invoice
+                                     WHERE date BETWEEN DATE_SUB(:startDate, INTERVAL 1 YEAR)
+                                           AND DATE_SUB(:endDate, INTERVAL 1 YEAR)
+                                 ) previous_period) as totalPreviousPeriod
+                        """, nativeQuery = true)
+        List<Object[]> getTotalInvoicesForPeriodAndPreviousYear(
+                        @Param("startDate") String startDate,
+                        @Param("endDate") String endDate);
+
+        @Query(value = """
+                            SELECT
+                                sub.seller_ref,
+                                SUM(sub.total_invoice) as seller_amount,
+                                (SUM(sub.total_invoice) /
+                                    (SELECT COALESCE(SUM(total_invoice), 0)
+                                     FROM (
+                                         SELECT DISTINCT invoice_ref, total_invoice
+                                         FROM Invoice
+                                         WHERE date BETWEEN :startDate AND :endDate
+                                     ) total)) * 100 as percentage
+                            FROM (
+                                SELECT DISTINCT i.invoice_ref, i.seller_ref, i.total_invoice
+                                FROM Invoice i
+                                WHERE i.date BETWEEN :startDate AND :endDate
+                            ) sub
+                            GROUP BY sub.seller_ref
+                            ORDER BY seller_amount DESC
+                        """, nativeQuery = true)
+        List<Object[]> getSellerRevenueStats(
+                        @Param("startDate") String startDate,
+                        @Param("endDate") String endDate);
 }
