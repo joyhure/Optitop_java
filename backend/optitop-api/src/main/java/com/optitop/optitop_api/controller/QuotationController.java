@@ -122,6 +122,22 @@ public class QuotationController {
         }
     }
 
+    @GetMapping("/previous-concretization")
+    public ResponseEntity<Double> getPreviousConcretizationRate(
+            @RequestParam String startDate,
+            @RequestParam String endDate) {
+        try {
+            LocalDate start = LocalDate.parse(startDate).minusYears(1);
+            LocalDate end = LocalDate.parse(endDate).minusYears(1);
+
+            Double rate = quotationsRepository.getPreviousConcretizationRate(start, end);
+            return ResponseEntity.ok(rate != null ? rate : 0.0);
+        } catch (Exception e) {
+            logger.error("Erreur lors du calcul du taux de concrétisation N-1", e);
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
     private QuotationDTO convertToDTO(Quotations quotation) {
         QuotationDTO dto = new QuotationDTO(quotation.getId());
         dto.setDate(quotation.getDate());

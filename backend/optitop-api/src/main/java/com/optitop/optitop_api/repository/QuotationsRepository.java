@@ -71,4 +71,11 @@ public interface QuotationsRepository extends JpaRepository<Quotations, Long> {
                         "ORDER BY q.sellerRef")
         List<Object[]> getSellerStats(@Param("startDate") LocalDate startDate,
                         @Param("endDate") LocalDate endDate);
+
+        @Query("SELECT CAST(COUNT(CASE WHEN q.status = 'Validé' THEN 1 END) AS float) / CAST(COUNT(q) AS float) * 100 "
+                        +
+                        "FROM Quotations q WHERE q.date BETWEEN :startDate AND :endDate")
+        Double getPreviousConcretizationRate(
+                        @Param("startDate") LocalDate startDate,
+                        @Param("endDate") LocalDate endDate);
 }

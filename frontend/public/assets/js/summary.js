@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return new Intl.DateTimeFormat('fr-FR').format(new Date(date));
         },
 
+        // Formatage identique à revenue.js
         formatCurrency(amount) {
             return new Intl.NumberFormat('fr-FR', {
                 style: 'currency',
@@ -25,11 +26,31 @@ document.addEventListener('DOMContentLoaded', function() {
             }).format(amount);
         },
 
+        formatDelta(delta) {
+            return new Intl.NumberFormat('fr-FR', {
+                style: 'currency',
+                currency: 'EUR',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+                signDisplay: 'always'
+            }).format(delta);
+        },
+
+        formatDeltaPercent(currentValue, previousValue) {
+            const percentChange = ((currentValue - previousValue) / Math.abs(previousValue)) * 100;
+            return new Intl.NumberFormat('fr-FR', {
+                style: 'percent',
+                minimumFractionDigits: 1,
+                maximumFractionDigits: 1,
+                signDisplay: 'always'
+            }).format(percentChange / 100);
+        },
+
         formatPercentage(value) {
             return new Intl.NumberFormat('fr-FR', {
                 style: 'percent',
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 0
+                minimumFractionDigits: 1,
+                maximumFractionDigits: 1
             }).format(value / 100);
         },
 
@@ -38,6 +59,30 @@ document.addEventListener('DOMContentLoaded', function() {
             const endDate = sessionStorage.getItem('endDate');
             document.getElementById('period-dates').textContent = 
                 `Du ${this.formatDate(startDate)} au ${this.formatDate(endDate)}`;
+        },
+
+        // Mise à jour des données
+        updateRevenueData(data) {
+            document.getElementById('current-revenue').textContent = this.formatCurrency(data.currentAmount || 0);
+            document.getElementById('previous-revenue').textContent = this.formatCurrency(data.previousAmount || 0);
+
+            const delta = (data.currentAmount || 0) - (data.previousAmount || 0);
+            document.getElementById('revenue-delta').textContent = this.formatDelta(delta);
+            document.getElementById('revenue-delta-percent').textContent = 
+                this.formatDeltaPercent(data.currentAmount, data.previousAmount);
+        },
+
+        updateConcretizationRates(stats) {
+            if (stats.concretizationRate !== undefined) {
+                document.getElementById('current-rate').textContent = this.formatPercentage(stats.concretizationRate);
+            }
+
+        },
+
+        updatePreviousConcretizationRate(rate) {
+            if (rate !== undefined && rate !== null) {
+                document.getElementById('previous-rate').textContent = this.formatPercentage(rate);
+            }
         }
     };
 
@@ -46,6 +91,10 @@ document.addEventListener('DOMContentLoaded', function() {
         async initialize() {
             try {
                 utils.updatePeriodDates();
+                await updateLastUpdateDate();
+
+                const startDate = sessionStorage.getItem('startDate');
+                const endDate = sessionStorage.getItem('endDate');
 
                 const lastUpdateElement = document.getElementById('last-update');
                 if (lastUpdateElement) {
@@ -58,7 +107,25 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
 
-                // Autres appels API et mises à jour à venir...
+                // Récupération des données période comme dans revenue.js
+                const periodData = await utils.fetchApi(
+                    `/invoices/period-revenue?startDate=${startDate}&endDate=${endDate}`
+                );
+
+                utils.updateRevenueData(periodData);
+
+                // Chargement des taux de concrétisation
+                const statsData = await utils.fetchApi(
+                    `/quotations/stats?startDate=${startDate}&endDate=${endDate}`
+                );
+                utils.updateConcretizationRates(statsData);
+
+                // Chargement du taux de concrétisation N-1
+                const previousRateData = await utils.fetchApi(
+                    `/quotations/previous-concretization?startDate=${startDate}&endDate=${endDate}`
+                );
+                utils.updatePreviousConcretizationRate(previousRateData);
+
             } catch (error) {
                 console.error('Erreur lors du chargement des données:', error);
             }

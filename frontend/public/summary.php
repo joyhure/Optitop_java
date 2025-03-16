@@ -50,11 +50,11 @@ if (
             </tr>
             <tr>
               <th class="text-center" colspan="2">
-                <h5 id="period-dates" class="text-secondary">Chargement...</h5>
+                <h5 id="period-dates" class="text-secondary">A définir</h5>
               </th>
               <th class="bg-secondary-subtle"></th>
               <th class="text-center" colspan="2">
-                <h5 id="last-update" class="text-secondary">Chargement...</h5>
+                <h5 id="last-update" class="text-secondary">Inconnue</h5>
               </th>
             </tr>
             <tr>
@@ -68,15 +68,15 @@ if (
           <tbody>
             <tr>
               <td class="text-center">N</td>
-              <td class="text-center">68 381 €</td>
-              <td rowspan="2" class="align-middle text-center">1500 €</td>
-              <td rowspan="2" class="align-middle text-center">2 %</td>
-              <td class="text-center">80 %</td>
+              <td id="current-revenue" class="text-center">-</td>
+              <td id="revenue-delta" rowspan="2" class="align-middle text-center">-</td>
+              <td id="revenue-delta-percent" rowspan="2" class="align-middle text-center">-</td>
+              <td id="current-rate" class="text-center">-</td>
             </tr>
             <tr>
               <td class="text-center">N-1</td>
-              <td class="text-center">69 350 €</td>
-              <td class="text-center">75 %</td>
+              <td id="previous-revenue" class="text-center">-</td>
+              <td id="previous-rate" class="text-center">-</td>
             </tr>
           </tbody>
         </table>
