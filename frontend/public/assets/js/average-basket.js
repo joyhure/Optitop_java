@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <td class="text-center">${seller.invoiceCount}</td>
                         <td class="text-center">${utils.formatCurrency(seller.averageP1MON)}</td>
                         <td class="text-center">${utils.formatCurrency(seller.averageP1VER)}</td>
-                        <td class="text-center">${utils.formatCurrency(seller.averageP2)}</td>
+                        <td class="text-center">${seller.p2Count > 0 ? utils.formatCurrency(seller.averageP2) : 'Aucun'}</td>
                     </tr>
                 `;
             });
@@ -124,7 +124,7 @@ document.addEventListener('DOMContentLoaded', function() {
             DOM.cardPm.textContent = utils.formatCurrency(avgBasket);
             DOM.cardP2.textContent = utils.formatCurrency(avgP2Total);
 
-            // Ajout de la ligne Total
+            // Ajout de la ligne Total avec gestion du cas "Aucun"
             rows.push(`
                 <tr class="fw-bold">
                     <td class="text-center">Total</td>
@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <td class="text-center">${totalCount}</td>
                     <td class="text-center">${utils.formatCurrency(avgFramesP1)}</td>
                     <td class="text-center">${utils.formatCurrency(avgLensesP1)}</td>
-                    <td class="text-center">${utils.formatCurrency(avgP2Total)}</td>
+                    <td class="text-center">${totalP2Count > 0 ? utils.formatCurrency(avgP2Total) : 'Aucun'}</td>
                 </tr>
             `);
 
