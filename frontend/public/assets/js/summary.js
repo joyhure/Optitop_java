@@ -63,13 +63,22 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Mise à jour des données
         updateRevenueData(data) {
+            // Gestion du CA N
             document.getElementById('current-revenue').textContent = this.formatCurrency(data.currentAmount || 0);
-            document.getElementById('previous-revenue').textContent = this.formatCurrency(data.previousAmount || 0);
-
-            const delta = (data.currentAmount || 0) - (data.previousAmount || 0);
-            document.getElementById('revenue-delta').textContent = this.formatDelta(delta);
-            document.getElementById('revenue-delta-percent').textContent = 
-                this.formatDeltaPercent(data.currentAmount, data.previousAmount);
+            
+            // Gestion du CA N-1 et des deltas
+            if (data.previousAmount === null || data.previousAmount === undefined || data.previousAmount === 0) {
+                document.getElementById('previous-revenue').textContent = 'Inconnu';
+                document.getElementById('revenue-delta').textContent = 'Inconnu';
+                document.getElementById('revenue-delta-percent').textContent = 'Inconnu';
+                document.getElementById('previous-rate').textContent = 'Inconnu';
+            } else {
+                document.getElementById('previous-revenue').textContent = this.formatCurrency(data.previousAmount);
+                const delta = data.currentAmount - data.previousAmount;
+                document.getElementById('revenue-delta').textContent = this.formatDelta(delta);
+                document.getElementById('revenue-delta-percent').textContent = 
+                    this.formatDeltaPercent(data.currentAmount, data.previousAmount);
+            }
         },
 
         updateConcretizationRates(stats) {
@@ -80,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function() {
         },
 
         updatePreviousConcretizationRate(rate) {
-            if (rate !== undefined && rate !== null) {
+            if (rate !== undefined && rate !== null && rate !== 0) {
                 document.getElementById('previous-rate').textContent = this.formatPercentage(rate);
             }
         }
