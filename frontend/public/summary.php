@@ -107,47 +107,8 @@ if (
               <th class="bg-secondary-subtle"></th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <td class="fw-bold text-center">BS</td>
-              <td class="text-center">50€</td>
-              <td class="text-center">15%</td>
-              <td class="text-center">31</td>
-              <td class="text-center">18 €</td>
-              <td class="text-center">42</td>
-              <td class="text-center">85 %</td>
-              <td class="text-center">26590 €</td>
-            </tr>
-            <tr>
-              <td class="fw-bold text-center">EG</td>
-              <td class="text-center">95€</td>
-              <td class="text-center">36%</td>
-              <td class="text-center">28</td>
-              <td class="text-center">22 €</td>
-              <td class="text-center">35</td>
-              <td class="text-center">75 %</td>
-              <td class="text-center">21263 €</td>
-            </tr>
-            <tr>
-              <td class="fw-bold text-center">IH</td>
-              <td class="text-center">35€</td>
-              <td class="text-center">11%</td>
-              <td class="text-center">25</td>
-              <td class="text-center">18 €</td>
-              <td class="text-center">37</td>
-              <td class="text-center">85 %</td>
-              <td class="text-center">19575 €</td>
-            </tr>
-            <tr>
-              <td class="fw-bold text-center">IR</td>
-              <td class="text-center">50€</td>
-              <td class="text-center">15%</td>
-              <td class="text-center">31</td>
-              <td class="text-center">18 €</td>
-              <td class="text-center">42</td>
-              <td class="text-center">85 %</td>
-              <td class="text-center">15617 €</td>
-            </tr>
+          <tbody id="collaborators-data">
+            <!-- Le contenu sera généré dynamiquement par JavaScript -->
           </tbody>
         </table>
       </div>

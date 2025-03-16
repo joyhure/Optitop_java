@@ -92,7 +92,71 @@ document.addEventListener('DOMContentLoaded', function() {
             if (rate !== undefined && rate !== null && rate !== 0) {
                 document.getElementById('previous-rate').textContent = this.formatPercentage(rate);
             }
-        }
+        },
+
+        updateCollaboratorsData: async function() {
+            const startDate = sessionStorage.getItem('startDate');
+            const endDate = sessionStorage.getItem('endDate');
+            
+            try {
+                // Récupération des statistiques de montures (Prime + %)
+                const frameStats = await utils.fetchApi(
+                    `/invoices/frame-stats?startDate=${startDate}&endDate=${endDate}`
+                );
+
+                // Récupération des données P2
+                const averageBaskets = await utils.fetchApi(
+                    `/invoices/average-baskets?startDate=${startDate}&endDate=${endDate}`
+                );
+
+                // Récupération des stats de devis
+                const quotationStats = await utils.fetchApi(
+                    `/quotations/stats?startDate=${startDate}&endDate=${endDate}`
+                );
+
+                // Récupération du CA par vendeur
+                const revenueStats = await utils.fetchApi(
+                    `/invoices/seller-stats?startDate=${startDate}&endDate=${endDate}`
+                );
+
+                // Mise à jour du tableau
+                const tbody = document.getElementById('collaborators-data');
+                if (!tbody) return;
+
+                tbody.innerHTML = frameStats.map(seller => {
+                    const sellerRef = seller.sellerRef;
+                    const p2Data = averageBaskets.find(b => b.sellerRef === sellerRef);
+                    const quoteData = quotationStats.sellerStats?.find(s => s.sellerRef === sellerRef);
+                    const revenueData = revenueStats.find(r => r.sellerRef === sellerRef);
+                    
+                    const bonus = (seller.premiumFrames || 0) * 5;
+                    const premiumPercent = seller.totalFrames > 0 
+                        ? (seller.premiumFrames * 100 / seller.totalFrames).toFixed(1) 
+                        : 0;
+
+                    return `
+                        <tr>
+                            <td class="fw-bold text-center">${utils.getInitials(sellerRef)}</td>
+                            <td class="text-center">${utils.formatCurrency(bonus)}</td>
+                            <td class="text-center">${premiumPercent}%</td>
+                            <td class="text-center">${p2Data?.p2Count || 0}</td>
+                            <td class="text-center">${utils.formatCurrency(p2Data?.averageP2 || 0)}</td>
+                            <td class="text-center">${quoteData?.totalQuotations || 0}</td>
+                            <td class="text-center">${utils.formatPercentage(quoteData?.concretizationRate || 0)}</td>
+                            <td class="text-center">${utils.formatCurrency(revenueData?.amount || 0)}</td>
+                        </tr>
+                    `;
+                }).join('');
+
+            } catch (error) {
+                console.error('Erreur lors de la récupération des données collaborateurs:', error);
+            }
+        },
+
+        // Ajout de la fonction getInitials
+        getInitials(sellerRef) {
+            return sellerRef?.substring(0, 2).toUpperCase() || 'XX';
+        },
     };
 
     // Gestionnaire de données
@@ -134,6 +198,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     `/quotations/previous-concretization?startDate=${startDate}&endDate=${endDate}`
                 );
                 utils.updatePreviousConcretizationRate(previousRateData);
+
+                // Ajout de la mise à jour des données collaborateurs
+                await utils.updateCollaboratorsData();
 
             } catch (error) {
                 console.error('Erreur lors du chargement des données:', error);
