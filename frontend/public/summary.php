@@ -41,7 +41,7 @@ if (
         <h3 class="px-4 mb-0">Synthèse</h3>
       </div>
       <div class="container">
-        <table class="table table-bordered my-3">
+        <table class="table table-bordered">
           <thead>
             <tr>
               <th id="table-header" colspan="5">
@@ -81,7 +81,7 @@ if (
           </tbody>
         </table>
 
-        <table class="table table-bordered table-striped my-5">
+        <table class="table table-bordered table-striped">
           <thead>
 
             <tr>

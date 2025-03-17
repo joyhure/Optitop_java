@@ -123,30 +123,78 @@ document.addEventListener('DOMContentLoaded', function() {
                 const tbody = document.getElementById('collaborators-data');
                 if (!tbody) return;
 
-                tbody.innerHTML = frameStats.map(seller => {
+                // Calcul des totaux
+                let totalBonus = 0;
+                let totalPremiumPercent = 0;
+                let totalP2Count = 0;
+                let totalP2Amount = 0;
+                let totalQuotations = 0;
+                let totalConcretized = 0;
+                let totalRevenue = 0;
+                let totalValidFrames = 0;
+
+                // Lignes des vendeurs
+                let vendorRows = ''; // Initialisation d'une chaîne vide pour stocker les lignes
+
+                frameStats.forEach(seller => {
                     const sellerRef = seller.sellerRef;
                     const p2Data = averageBaskets.find(b => b.sellerRef === sellerRef);
                     const quoteData = quotationStats.sellerStats?.find(s => s.sellerRef === sellerRef);
                     const revenueData = revenueStats.find(r => r.sellerRef === sellerRef);
                     
+                    // Accumulation des totaux
                     const bonus = (seller.premiumFrames || 0) * 5;
+                    totalBonus += bonus;
+                    totalValidFrames += seller.totalFrames || 0;
+                    totalPremiumPercent += seller.premiumFrames || 0;
+                    totalP2Count += p2Data?.p2Count || 0;
+                    totalP2Amount += (p2Data?.averageP2 || 0) * (p2Data?.p2Count || 0);
+                    totalQuotations += quoteData?.totalQuotations || 0;
+                    totalConcretized += quoteData?.concretizedQuotations || 0;
+                    totalRevenue += revenueData?.amount || 0;
+
                     const premiumPercent = seller.totalFrames > 0 
-                        ? (seller.premiumFrames * 100 / seller.totalFrames).toFixed(1) 
+                        ? ((seller.premiumFrames * 100) / seller.totalFrames).toFixed(1)
                         : 0;
 
-                    return `
+                    vendorRows += `
                         <tr>
                             <td class="fw-bold text-center">${utils.getInitials(sellerRef)}</td>
                             <td class="text-center">${utils.formatCurrency(bonus)}</td>
                             <td class="text-center">${premiumPercent}%</td>
                             <td class="text-center">${p2Data?.p2Count || 0}</td>
-                            <td class="text-center">${utils.formatCurrency(p2Data?.averageP2 || 0)}</td>
+                            <td class="text-center">${p2Data?.p2Count > 0 ? utils.formatCurrency(p2Data?.averageP2) : 'Aucun'}</td>
                             <td class="text-center">${quoteData?.totalQuotations || 0}</td>
                             <td class="text-center">${utils.formatPercentage(quoteData?.concretizationRate || 0)}</td>
                             <td class="text-center">${utils.formatCurrency(revenueData?.amount || 0)}</td>
                         </tr>
                     `;
-                }).join('');
+                });
+
+                // Calcul des moyennes globales
+                const globalPremiumPercent = totalValidFrames > 0 
+                    ? ((totalPremiumPercent * 100) / totalValidFrames).toFixed(1)
+                    : 0;
+                const globalP2Average = totalP2Count > 0 
+                    ? totalP2Amount / totalP2Count 
+                    : 0;
+                const globalConcretizationRate = totalQuotations > 0
+                    ? (totalConcretized * 100 / totalQuotations)
+                    : 0;
+
+                // Ajout de la ligne Total au HTML
+                tbody.innerHTML = vendorRows + `
+                    <tr class="fw-bold table-light">
+                        <td class="text-center">Total</td>
+                        <td class="text-center">${utils.formatCurrency(totalBonus)}</td>
+                        <td class="text-center">${globalPremiumPercent}%</td>
+                        <td class="text-center">${totalP2Count}</td>
+                        <td class="text-center">${totalP2Count > 0 ? utils.formatCurrency(globalP2Average) : 'Aucun'}</td>
+                        <td class="text-center">${totalQuotations}</td>
+                        <td class="text-center">${utils.formatPercentage(globalConcretizationRate)}</td>
+                        <td class="text-center">${utils.formatCurrency(totalRevenue)}</td>
+                    </tr>
+                `;
 
             } catch (error) {
                 console.error('Erreur lors de la récupération des données collaborateurs:', error);
