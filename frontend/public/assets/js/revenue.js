@@ -93,16 +93,21 @@ document.addEventListener('DOMContentLoaded', function() {
             const tbody = document.getElementById('sellers-revenue-body');
             if (!tbody || !Array.isArray(data)) return;
             
-            tbody.innerHTML = '';
-            data.forEach(seller => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td class="text-center align-middle">${this.getInitials(seller.sellerRef)}</td>
-                    <td class="text-center align-middle">${this.formatCurrency(seller.amount)}</td>
-                    <td class="text-center align-middle">${this.formatPercentage(seller.percentage)}</td>
-                `;
-                tbody.appendChild(row);
-            });
+            // Tri des données par initiales vendeurs en ordre décroissant
+            const sortedData = [...data].sort((a, b) => 
+                this.getInitials(b.sellerRef).localeCompare(this.getInitials(a.sellerRef))
+            );
+            
+            // Génération du HTML avec les données triées
+            tbody.innerHTML = sortedData
+                .map(seller => `
+                    <tr>
+                        <td class="text-center align-middle">${this.getInitials(seller.sellerRef)}</td>
+                        <td class="text-center align-middle">${this.formatCurrency(seller.amount)}</td>
+                        <td class="text-center align-middle">${this.formatPercentage(seller.percentage)}</td>
+                    </tr>
+                `)
+                .join('');
         },
 
         // Génération HTML

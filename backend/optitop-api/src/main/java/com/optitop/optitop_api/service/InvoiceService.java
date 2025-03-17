@@ -103,7 +103,7 @@ public class InvoiceService {
         }
 
         public List<FrameStatsDTO> getFrameStats(LocalDate startDate, LocalDate endDate) {
-                Map<String, Long> totalFrames = invoiceRepository.calculateTotalFramesCount(startDate, endDate)
+                Map<String, Long> totalFrames = invoiceRepository.calculateP1FramesCounts(startDate, endDate)
                                 .stream()
                                 .collect(Collectors.toMap(
                                                 row -> (String) row[0],

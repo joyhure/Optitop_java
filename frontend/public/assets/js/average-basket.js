@@ -68,8 +68,8 @@ document.addEventListener('DOMContentLoaded', function() {
             let sumBasket = 0;       
             let sumFramesP1 = 0; 
             let sumLensesP1 = 0; 
-            let totalP2Amount = 0;    // Un seul compteur pour le montant P2
-            let totalP2Count = 0;     // Un seul compteur pour le nombre de P2
+            let totalP2Amount = 0;   
+            let totalP2Count = 0;   
 
             // Lignes des vendeurs
             const rows = stats.map(seller => {
@@ -101,12 +101,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 `;
             });
 
-            // Calcul des moyennes globales avec logs pour le P2 Total
-            console.log('Calcul PM P2 Total:', {
-                totalP2Amount,
-                totalP2Count,
-                avgP2Total: totalP2Count ? totalP2Amount / totalP2Count : 0
-            });
+            // Calcul des moyennes globalespour le P2 Total
 
             const avgBasket = totalCount ? sumBasket / totalCount : 0;
             const avgFramesP1 = totalCount ? sumFramesP1 / totalCount : 0;

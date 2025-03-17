@@ -55,7 +55,8 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
             "AND a.status = 'avoir') as invoiceCount " +
             "FROM Invoice i " +
             "WHERE i.date BETWEEN :startDate AND :endDate " +
-            "GROUP BY i.sellerRef")
+            "GROUP BY i.sellerRef " +
+            "ORDER BY i.sellerRef")
     List<Object[]> calculateInvoiceCounts(@Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate);
 
@@ -115,17 +116,6 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
             "GROUP BY i.sellerRef " +
             "ORDER BY i.sellerRef")
     List<Object[]> calculateP2Counts(@Param("startDate") LocalDate startDate,
-            @Param("endDate") LocalDate endDate);
-
-    @Query("SELECT i.sellerRef as sellerRef, " +
-            "COUNT(i) as totalFrames " +
-            "FROM Invoice i " +
-            "WHERE i.date BETWEEN :startDate AND :endDate " +
-            "AND i.family = 'MON' " +
-            "AND i.pair = 1 " +
-            "GROUP BY i.sellerRef " +
-            "ORDER BY i.sellerRef")
-    List<Object[]> calculateTotalFramesCount(@Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate);
 
     @Query("SELECT i.sellerRef as sellerRef, " +
