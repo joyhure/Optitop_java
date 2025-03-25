@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.optitop.optitop_api.dto.AverageBasketDTO;
 import com.optitop.optitop_api.dto.FrameStatsDTO;
-import com.optitop.optitop_api.repository.InvoiceRepository;
+import com.optitop.optitop_api.repository.InvoicesLinesRepository;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -18,25 +18,26 @@ import java.util.ArrayList;
 public class InvoiceService {
 
         @Autowired
-        private InvoiceRepository invoiceRepository;
+        private InvoicesLinesRepository invoicesLinesRepository;
 
         public List<AverageBasketDTO> getAverageBaskets(LocalDate startDate, LocalDate endDate) {
                 // Récupération des montants totaux par vendeur
-                Map<String, Double> totalAmounts = invoiceRepository.calculateTotalAmounts(startDate, endDate)
+                Map<String, Double> totalAmounts = invoicesLinesRepository.calculateTotalAmounts(startDate, endDate)
                                 .stream()
                                 .collect(Collectors.toMap(
                                                 row -> (String) row[0],
                                                 row -> (Double) row[1]));
 
                 // Récupération des nombres de factures par vendeur
-                Map<String, Long> invoiceCounts = invoiceRepository.calculateInvoiceCounts(startDate, endDate)
+                Map<String, Long> invoiceCounts = invoicesLinesRepository.calculateInvoiceCounts(startDate, endDate)
                                 .stream()
                                 .collect(Collectors.toMap(
                                                 row -> (String) row[0],
                                                 row -> (Long) row[1]));
 
                 // Ajout des montants P1 montures
-                Map<String, Double> p1MonAmounts = invoiceRepository.calculateP1FramesTotalAmounts(startDate, endDate)
+                Map<String, Double> p1MonAmounts = invoicesLinesRepository
+                                .calculateP1FramesTotalAmounts(startDate, endDate)
                                 .stream()
                                 .collect(Collectors.toMap(
                                                 row -> (String) row[0],
@@ -44,7 +45,7 @@ public class InvoiceService {
                                                 (v1, v2) -> v1,
                                                 HashMap::new));
 
-                Map<String, Long> p1MonCounts = invoiceRepository.calculateP1FramesCounts(startDate, endDate)
+                Map<String, Long> p1MonCounts = invoicesLinesRepository.calculateP1FramesCounts(startDate, endDate)
                                 .stream()
                                 .collect(Collectors.toMap(
                                                 row -> (String) row[0],
@@ -53,7 +54,8 @@ public class InvoiceService {
                                                 HashMap::new));
 
                 // Ajout des montants P1 verres
-                Map<String, Double> p1VerAmounts = invoiceRepository.calculateP1LensesTotalAmounts(startDate, endDate)
+                Map<String, Double> p1VerAmounts = invoicesLinesRepository
+                                .calculateP1LensesTotalAmounts(startDate, endDate)
                                 .stream()
                                 .collect(Collectors.toMap(
                                                 row -> (String) row[0],
@@ -61,7 +63,7 @@ public class InvoiceService {
                                                 (v1, v2) -> v1,
                                                 HashMap::new));
 
-                Map<String, Long> p1VerCounts = invoiceRepository.calculateP1LensesCounts(startDate, endDate)
+                Map<String, Long> p1VerCounts = invoicesLinesRepository.calculateP1LensesCounts(startDate, endDate)
                                 .stream()
                                 .collect(Collectors.toMap(
                                                 row -> (String) row[0],
@@ -70,7 +72,7 @@ public class InvoiceService {
                                                 HashMap::new));
 
                 // Ajout des montants P2
-                Map<String, Double> p2Amounts = invoiceRepository.calculateP2TotalAmounts(startDate, endDate)
+                Map<String, Double> p2Amounts = invoicesLinesRepository.calculateP2TotalAmounts(startDate, endDate)
                                 .stream()
                                 .collect(Collectors.toMap(
                                                 row -> (String) row[0],
@@ -78,7 +80,7 @@ public class InvoiceService {
                                                 (v1, v2) -> v1,
                                                 HashMap::new));
 
-                Map<String, Long> p2Counts = invoiceRepository.calculateP2Counts(startDate, endDate)
+                Map<String, Long> p2Counts = invoicesLinesRepository.calculateP2Counts(startDate, endDate)
                                 .stream()
                                 .collect(Collectors.toMap(
                                                 row -> (String) row[0],
@@ -103,13 +105,14 @@ public class InvoiceService {
         }
 
         public List<FrameStatsDTO> getFrameStats(LocalDate startDate, LocalDate endDate) {
-                Map<String, Long> totalFrames = invoiceRepository.calculateP1FramesCounts(startDate, endDate)
+                Map<String, Long> totalFrames = invoicesLinesRepository.calculateP1FramesCounts(startDate, endDate)
                                 .stream()
                                 .collect(Collectors.toMap(
                                                 row -> (String) row[0],
                                                 row -> (Long) row[1]));
 
-                Map<String, Long> premiumFrames = invoiceRepository.calculatePremiumFramesCount(startDate, endDate)
+                Map<String, Long> premiumFrames = invoicesLinesRepository
+                                .calculatePremiumFramesCount(startDate, endDate)
                                 .stream()
                                 .collect(Collectors.toMap(
                                                 row -> (String) row[0],
@@ -125,11 +128,11 @@ public class InvoiceService {
         }
 
         public List<Integer> getDistinctYears() {
-                return invoiceRepository.findDistinctYears();
+                return invoicesLinesRepository.findDistinctYears();
         }
 
         public Map<Integer, Double> getMonthlyRevenue(int year) {
-                return invoiceRepository.calculateMonthlyRevenue(year)
+                return invoicesLinesRepository.calculateMonthlyRevenue(year)
                                 .stream()
                                 .collect(Collectors.toMap(
                                                 row -> (Integer) row[0],
@@ -141,7 +144,8 @@ public class InvoiceService {
         public Map<String, Object> getPeriodRevenue(LocalDate startDate, LocalDate endDate) {
                 Map<String, Object> result = new HashMap<>();
 
-                List<Object[]> data = invoiceRepository.getTotalInvoicesForPeriodAndPreviousYear(startDate, endDate);
+                List<Object[]> data = invoicesLinesRepository.getTotalInvoicesForPeriodAndPreviousYear(startDate,
+                                endDate);
 
                 if (!data.isEmpty()) {
                         Object[] firstRow = data.get(0);
@@ -158,7 +162,7 @@ public class InvoiceService {
         public List<Map<String, Object>> getSellerRevenueStats(LocalDate startDate, LocalDate endDate) {
                 List<Map<String, Object>> result = new ArrayList<>();
 
-                List<Object[]> data = invoiceRepository.getSellerRevenueStats(startDate, endDate);
+                List<Object[]> data = invoicesLinesRepository.getSellerRevenueStats(startDate, endDate);
 
                 for (Object[] row : data) {
                         Map<String, Object> sellerStats = new HashMap<>();

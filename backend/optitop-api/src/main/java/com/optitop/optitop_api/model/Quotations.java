@@ -116,7 +116,6 @@ public class Quotations {
     }
 
     public void setSellerRef(String sellerRef) {
-        // À gérer au niveau service
         this.seller = null;
     }
 

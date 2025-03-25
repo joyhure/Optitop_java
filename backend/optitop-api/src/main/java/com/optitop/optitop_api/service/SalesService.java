@@ -1,10 +1,10 @@
 package com.optitop.optitop_api.service;
 
-import com.optitop.optitop_api.model.Invoice;
+import com.optitop.optitop_api.model.InvoicesLines;
 import com.optitop.optitop_api.model.QuotationsLines;
 import com.optitop.optitop_api.model.Quotations;
 import com.optitop.optitop_api.model.Seller;
-import com.optitop.optitop_api.repository.InvoiceRepository;
+import com.optitop.optitop_api.repository.InvoicesLinesRepository;
 import com.optitop.optitop_api.repository.QuotationsLinesRepository;
 import com.optitop.optitop_api.repository.SellerRepository;
 
@@ -35,7 +35,7 @@ public class SalesService {
     private static final int BATCH_SIZE = 1000;
 
     @Autowired
-    private InvoiceRepository invoiceRepository;
+    private InvoicesLinesRepository invoiceRepository;
 
     @Autowired
     private QuotationsLinesRepository quotationImportRepository;
@@ -90,7 +90,7 @@ public class SalesService {
             quotationImportRepository.deleteByDateBetween(minDate, maxDate);
 
             // Traitement par lots pour l'insertion
-            List<Invoice> invoiceBatch = new ArrayList<>();
+            List<InvoicesLines> invoiceBatch = new ArrayList<>();
             List<QuotationsLines> quotationBatch = new ArrayList<>();
 
             for (String line : lines) {
@@ -110,7 +110,7 @@ public class SalesService {
                     }
 
                     if (type.contains("facture") || type.contains("avoir")) {
-                        Invoice invoice = new Invoice();
+                        InvoicesLines invoice = new InvoicesLines();
                         invoice.setDate(date);
                         invoice.setClientId(columns[2]);
                         invoice.setClient(columns[3]);

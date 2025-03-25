@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.optitop.optitop_api.model.Invoice;
+import com.optitop.optitop_api.model.InvoicesLines;
 import com.optitop.optitop_api.model.QuotationsLines;
-import com.optitop.optitop_api.repository.InvoiceRepository;
+import com.optitop.optitop_api.repository.InvoicesLinesRepository;
 import com.optitop.optitop_api.repository.QuotationsLinesRepository;
 
 @RestController
@@ -25,7 +25,7 @@ public class UpdateController {
     private QuotationsLinesRepository quotationsLinesRepository;
 
     @Autowired
-    private InvoiceRepository invoiceRepository;
+    private InvoicesLinesRepository invoiceRepository;
 
     @GetMapping("/last")
     public ResponseEntity<String> getLastUpdate() {
@@ -36,7 +36,7 @@ public class UpdateController {
                 .orElse(null);
 
         LocalDateTime lastInvoiceDate = invoiceRepository.findTopByOrderByCreatedAtDesc()
-                .map(Invoice::getCreatedAt)
+                .map(InvoicesLines::getCreatedAt)
                 .orElse(null);
 
         LocalDateTime lastUpdate = Stream.of(lastQuotationDate, lastInvoiceDate)

@@ -6,12 +6,16 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import jakarta.persistence.Column;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import jakarta.persistence.ForeignKey;
+
 @Entity
-public class Invoice {
+@Table(name = "invoices_lines")
+public class InvoicesLines {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,7 +43,7 @@ public class Invoice {
     private Double totalTtc;
 
     @ManyToOne
-    @JoinColumn(name = "seller_ref", referencedColumnName = "seller_ref", nullable = false)
+    @JoinColumn(name = "seller_ref", referencedColumnName = "seller_ref", nullable = false, foreignKey = @ForeignKey(name = "fk_invoices_lines_seller_ref"))
     private Seller seller;
 
     @Column(nullable = false, name = "total_invoice")

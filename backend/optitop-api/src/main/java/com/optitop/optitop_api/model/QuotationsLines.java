@@ -11,6 +11,8 @@ import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import jakarta.persistence.ForeignKey;
+
 @Entity
 @Table(name = "quotations_lines")
 public class QuotationsLines {
@@ -41,7 +43,7 @@ public class QuotationsLines {
     private Double totalTtc;
 
     @ManyToOne
-    @JoinColumn(name = "seller_ref", referencedColumnName = "seller_ref", nullable = false)
+    @JoinColumn(name = "seller_ref", referencedColumnName = "seller_ref", nullable = false, foreignKey = @ForeignKey(name = "fk_quotations_lines_seller_ref"))
     private Seller seller;
 
     @Column(nullable = false)
