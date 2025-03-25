@@ -4,6 +4,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Column;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -36,8 +38,9 @@ public class Invoice {
     @Column(nullable = false, name = "total_ttc")
     private Double totalTtc;
 
-    @Column(nullable = false, name = "seller_ref")
-    private String sellerRef;
+    @ManyToOne
+    @JoinColumn(name = "seller_ref", referencedColumnName = "seller_ref", nullable = false)
+    private Seller seller;
 
     @Column(nullable = false, name = "total_invoice")
     private Double totalInvoice;
@@ -116,12 +119,12 @@ public class Invoice {
         this.totalTtc = totalTtc;
     }
 
-    public String getSellerRef() {
-        return sellerRef;
+    public Seller getSeller() {
+        return seller;
     }
 
-    public void setSellerRef(String sellerRef) {
-        this.sellerRef = sellerRef;
+    public void setSeller(Seller seller) {
+        this.seller = seller;
     }
 
     public Double getTotalInvoice() {

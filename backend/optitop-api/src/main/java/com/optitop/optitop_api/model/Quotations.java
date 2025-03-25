@@ -4,15 +4,30 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Column;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.EnumType;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import jakarta.persistence.ForeignKey;
+
 @Entity
 @Table(name = "quotations")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Quotations {
 
     @Id
@@ -22,17 +37,18 @@ public class Quotations {
     @Column(nullable = false)
     private LocalDate date;
 
-    @Column(nullable = false)
+    @Column(name = "client_id", nullable = false)
     private String clientId;
 
     @Column(nullable = false)
     private String client;
 
-    @Column(nullable = false)
-    private String sellerRef;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "seller_ref", referencedColumnName = "seller_ref", foreignKey = @ForeignKey(name = "fk_quotations_seller_ref"))
+    private Seller seller;
 
-    @Column(nullable = false)
-    private String status;
+    @Column(name = "is_validated", nullable = false)
+    private Boolean isValidated;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -96,19 +112,24 @@ public class Quotations {
     }
 
     public String getSellerRef() {
-        return sellerRef;
+        return seller != null ? seller.getSellerRef() : null;
     }
 
     public void setSellerRef(String sellerRef) {
-        this.sellerRef = sellerRef;
+        // À gérer au niveau service
+        this.seller = null;
     }
 
-    public String getStatus() {
-        return status;
+    public void setSeller(Seller seller) {
+        this.seller = seller;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public Boolean getIsValidated() {
+        return isValidated;
+    }
+
+    public void setIsValidated(Boolean isValidated) {
+        this.isValidated = isValidated;
     }
 
     public LocalDateTime getCreatedAt() {

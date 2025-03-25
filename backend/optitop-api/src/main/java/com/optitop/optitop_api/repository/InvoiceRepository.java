@@ -21,9 +21,9 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
 
     Optional<Invoice> findTopByOrderByCreatedAtDesc();
 
-    @Query("SELECT DISTINCT i.sellerRef FROM Invoice i " +
+    @Query("SELECT DISTINCT i.seller.sellerRef FROM Invoice i " +
             "WHERE i.date BETWEEN :startDate AND :endDate " +
-            "ORDER BY i.sellerRef")
+            "ORDER BY i.seller.sellerRef")
     List<String> findDistinctSellersBetweenDates(
             @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate);
@@ -42,94 +42,110 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
     List<Object[]> calculateTotalAmounts(@Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate);
 
-    @Query("SELECT i.sellerRef as sellerRef, " +
+    @Query("SELECT i.seller.sellerRef as sellerRef, " +
             "(SELECT COUNT(DISTINCT f.invoiceRef) FROM Invoice f " +
-            "WHERE f.sellerRef = i.sellerRef " +
+            "WHERE f.seller.sellerRef = i.seller.sellerRef " +
             "AND f.date BETWEEN :startDate AND :endDate " +
             "AND f.family = 'VER' " +
             "AND f.status = 'facture') - " +
             "(SELECT COUNT(DISTINCT a.invoiceRef) FROM Invoice a " +
-            "WHERE a.sellerRef = i.sellerRef " +
+            "WHERE a.seller.sellerRef = i.seller.sellerRef " +
             "AND a.date BETWEEN :startDate AND :endDate " +
             "AND a.family = 'VER' " +
             "AND a.status = 'avoir') as invoiceCount " +
             "FROM Invoice i " +
             "WHERE i.date BETWEEN :startDate AND :endDate " +
-            "GROUP BY i.sellerRef " +
-            "ORDER BY i.sellerRef")
+            "GROUP BY i.seller.sellerRef " +
+            "ORDER BY i.seller.sellerRef")
     List<Object[]> calculateInvoiceCounts(@Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate);
 
-    @Query("SELECT i.sellerRef as sellerRef, " +
-            "SUM(CASE WHEN i.pair = 1 THEN i.totalTtc ELSE 0 END) as totalAmountP1MON " +
-            "FROM Invoice i " +
-            "WHERE i.date BETWEEN :startDate AND :endDate " +
-            "AND i.family = 'MON' " +
-            "GROUP BY i.sellerRef " +
-            "ORDER BY i.sellerRef")
-    List<Object[]> calculateP1FramesTotalAmounts(@Param("startDate") LocalDate startDate,
+    @Query(value = """
+                SELECT
+                    i.seller_ref,
+                    SUM(CASE WHEN i.pair = 1 THEN i.total_ttc ELSE 0 END) as total_amount
+                FROM Invoice i
+                WHERE i.date BETWEEN :startDate AND :endDate
+                AND i.family = 'MON'
+                GROUP BY i.seller_ref
+                ORDER BY i.seller_ref
+            """, nativeQuery = true)
+    List<Object[]> calculateP1FramesTotalAmounts(
+            @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate);
 
-    @Query("SELECT i.sellerRef as sellerRef, " +
-            "SUM(CASE WHEN i.pair = 1 THEN i.quantity ELSE 0 END) as countP1MON " +
-            "FROM Invoice i " +
-            "WHERE i.date BETWEEN :startDate AND :endDate " +
-            "AND i.family = 'MON' " +
-            "GROUP BY i.sellerRef " +
-            "ORDER BY i.sellerRef")
-    List<Object[]> calculateP1FramesCounts(@Param("startDate") LocalDate startDate,
+    @Query(value = """
+                SELECT
+                    i.seller_ref,
+                    SUM(CASE WHEN i.pair = 1 THEN i.quantity ELSE 0 END) as count
+                FROM Invoice i
+                WHERE i.date BETWEEN :startDate AND :endDate
+                AND i.family = 'MON'
+                GROUP BY i.seller_ref
+                ORDER BY i.seller_ref
+            """, nativeQuery = true)
+    List<Object[]> calculateP1FramesCounts(
+            @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate);
 
-    @Query("SELECT i.sellerRef as sellerRef, " +
+    @Query(value = """
+                SELECT
+                    i.seller_ref,
+                    SUM(CASE WHEN i.pair = 1 THEN i.quantity ELSE 0 END) as count
+                FROM Invoice i
+                WHERE i.date BETWEEN :startDate AND :endDate
+                AND i.family = 'VER'
+                GROUP BY i.seller_ref
+                ORDER BY i.seller_ref
+            """, nativeQuery = true)
+    List<Object[]> calculateP1LensesCounts(
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate);
+
+    @Query("SELECT i.seller.sellerRef as sellerRef, " +
             "SUM(CASE WHEN i.pair = 1 THEN i.totalTtc ELSE 0 END) as totalAmountP1VER " +
             "FROM Invoice i " +
             "WHERE i.date BETWEEN :startDate AND :endDate " +
             "AND i.family = 'VER' " +
-            "GROUP BY i.sellerRef " +
-            "ORDER BY i.sellerRef")
+            "GROUP BY i.seller.sellerRef " +
+            "ORDER BY i.seller.sellerRef")
     List<Object[]> calculateP1LensesTotalAmounts(@Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate);
 
-    @Query("SELECT i.sellerRef as sellerRef, " +
-            "SUM(CASE WHEN i.pair = 1 THEN i.quantity ELSE 0 END) as countP1VER " +
-            "FROM Invoice i " +
-            "WHERE i.date BETWEEN :startDate AND :endDate " +
-            "AND i.family = 'VER' " +
-            "GROUP BY i.sellerRef " +
-            "ORDER BY i.sellerRef")
-    List<Object[]> calculateP1LensesCounts(@Param("startDate") LocalDate startDate,
-            @Param("endDate") LocalDate endDate);
-
-    @Query("SELECT i.sellerRef as sellerRef, " +
+    @Query("SELECT i.seller.sellerRef as sellerRef, " +
             "SUM(CASE WHEN i.pair = 2 THEN i.totalTtc ELSE 0 END) as totalAmountP2 " +
             "FROM Invoice i " +
             "WHERE i.date BETWEEN :startDate AND :endDate " +
-            "GROUP BY i.sellerRef " +
-            "ORDER BY i.sellerRef")
+            "GROUP BY i.seller.sellerRef " +
+            "ORDER BY i.seller.sellerRef")
     List<Object[]> calculateP2TotalAmounts(@Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate);
 
-    @Query("SELECT i.sellerRef as sellerRef, " +
-            "SUM(CASE WHEN i.pair = 2 THEN i.quantity ELSE 0 END) as countP2 " +
-            "FROM Invoice i " +
-            "WHERE i.date BETWEEN :startDate AND :endDate " +
-            "GROUP BY i.sellerRef " +
-            "ORDER BY i.sellerRef")
-    List<Object[]> calculateP2Counts(@Param("startDate") LocalDate startDate,
+    @Query(value = """
+                SELECT
+                    i.seller_ref as seller_ref,
+                    SUM(CASE WHEN i.pair = 2 THEN i.quantity ELSE 0 END) as count
+                FROM Invoice i
+                WHERE i.date BETWEEN :startDate AND :endDate
+                GROUP BY i.seller_ref
+                ORDER BY i.seller_ref
+            """, nativeQuery = true)
+    List<Object[]> calculateP2Counts(
+            @Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate);
 
-    @Query("SELECT i.sellerRef as sellerRef, " +
-            "(SELECT COUNT(f) FROM Invoice f WHERE f.sellerRef = i.sellerRef " +
+    @Query("SELECT i.seller.sellerRef as sellerRef, " +
+            "(SELECT COUNT(f) FROM Invoice f WHERE f.seller.sellerRef = i.seller.sellerRef " +
             "AND f.date BETWEEN :startDate AND :endDate " +
             "AND f.family = 'MON' AND f.totalTtc >= 200) - " +
-            "(SELECT COUNT(a) FROM Invoice a WHERE a.sellerRef = i.sellerRef " +
+            "(SELECT COUNT(a) FROM Invoice a WHERE a.seller.sellerRef = i.seller.sellerRef " +
             "AND a.date BETWEEN :startDate AND :endDate " +
             "AND a.family = 'MON' AND a.totalTtc <= -200) as premiumFrames " +
             "FROM Invoice i " +
             "WHERE i.date BETWEEN :startDate AND :endDate " +
             "AND i.family = 'MON' " +
-            "GROUP BY i.sellerRef " +
-            "ORDER BY i.sellerRef")
+            "GROUP BY i.seller.sellerRef " +
+            "ORDER BY i.seller.sellerRef")
     List<Object[]> calculatePremiumFramesCount(@Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate);
 
@@ -166,8 +182,8 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
                      ) previous_period) as totalPreviousPeriod
             """, nativeQuery = true)
     List<Object[]> getTotalInvoicesForPeriodAndPreviousYear(
-            @Param("startDate") String startDate,
-            @Param("endDate") String endDate);
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate);
 
     @Query(value = """
                 SELECT
@@ -189,6 +205,6 @@ public interface InvoiceRepository extends JpaRepository<Invoice, Long> {
                 ORDER BY seller_amount DESC
             """, nativeQuery = true)
     List<Object[]> getSellerRevenueStats(
-            @Param("startDate") String startDate,
-            @Param("endDate") String endDate);
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate);
 }

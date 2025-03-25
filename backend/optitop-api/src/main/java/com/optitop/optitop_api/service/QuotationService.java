@@ -11,8 +11,11 @@ import com.optitop.optitop_api.dto.QuotationUpdateDTO;
 import com.optitop.optitop_api.model.Quotations;
 import com.optitop.optitop_api.model.Quotations.QuotationAction;
 import com.optitop.optitop_api.repository.QuotationsRepository;
+import com.optitop.optitop_api.repository.SellerRepository;
+import com.optitop.optitop_api.model.Seller;
 
 import jakarta.transaction.Transactional;
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class QuotationService {
@@ -21,6 +24,9 @@ public class QuotationService {
 
     @Autowired
     private QuotationsRepository quotationsRepository;
+
+    @Autowired
+    private SellerRepository sellerRepository;
 
     /**
      * Met à jour un lot de devis avec les nouvelles actions et commentaires
@@ -78,5 +84,16 @@ public class QuotationService {
                         quotation.getId(), update.getAction());
             }
         }
+    }
+
+    public void updateQuotationSeller(Quotations quotation, String sellerRef) {
+        if (sellerRef == null) {
+            quotation.setSeller(null);
+            return;
+        }
+
+        Seller seller = sellerRepository.findBySellerRef(sellerRef)
+                .orElseThrow(() -> new EntityNotFoundException("Vendeur non trouvé : " + sellerRef));
+        quotation.setSeller(seller);
     }
 }

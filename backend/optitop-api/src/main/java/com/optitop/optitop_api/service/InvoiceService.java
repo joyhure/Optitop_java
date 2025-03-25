@@ -141,9 +141,7 @@ public class InvoiceService {
         public Map<String, Object> getPeriodRevenue(LocalDate startDate, LocalDate endDate) {
                 Map<String, Object> result = new HashMap<>();
 
-                List<Object[]> data = invoiceRepository.getTotalInvoicesForPeriodAndPreviousYear(
-                                startDate.toString(),
-                                endDate.toString());
+                List<Object[]> data = invoiceRepository.getTotalInvoicesForPeriodAndPreviousYear(startDate, endDate);
 
                 if (!data.isEmpty()) {
                         Object[] firstRow = data.get(0);
@@ -160,9 +158,7 @@ public class InvoiceService {
         public List<Map<String, Object>> getSellerRevenueStats(LocalDate startDate, LocalDate endDate) {
                 List<Map<String, Object>> result = new ArrayList<>();
 
-                List<Object[]> data = invoiceRepository.getSellerRevenueStats(
-                                startDate.toString(),
-                                endDate.toString());
+                List<Object[]> data = invoiceRepository.getSellerRevenueStats(startDate, endDate);
 
                 for (Object[] row : data) {
                         Map<String, Object> sellerStats = new HashMap<>();

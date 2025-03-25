@@ -1,12 +1,15 @@
 package com.optitop.optitop_api.service;
 
 import com.optitop.optitop_api.model.Invoice;
-import com.optitop.optitop_api.model.QuotationImport;
+import com.optitop.optitop_api.model.QuotationsLines;
 import com.optitop.optitop_api.model.Quotations;
 import com.optitop.optitop_api.model.Seller;
 import com.optitop.optitop_api.repository.InvoiceRepository;
-import com.optitop.optitop_api.repository.QuotationImportRepository;
+import com.optitop.optitop_api.repository.QuotationsLinesRepository;
 import com.optitop.optitop_api.repository.SellerRepository;
+
+import jakarta.persistence.EntityNotFoundException;
+
 import com.optitop.optitop_api.repository.QuotationsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,7 +38,7 @@ public class SalesService {
     private InvoiceRepository invoiceRepository;
 
     @Autowired
-    private QuotationImportRepository quotationImportRepository;
+    private QuotationsLinesRepository quotationImportRepository;
 
     @Autowired
     private SellerRepository sellerRepository;
@@ -88,7 +91,7 @@ public class SalesService {
 
             // Traitement par lots pour l'insertion
             List<Invoice> invoiceBatch = new ArrayList<>();
-            List<QuotationImport> quotationBatch = new ArrayList<>();
+            List<QuotationsLines> quotationBatch = new ArrayList<>();
 
             for (String line : lines) {
                 try {
@@ -99,7 +102,7 @@ public class SalesService {
                     LocalDate date = LocalDate.parse(columns[0], formatter);
 
                     // Vérifier si le seller_ref existe, sinon l'ajouter
-                    if (!sellerRepository.existsById(sellerRef)) {
+                    if (!sellerRepository.existsBySellerRef(sellerRef)) {
                         Seller newSeller = new Seller();
                         newSeller.setSellerRef(sellerRef);
                         sellerRepository.save(newSeller);
@@ -115,10 +118,13 @@ public class SalesService {
                         invoice.setFamily(columns[5]);
                         invoice.setQuantity(Integer.parseInt(columns[6]));
                         invoice.setTotalTtc(Double.parseDouble(columns[8].replace(",", ".")));
-                        invoice.setSellerRef(sellerRef);
                         invoice.setTotalInvoice(Double.parseDouble(columns[12].replace(",", ".")));
                         invoice.setPair(columns[13].isEmpty() ? null : Integer.parseInt(columns[13]));
                         invoice.setStatus(type);
+
+                        Seller seller = sellerRepository.findBySellerRef(sellerRef)
+                                .orElseThrow(() -> new EntityNotFoundException("Vendeur non trouvé: " + sellerRef));
+                        invoice.setSeller(seller);
 
                         invoiceBatch.add(invoice);
                         if (invoiceBatch.size() >= BATCH_SIZE) {
@@ -126,7 +132,7 @@ public class SalesService {
                             invoiceBatch.clear();
                         }
                     } else if (type.contains("devis")) {
-                        QuotationImport quotation = new QuotationImport();
+                        QuotationsLines quotation = new QuotationsLines();
                         quotation.setDate(date);
                         quotation.setClientId(columns[2]);
                         quotation.setClient(columns[3]);
@@ -134,10 +140,13 @@ public class SalesService {
                         quotation.setFamily(columns[5]);
                         quotation.setQuantity(Integer.parseInt(columns[6]));
                         quotation.setTotalTtc(Double.parseDouble(columns[8].replace(",", ".")));
-                        quotation.setSellerRef(sellerRef);
                         quotation.setTotalQuotation(Double.parseDouble(columns[12].replace(",", ".")));
                         quotation.setPair(columns[13].isEmpty() ? null : Integer.parseInt(columns[13]));
                         quotation.setStatus(type);
+
+                        Seller seller = sellerRepository.findBySellerRef(sellerRef)
+                                .orElseThrow(() -> new EntityNotFoundException("Vendeur non trouvé: " + sellerRef));
+                        quotation.setSeller(seller);
 
                         quotationBatch.add(quotation);
                         if (quotationBatch.size() >= BATCH_SIZE) {
@@ -168,13 +177,13 @@ public class SalesService {
 
     private void createQuotationsEntries(LocalDate startDate, LocalDate endDate) {
         try {
-            List<QuotationImport> imports = quotationImportRepository
+            List<QuotationsLines> imports = quotationImportRepository
                     .findByDateBetweenAndFamilyIn(startDate, endDate, Arrays.asList("VER", "MON"));
 
             // Grouper les imports par clientId et date
-            Map<String, Map<LocalDate, List<QuotationImport>>> groupedQuotations = imports.stream()
-                    .collect(Collectors.groupingBy(QuotationImport::getClientId,
-                            Collectors.groupingBy(QuotationImport::getDate)));
+            Map<String, Map<LocalDate, List<QuotationsLines>>> groupedQuotations = imports.stream()
+                    .collect(Collectors.groupingBy(QuotationsLines::getClientId,
+                            Collectors.groupingBy(QuotationsLines::getDate)));
 
             List<Quotations> quotationsList = new ArrayList<>();
 
@@ -188,7 +197,7 @@ public class SalesService {
                                 .anyMatch(q -> "devis validé".equalsIgnoreCase(q.getStatus()));
 
                         existingQuotations.forEach(quotation -> {
-                            quotation.setStatus(hasValidatedQuotation ? "Validé" : "Non validé");
+                            quotation.setIsValidated(hasValidatedQuotation);
                             quotationsRepository.save(quotation);
                         });
                     } else {
@@ -197,11 +206,11 @@ public class SalesService {
                         quotation.setDate(date);
                         quotation.setClientId(clientId);
                         quotation.setClient(quotationImports.get(0).getClient());
-                        quotation.setSellerRef(quotationImports.get(0).getSellerRef());
+                        quotation.setSellerRef(quotationImports.get(0).getSeller().getSellerRef());
 
                         boolean hasValidatedQuotation = quotationImports.stream()
                                 .anyMatch(q -> "devis validé".equalsIgnoreCase(q.getStatus()));
-                        quotation.setStatus(hasValidatedQuotation ? "Validé" : "Non validé");
+                        quotation.setIsValidated(hasValidatedQuotation);
 
                         quotation.setCreatedAt(LocalDateTime.now());
                         quotationsList.add(quotation);
