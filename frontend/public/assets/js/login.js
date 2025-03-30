@@ -5,8 +5,9 @@ document.addEventListener('DOMContentLoaded', function() {
 async function handleLogin(event) {
     event.preventDefault();
     
+    const loginForm = document.getElementById('loginForm');
+    
     try {
-        // Appel à l'API Spring Boot
         const response = await fetch('http://localhost:8080/api/auth/login', {
             method: 'POST',
             headers: {
@@ -21,12 +22,12 @@ async function handleLogin(event) {
         if (response.ok) {
             const userData = await response.json();
             
-            // Stocker dans sessionStorage
+            // Stocker dans sessionStorage avec seller_ref
             sessionStorage.setItem('user', JSON.stringify({
                 id: userData.id,
                 firstname: userData.firstname,
                 role: userData.role,
-                sellerRef: userData.sellerRef
+                seller_ref: userData.seller_ref
             }));
 
             // Synchroniser avec la session PHP
@@ -40,7 +41,11 @@ async function handleLogin(event) {
 
             window.location.href = 'dashboard.php';
         } else {
-            alert('Identifiants incorrects');
+            const errorData = await response.json();
+            alert(errorData.error || 'Erreur lors de la connexion');
+            
+            // Réinitialiser le champ mot de passe
+            document.getElementById('password').value = '';
         }
     } catch (error) {
         console.error('Erreur:', error);

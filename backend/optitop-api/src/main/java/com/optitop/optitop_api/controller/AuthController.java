@@ -1,12 +1,14 @@
 package com.optitop.optitop_api.controller;
 
-import com.optitop.optitop_api.dto.LoginRequest;
+import com.optitop.optitop_api.dto.LoginRequestDTO;
 // Modèles et repositories
 import com.optitop.optitop_api.model.User;
 import com.optitop.optitop_api.repository.UserRepository;
+import com.optitop.optitop_api.service.PasswordService;
 
 // Spring Framework
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,21 +27,25 @@ public class AuthController {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private PasswordService passwordService;
+
     @PostMapping("/login")
-    public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<Map<String, Object>> login(@RequestBody LoginRequestDTO loginRequest) {
         User user = userRepository.findByLogin(loginRequest.getLogin());
 
-        if (user != null && user.getPassword().equals(loginRequest.getPassword())) {
+        if (user != null && passwordService.verifyPassword(loginRequest.getPassword(), user.getPassword())) {
             Map<String, Object> response = new HashMap<>();
             response.put("id", user.getId());
             response.put("firstname", user.getFirstname());
-            response.put("lastname", user.getLastname());
             response.put("role", user.getRole());
-            response.put("sellerRef", user.getLogin());
+            response.put("seller_ref", user.getLogin()); // Renommé en seller_ref pour plus de clarté
+
             return ResponseEntity.ok(response);
         }
 
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of("error", "Identifiants incorrects"));
     }
 
     @PostMapping("/logout")
