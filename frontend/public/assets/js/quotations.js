@@ -152,7 +152,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-    // 6. Gestionnaire de tri
+    // Gestionnaire de tri
     const sortManager = {
         sortQuotations(data, field, order) {
             const sortFunctions = {
