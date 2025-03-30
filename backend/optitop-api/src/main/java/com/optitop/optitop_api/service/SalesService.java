@@ -59,9 +59,21 @@ public class SalesService {
         }
 
         try {
+            // Ignorer la ligne d'en-tête si présente
+            List<String> dataLines = new ArrayList<>(lines);
+            if (!dataLines.isEmpty() && dataLines.get(0).contains("Date;C.;Num client;Client;")) {
+                logger.info("Détection d'une ligne d'en-tête, suppression");
+                dataLines.remove(0);
+            }
+
+            if (dataLines.isEmpty()) {
+                logger.warn("Aucune ligne de données après suppression de l'en-tête");
+                return;
+            }
+
             // Déterminer la plage de dates
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            LocalDate minDate = lines.stream()
+            LocalDate minDate = dataLines.stream()
                     .map(line -> {
                         try {
                             String[] columns = line.split(";");
@@ -75,7 +87,7 @@ public class SalesService {
                     .min(LocalDate::compareTo)
                     .orElseThrow(() -> new IllegalArgumentException("Aucune date valide trouvée"));
 
-            LocalDate maxDate = lines.stream()
+            LocalDate maxDate = dataLines.stream()
                     .map(line -> {
                         try {
                             String[] columns = line.split(";");
@@ -98,7 +110,7 @@ public class SalesService {
             List<InvoicesLines> invoiceBatch = new ArrayList<>();
             List<QuotationsLines> quotationBatch = new ArrayList<>();
 
-            for (String line : lines) {
+            for (String line : dataLines) {
                 try {
                     String[] columns = line.split(";");
 
@@ -124,6 +136,7 @@ public class SalesService {
                         logger.info("Nouveau vendeur ajouté avec la référence : " + sellerRef);
                     }
 
+                    // Factures
                     if (type.contains("facture") || type.contains("avoir")) {
                         InvoicesLines invoice = new InvoicesLines();
                         invoice.setDate(date);
@@ -136,6 +149,7 @@ public class SalesService {
                         invoice.setTotalInvoice(Double.parseDouble(columns[12].replace(",", ".")));
                         invoice.setPair(columns[13].isEmpty() ? null : Integer.parseInt(columns[13]));
                         invoice.setStatus(type);
+                        invoice.setCreatedAt(LocalDateTime.now());
 
                         Seller seller = sellerRepository.findBySellerRef(sellerRef)
                                 .orElseThrow(() -> new EntityNotFoundException("Vendeur non trouvé: " + sellerRef));
@@ -158,6 +172,7 @@ public class SalesService {
                         quotation.setTotalQuotation(Double.parseDouble(columns[12].replace(",", ".")));
                         quotation.setPair(columns[13].isEmpty() ? null : Integer.parseInt(columns[13]));
                         quotation.setStatus(type);
+                        quotation.setCreatedAt(LocalDateTime.now());
 
                         Seller seller = sellerRepository.findBySellerRef(sellerRef)
                                 .orElseThrow(() -> new EntityNotFoundException("Vendeur non trouvé: " + sellerRef));
@@ -193,7 +208,21 @@ public class SalesService {
     private void createQuotationsEntries(LocalDate startDate, LocalDate endDate) {
         try {
             List<QuotationsLines> imports = quotationsLinesRepository
-                    .findByDateBetweenAndFamilyIn(startDate, endDate, Arrays.asList("VER", "MON"));
+                    .findByDateBetweenAndFamilyInFetchSeller(startDate, endDate, Arrays.asList("VER"));
+
+            // log
+            logger.info("Premier seller chargé: {}",
+                    !imports.isEmpty() && imports.get(0).getSeller() != null
+                            ? imports.get(0).getSeller().getSellerRef()
+                            : "NULL");
+
+            if (!imports.isEmpty()) {
+                QuotationsLines firstLine = imports.get(0);
+                logger.info("Première ligne: quotationRef={}, seller={}, sellerObject={}",
+                        firstLine.getQuotationRef(),
+                        firstLine.getSeller() != null ? firstLine.getSeller().getSellerRef() : "NULL",
+                        firstLine.getSeller());
+            }
 
             // Grouper les imports par clientId et date
             Map<String, Map<LocalDate, List<QuotationsLines>>> groupedQuotations = imports.stream()

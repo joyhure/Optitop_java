@@ -22,10 +22,12 @@ public interface QuotationsLinesRepository extends JpaRepository<QuotationsLines
             @Param("endDate") LocalDate endDate,
             @Param("families") List<String> families);
 
+    @Query("SELECT q FROM QuotationsLines q LEFT JOIN FETCH q.seller WHERE q.date BETWEEN :startDate AND :endDate AND q.family IN :families")
+    List<QuotationsLines> findByDateBetweenAndFamilyInFetchSeller(
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate,
+            @Param("families") List<String> families);
+
     void deleteByDateBetween(LocalDate startDate, LocalDate endDate);
 
-    @Query("SELECT ql FROM QuotationsLines ql LEFT JOIN FETCH ql.seller WHERE ql.date BETWEEN :startDate AND :endDate")
-    List<QuotationsLines> findByDateBetweenWithSeller(
-            @Param("startDate") LocalDate startDate,
-            @Param("endDate") LocalDate endDate);
 }
