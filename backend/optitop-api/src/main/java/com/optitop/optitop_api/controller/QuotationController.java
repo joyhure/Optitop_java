@@ -18,6 +18,7 @@ import com.optitop.optitop_api.dto.QuotationUpdateDTO;
 import com.optitop.optitop_api.dto.SellerStatsDTO;
 import com.optitop.optitop_api.model.Quotations;
 import com.optitop.optitop_api.model.Quotations.QuotationAction;
+import com.optitop.optitop_api.model.Seller;
 import com.optitop.optitop_api.repository.QuotationsRepository;
 import com.optitop.optitop_api.service.QuotationService;
 
@@ -141,7 +142,15 @@ public class QuotationController {
     private QuotationDTO convertToDTO(Quotations quotation) {
         QuotationDTO dto = new QuotationDTO(quotation.getId());
         dto.setDate(quotation.getDate());
-        dto.setSellerRef(quotation.getSellerRef());
+
+        // Récupération du seller depuis la quotation
+        Seller quotationSeller = quotation.getSeller();
+        if (quotationSeller != null) {
+            dto.setSeller(quotationSeller.getSellerRef());
+        } else {
+            dto.setSeller("Non assigné"); // Valeur par défaut
+        }
+
         dto.setClient(quotation.getClient());
         dto.setAction(quotation.getAction() != null ? quotation.getAction().getValue() : null);
         dto.setComment(quotation.getComment());

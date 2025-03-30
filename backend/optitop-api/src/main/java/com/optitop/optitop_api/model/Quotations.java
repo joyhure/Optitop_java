@@ -14,7 +14,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.EnumType;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -43,7 +42,7 @@ public class Quotations {
     @Column(nullable = false)
     private String client;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "seller_ref", referencedColumnName = "seller_ref", foreignKey = @ForeignKey(name = "fk_quotations_seller_ref"))
     private Seller seller;
 
@@ -111,12 +110,8 @@ public class Quotations {
         this.client = client;
     }
 
-    public String getSellerRef() {
-        return seller != null ? seller.getSellerRef() : null;
-    }
-
-    public void setSellerRef(String sellerRef) {
-        this.seller = null;
+    public Seller getSeller() {
+        return seller;
     }
 
     public void setSeller(Seller seller) {

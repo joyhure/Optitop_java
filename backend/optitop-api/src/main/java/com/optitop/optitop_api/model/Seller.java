@@ -18,7 +18,7 @@ public class Seller {
     private LocalDateTime createdAt;
 
     @OneToOne
-    @JoinColumn(name = "user_id", unique = true, referencedColumnName = "id", foreignKey = @ForeignKey(name = "fk_seller_user"), nullable = true)
+    @JoinColumn(name = "user_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "fk_seller_user"), nullable = true)
     private User user;
 
     // Constructeurs

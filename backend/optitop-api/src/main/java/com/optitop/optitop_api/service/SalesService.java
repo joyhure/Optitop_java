@@ -4,9 +4,11 @@ import com.optitop.optitop_api.model.InvoicesLines;
 import com.optitop.optitop_api.model.QuotationsLines;
 import com.optitop.optitop_api.model.Quotations;
 import com.optitop.optitop_api.model.Seller;
+import com.optitop.optitop_api.model.User;
 import com.optitop.optitop_api.repository.InvoicesLinesRepository;
 import com.optitop.optitop_api.repository.QuotationsLinesRepository;
 import com.optitop.optitop_api.repository.SellerRepository;
+import com.optitop.optitop_api.repository.UserRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -35,16 +37,19 @@ public class SalesService {
     private static final int BATCH_SIZE = 1000;
 
     @Autowired
-    private InvoicesLinesRepository invoiceRepository;
+    private InvoicesLinesRepository invoicesLinesRepository;
 
     @Autowired
-    private QuotationsLinesRepository quotationImportRepository;
+    private QuotationsLinesRepository quotationsLinesRepository;
 
     @Autowired
     private SellerRepository sellerRepository;
 
     @Autowired
     private QuotationsRepository quotationsRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Transactional
     public void processBatch(List<String> lines) {
@@ -86,8 +91,8 @@ public class SalesService {
 
             // Supprimer toutes les données de la période
             logger.info("Suppression des données entre " + minDate + " et " + maxDate);
-            invoiceRepository.deleteByDateBetween(minDate, maxDate);
-            quotationImportRepository.deleteByDateBetween(minDate, maxDate);
+            invoicesLinesRepository.deleteByDateBetween(minDate, maxDate);
+            quotationsLinesRepository.deleteByDateBetween(minDate, maxDate);
 
             // Traitement par lots pour l'insertion
             List<InvoicesLines> invoiceBatch = new ArrayList<>();
@@ -105,6 +110,16 @@ public class SalesService {
                     if (!sellerRepository.existsBySellerRef(sellerRef)) {
                         Seller newSeller = new Seller();
                         newSeller.setSellerRef(sellerRef);
+
+                        // Chercher un utilisateur avec le même login
+                        User matchingUser = userRepository.findByLogin(sellerRef);
+                        if (matchingUser != null) {
+                            newSeller.setUser(matchingUser);
+                            logger.info(
+                                    "Associé le vendeur " + sellerRef + " à l'utilisateur " + matchingUser.getLogin());
+                        }
+
+                        newSeller.setCreatedAt(LocalDateTime.now());
                         sellerRepository.save(newSeller);
                         logger.info("Nouveau vendeur ajouté avec la référence : " + sellerRef);
                     }
@@ -128,7 +143,7 @@ public class SalesService {
 
                         invoiceBatch.add(invoice);
                         if (invoiceBatch.size() >= BATCH_SIZE) {
-                            invoiceRepository.saveAll(invoiceBatch);
+                            invoicesLinesRepository.saveAll(invoiceBatch);
                             invoiceBatch.clear();
                         }
                     } else if (type.contains("devis")) {
@@ -150,7 +165,7 @@ public class SalesService {
 
                         quotationBatch.add(quotation);
                         if (quotationBatch.size() >= BATCH_SIZE) {
-                            quotationImportRepository.saveAll(quotationBatch);
+                            quotationsLinesRepository.saveAll(quotationBatch);
                             quotationBatch.clear();
                         }
                     }
@@ -161,10 +176,10 @@ public class SalesService {
 
             // Sauvegarder les derniers lots
             if (!invoiceBatch.isEmpty()) {
-                invoiceRepository.saveAll(invoiceBatch);
+                invoicesLinesRepository.saveAll(invoiceBatch);
             }
             if (!quotationBatch.isEmpty()) {
-                quotationImportRepository.saveAll(quotationBatch);
+                quotationsLinesRepository.saveAll(quotationBatch);
             }
 
             // Après le traitement de toutes les lignes, créer les entrées dans quotations
@@ -177,7 +192,7 @@ public class SalesService {
 
     private void createQuotationsEntries(LocalDate startDate, LocalDate endDate) {
         try {
-            List<QuotationsLines> imports = quotationImportRepository
+            List<QuotationsLines> imports = quotationsLinesRepository
                     .findByDateBetweenAndFamilyIn(startDate, endDate, Arrays.asList("VER", "MON"));
 
             // Grouper les imports par clientId et date
@@ -206,7 +221,7 @@ public class SalesService {
                         quotation.setDate(date);
                         quotation.setClientId(clientId);
                         quotation.setClient(quotationImports.get(0).getClient());
-                        quotation.setSellerRef(quotationImports.get(0).getSeller().getSellerRef());
+                        quotation.setSeller(quotationImports.get(0).getSeller());
 
                         boolean hasValidatedQuotation = quotationImports.stream()
                                 .anyMatch(q -> "devis validé".equalsIgnoreCase(q.getStatus()));

@@ -43,7 +43,7 @@ public class QuotationsLines {
     private Double totalTtc;
 
     @ManyToOne
-    @JoinColumn(name = "seller_ref", referencedColumnName = "seller_ref", nullable = false, foreignKey = @ForeignKey(name = "fk_quotations_lines_seller_ref"))
+    @JoinColumn(name = "seller_ref", referencedColumnName = "seller_ref", nullable = true, foreignKey = @ForeignKey(name = "fk_quotations_lines_seller"))
     private Seller seller;
 
     @Column(nullable = false)

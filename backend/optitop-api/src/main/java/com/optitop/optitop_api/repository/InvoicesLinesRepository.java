@@ -207,4 +207,6 @@ public interface InvoicesLinesRepository extends JpaRepository<InvoicesLines, Lo
         List<Object[]> getSellerRevenueStats(
                         @Param("startDate") LocalDate startDate,
                         @Param("endDate") LocalDate endDate);
+
+        List<InvoicesLines> findByDateBetween(LocalDate startDate, LocalDate endDate);
 }
