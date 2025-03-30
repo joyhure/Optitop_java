@@ -1,11 +1,13 @@
 package com.optitop.optitop_api.service;
 
+import com.optitop.optitop_api.model.Invoices;
 import com.optitop.optitop_api.model.InvoicesLines;
 import com.optitop.optitop_api.model.QuotationsLines;
 import com.optitop.optitop_api.model.Quotations;
 import com.optitop.optitop_api.model.Seller;
 import com.optitop.optitop_api.model.User;
 import com.optitop.optitop_api.repository.InvoicesLinesRepository;
+import com.optitop.optitop_api.repository.InvoicesRepository;
 import com.optitop.optitop_api.repository.QuotationsLinesRepository;
 import com.optitop.optitop_api.repository.SellerRepository;
 import com.optitop.optitop_api.repository.UserRepository;
@@ -50,6 +52,9 @@ public class SalesService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private InvoicesRepository invoicesRepository;
 
     @Transactional
     public void processBatch(List<String> lines) {
@@ -197,7 +202,8 @@ public class SalesService {
                 quotationsLinesRepository.saveAll(quotationBatch);
             }
 
-            // Après le traitement de toutes les lignes, créer les entrées dans quotations
+            // Après le traitement de toutes les lignes, créer les entrées agrégées
+            createInvoicesEntries(minDate, maxDate);
             createQuotationsEntries(minDate, maxDate);
         } catch (Exception e) {
             logger.error("Erreur lors du traitement du lot", e);
@@ -272,6 +278,65 @@ public class SalesService {
         } catch (Exception e) {
             logger.error("Erreur lors de la création des entrées de devis", e);
             throw new RuntimeException("Erreur lors de la création des entrées de devis", e);
+        }
+    }
+
+    private void createInvoicesEntries(LocalDate startDate, LocalDate endDate) {
+        try {
+            logger.info("Création des entrées de factures entre {} et {}", startDate, endDate);
+
+            // Récupérer toutes les lignes de factures avec les vendeurs pour la période
+            List<InvoicesLines> imports = invoicesLinesRepository
+                    .findByDateBetweenWithSeller(startDate, endDate);
+
+            logger.info("Nombre de lignes de factures récupérées: {}", imports.size());
+
+            // Supprimer d'abord toutes les factures existantes de la période
+            invoicesRepository.deleteByDateBetween(startDate, endDate);
+
+            // Grouper les imports par référence de facture
+            Map<String, List<InvoicesLines>> groupedInvoices = imports.stream()
+                    .collect(Collectors.groupingBy(InvoicesLines::getInvoiceRef));
+
+            // Créer une liste pour stocker les nouvelles factures
+            List<Invoices> invoicesList = new ArrayList<>();
+
+            // Traiter chaque groupe
+            groupedInvoices.forEach((invoiceRef, invoiceLines) -> {
+                // Prendre la première ligne pour l'information commune
+                InvoicesLines firstLine = invoiceLines.get(0);
+
+                // Vérifier si au moins une ligne concerne des verres (famille VER)
+                boolean isOptical = invoiceLines.stream()
+                        .anyMatch(line -> "VER".equalsIgnoreCase(line.getFamily()));
+
+                // Créer une nouvelle facture
+                Invoices invoice = new Invoices();
+                invoice.setDate(firstLine.getDate());
+                invoice.setClientId(firstLine.getClientId());
+                invoice.setClient(firstLine.getClient());
+                invoice.setInvoiceRef(invoiceRef);
+                invoice.setSeller(firstLine.getSeller());
+                invoice.setTotalInvoice(firstLine.getTotalInvoice());
+                invoice.setStatus(firstLine.getStatus());
+                invoice.setIsOptical(isOptical);
+                invoice.setCreatedAt(LocalDateTime.now());
+
+                invoicesList.add(invoice);
+            });
+
+            // Sauvegarder par lots
+            if (!invoicesList.isEmpty()) {
+                logger.info("Création de {} factures", invoicesList.size());
+                for (int i = 0; i < invoicesList.size(); i += BATCH_SIZE) {
+                    int end = Math.min(i + BATCH_SIZE, invoicesList.size());
+                    invoicesRepository.saveAll(invoicesList.subList(i, end));
+                }
+            }
+
+        } catch (Exception e) {
+            logger.error("Erreur lors de la création des entrées de factures", e);
+            throw new RuntimeException("Erreur lors de la création des entrées de factures", e);
         }
     }
 }
