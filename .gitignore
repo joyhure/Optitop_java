@@ -8,5 +8,6 @@ node_modules/
 # Logs
 *.log
 
-# Original CSV files
+# Ressources
 Ressources/Fichiers .csv/Originaux/*.csv
+Ressources/id&pass
