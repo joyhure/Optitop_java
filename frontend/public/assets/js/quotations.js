@@ -76,6 +76,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 const response = await utils.fetchApi(url);
                 const quotations = await response.json();
+                console.log('Quotations reçues:', quotations);
                 
                 return sortManager.sortQuotations(quotations, STATE.currentSort.field, STATE.currentSort.order);
             } catch (error) {
@@ -251,7 +252,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return `
                 <tr data-quotation-id="${quotation.id}">
                     <td>${utils.formatDate(quotation.date)}</td>
-                    <td class="text-center">${utils.getInitials(quotation.sellerRef)}</td>
+                    <td class="text-center">${utils.getInitials(quotation.seller)}</td>
                     <td>${quotation.client}</td>
                     <td>
                         <select class="form-select form-select-sm action-select" 
