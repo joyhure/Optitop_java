@@ -18,7 +18,6 @@ import com.optitop.optitop_api.dto.QuotationUpdateDTO;
 import com.optitop.optitop_api.dto.SellerStatsDTO;
 import com.optitop.optitop_api.model.Quotations;
 import com.optitop.optitop_api.model.Quotations.QuotationAction;
-import com.optitop.optitop_api.model.Seller;
 import com.optitop.optitop_api.repository.QuotationsRepository;
 import com.optitop.optitop_api.service.QuotationService;
 
@@ -41,23 +40,33 @@ public class QuotationController {
             @RequestParam String endDate,
             @RequestParam(required = false) String userRole,
             @RequestParam(required = false) String userSellerRef) {
+
+        logger.debug("Requête reçue - startDate: {}, endDate: {}, userRole: {}, userSellerRef: {}",
+                startDate, endDate, userRole, userSellerRef); // Ajout de logs
+
         try {
             LocalDate start = LocalDate.parse(startDate);
             LocalDate end = LocalDate.parse(endDate);
 
             List<Quotations> quotations;
-            if ("collaborator".equalsIgnoreCase(userRole)) {
+            if ("collaborator".equalsIgnoreCase(userRole) && userSellerRef != null) {
+                logger.debug("Recherche des devis pour le collaborateur: {}", userSellerRef);
                 quotations = quotationsRepository.findUnvalidatedByDateBetweenAndSellerRef(
                         start, end, userSellerRef);
             } else {
+                logger.debug("Recherche de tous les devis non validés");
                 quotations = quotationsRepository.findUnvalidatedByDateBetween(start, end);
             }
 
             logger.debug("Nombre de devis trouvés: {}", quotations.size());
 
-            return ResponseEntity.ok(quotations.stream()
+            List<QuotationDTO> dtos = quotations.stream()
                     .map(this::convertToDTO)
-                    .collect(Collectors.toList()));
+                    .collect(Collectors.toList());
+
+            logger.debug("DTOs générés: {}", dtos);
+
+            return ResponseEntity.ok(dtos);
         } catch (Exception e) {
             logger.error("Erreur lors de la récupération des devis non validés", e);
             return ResponseEntity.internalServerError().build();
@@ -144,9 +153,8 @@ public class QuotationController {
         dto.setDate(quotation.getDate());
 
         // Récupération du seller depuis la quotation
-        Seller quotationSeller = quotation.getSeller();
-        if (quotationSeller != null) {
-            dto.setSeller(quotationSeller.getSellerRef());
+        if (quotation.getSeller() != null) {
+            dto.setSeller(quotation.getSeller().getSellerRef());
         } else {
             dto.setSeller("Non assigné"); // Valeur par défaut
         }
