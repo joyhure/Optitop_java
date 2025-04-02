@@ -8,7 +8,7 @@ public class AverageBasketDTO {
     private Double averageP1MON;
     private Double averageP1VER;
     private Double averageP2;
-    private Long p2Count; // Ajout du compteur de P2
+    private Long p2Count;
 
     public AverageBasketDTO(String sellerRef, Double totalAmount, Long invoiceCount,
             Double totalAmountP1MON, Long countP1MON,
@@ -21,7 +21,7 @@ public class AverageBasketDTO {
         this.averageP1MON = calculateAverage(totalAmountP1MON, countP1MON);
         this.averageP1VER = calculateAverage(totalAmountP1VER, countP1VER);
         this.averageP2 = calculateAverage(totalAmountP2, countP2);
-        this.p2Count = countP2; // Stockage du nombre de P2
+        this.p2Count = countP2;
     }
 
     private Double calculateAverage(Double amount, Long count) {

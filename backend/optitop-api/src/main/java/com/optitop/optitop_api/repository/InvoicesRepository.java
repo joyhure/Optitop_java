@@ -20,4 +20,32 @@ public interface InvoicesRepository extends JpaRepository<Invoices, Long> {
     @Modifying
     @Query("DELETE FROM Invoices i WHERE i.date BETWEEN :startDate AND :endDate")
     void deleteByDateBetween(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
+
+    @Query("SELECT i.seller.sellerRef, " +
+            "SUM(i.totalInvoice) as totalAmount " +
+            "FROM Invoices i " +
+            "WHERE i.date BETWEEN :startDate AND :endDate " +
+            "AND i.isOptical = true " +
+            "GROUP BY i.seller.sellerRef " +
+            "ORDER BY i.seller.sellerRef")
+    List<Object[]> calculateTotalAmounts(@Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate);
+
+    @Query("SELECT i.seller.sellerRef as sellerRef, " +
+            "(SELECT COUNT(*) FROM Invoices f " +
+            "WHERE f.seller.sellerRef = i.seller.sellerRef " +
+            "AND f.date BETWEEN :startDate AND :endDate " +
+            "AND f.isOptical = true " +
+            "AND f.status = 'facture') - " +
+            "(SELECT COUNT(*) FROM Invoices a " +
+            "WHERE a.seller.sellerRef = i.seller.sellerRef " +
+            "AND a.date BETWEEN :startDate AND :endDate " +
+            "AND a.isOptical = true " +
+            "AND a.status = 'avoir') as invoiceCount " +
+            "FROM Invoices i " +
+            "WHERE i.date BETWEEN :startDate AND :endDate " +
+            "GROUP BY i.seller.sellerRef " +
+            "ORDER BY i.seller.sellerRef")
+    List<Object[]> calculateInvoiceCounts(@Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate);
 }

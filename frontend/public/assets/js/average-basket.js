@@ -21,8 +21,8 @@ document.addEventListener('DOMContentLoaded', function() {
             return `${amount.toFixed(2)}€`;
         },
         
-        getInitials(sellerRef) {
-            return sellerRef?.substring(0, 2).toUpperCase() || 'XX';
+        getInitials(seller) {
+            return seller?.substring(0, 2).toUpperCase() || 'XX';
         },
 
         async fetchApi(endpoint, options = {}) {

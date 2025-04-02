@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.optitop.optitop_api.dto.AverageBasketDTO;
 import com.optitop.optitop_api.dto.FrameStatsDTO;
 import com.optitop.optitop_api.repository.InvoicesLinesRepository;
-
+import com.optitop.optitop_api.repository.InvoicesRepository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -20,16 +20,19 @@ public class InvoiceService {
         @Autowired
         private InvoicesLinesRepository invoicesLinesRepository;
 
+        @Autowired
+        private InvoicesRepository invoicesRepository;
+
         public List<AverageBasketDTO> getAverageBaskets(LocalDate startDate, LocalDate endDate) {
                 // Récupération des montants totaux par vendeur
-                Map<String, Double> totalAmounts = invoicesLinesRepository.calculateTotalAmounts(startDate, endDate)
+                Map<String, Double> totalAmounts = invoicesRepository.calculateTotalAmounts(startDate, endDate)
                                 .stream()
                                 .collect(Collectors.toMap(
                                                 row -> (String) row[0],
                                                 row -> (Double) row[1]));
 
                 // Récupération des nombres de factures par vendeur
-                Map<String, Long> invoiceCounts = invoicesLinesRepository.calculateInvoiceCounts(startDate, endDate)
+                Map<String, Long> invoiceCounts = invoicesRepository.calculateInvoiceCounts(startDate, endDate)
                                 .stream()
                                 .collect(Collectors.toMap(
                                                 row -> (String) row[0],
