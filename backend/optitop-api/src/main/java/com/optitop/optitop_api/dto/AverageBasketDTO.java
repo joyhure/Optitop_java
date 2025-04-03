@@ -25,7 +25,7 @@ public class AverageBasketDTO {
     }
 
     private Double calculateAverage(Double amount, Long count) {
-        return count != null && count > 0 && amount != null ? amount / count : 0.0;
+        return (count != null && count > 0 && amount != null) ? amount / count : null;
     }
 
     // Getters

@@ -13,6 +13,8 @@ import java.util.stream.Collectors;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.ArrayList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 public class InvoiceService {
@@ -22,6 +24,8 @@ public class InvoiceService {
 
         @Autowired
         private InvoicesRepository invoicesRepository;
+
+        private static final Logger logger = LoggerFactory.getLogger(InvoiceService.class);
 
         public List<AverageBasketDTO> getAverageBaskets(LocalDate startDate, LocalDate endDate) {
                 // Récupération des montants totaux par vendeur
@@ -176,5 +180,67 @@ public class InvoiceService {
                 }
 
                 return result;
+        }
+
+        public AverageBasketDTO getTotalStats(LocalDate startDate, LocalDate endDate) {
+                // Totaux depuis Invoices
+                Double totalAmount = invoicesRepository.calculateTotalAmount(startDate, endDate);
+                Long invoiceCount = invoicesRepository.calculateTotalInvoiceCount(startDate, endDate);
+
+                // Totaux depuis InvoicesLines
+                List<Object[]> p1FramesTotalAmounts = invoicesLinesRepository.calculateP1FramesTotalAmounts(startDate,
+                                endDate);
+
+                logger.info("P1 Frames Total Amounts: {}", p1FramesTotalAmounts);
+                p1FramesTotalAmounts.forEach(row -> {
+                        logger.info("Seller: {}, Amount: {}", row[0], row[1]);
+                });
+
+                Double totalAmountP1MON = p1FramesTotalAmounts.stream()
+                                .map(row -> (Double) row[1])
+                                .reduce(0.0, Double::sum);
+
+                logger.info("Total Amount P1MON: {}", totalAmountP1MON);
+
+                Long countP1MON = invoicesLinesRepository
+                                .calculateP1FramesCounts(startDate, endDate)
+                                .stream()
+                                .map(row -> (Long) row[1])
+                                .reduce(0L, Long::sum);
+
+                Double totalAmountP1VER = invoicesLinesRepository
+                                .calculateP1LensesTotalAmounts(startDate, endDate)
+                                .stream()
+                                .map(row -> (Double) row[1])
+                                .reduce(0.0, Double::sum);
+
+                Long countP1VER = invoicesLinesRepository
+                                .calculateP1LensesCounts(startDate, endDate)
+                                .stream()
+                                .map(row -> (Long) row[1])
+                                .reduce(0L, Long::sum);
+
+                Double totalAmountP2 = invoicesLinesRepository
+                                .calculateP2TotalAmounts(startDate, endDate)
+                                .stream()
+                                .map(row -> (Double) row[1])
+                                .reduce(0.0, Double::sum);
+
+                Long countP2 = invoicesLinesRepository
+                                .calculateP2Counts(startDate, endDate)
+                                .stream()
+                                .map(row -> (Long) row[1])
+                                .reduce(0L, Long::sum);
+
+                return new AverageBasketDTO(
+                                "TOTAL",
+                                totalAmount,
+                                invoiceCount,
+                                totalAmountP1MON,
+                                countP1MON,
+                                totalAmountP1VER,
+                                countP1VER,
+                                totalAmountP2,
+                                countP2);
         }
 }

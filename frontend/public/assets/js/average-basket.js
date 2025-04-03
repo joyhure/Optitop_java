@@ -1,8 +1,11 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Configuration
     const CONFIG = {
-        API_BASE_URL: 'http://localhost:8080/api'
+        API_BASE_URL: 'http://localhost:8080/api',
+        BONUS_PER_FRAME: 5
     };
 
+    // Éléments du DOM
     const DOM = {
         basketsBody: document.getElementById('table-baskets-body'),
         framesBody: document.getElementById('table-frames-body'),
@@ -10,11 +13,13 @@ document.addEventListener('DOMContentLoaded', function() {
         cardP2: document.getElementById('card-p2')
     };
 
+    // État de l'application
     const STATE = {
         startDate: sessionStorage.getItem('startDate'),
         endDate: sessionStorage.getItem('endDate')
     };
 
+    // Utilitaires
     const utils = {
         formatCurrency(amount) {
             if (amount === null || amount === undefined) return 'Indéfini';
@@ -26,112 +31,180 @@ document.addEventListener('DOMContentLoaded', function() {
         },
 
         async fetchApi(endpoint, options = {}) {
-            const response = await fetch(`${CONFIG.API_BASE_URL}${endpoint}`, {
-                ...options,
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...options.headers
-                }
-            });
-            if (!response.ok) throw new Error(`Erreur API: ${response.status}`);
-            return response.json();
+            try {
+                const response = await fetch(`${CONFIG.API_BASE_URL}${endpoint}`, {
+                    ...options,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers
+                    }
+                });
+                if (!response.ok) throw new Error(`Erreur API: ${response.status}`);
+                return response.json();
+            } catch (error) {
+                console.error(`Erreur lors de l'appel API ${endpoint}:`, error);
+                throw error;
+            }
         }
     };
 
+    // Gestionnaire des paniers moyens
+    const averageBasketManager = {
+        calculateTotals(stats) {
+            return stats.reduce((acc, seller) => {
+                acc.totalCount += seller.invoiceCount || 0;
+                acc.sumBasket += (seller.averageBasket || 0) * (seller.invoiceCount || 0);
+                acc.sumFramesP1 += (seller.averageP1MON || 0) * (seller.invoiceCount || 0);
+                acc.sumLensesP1 += (seller.averageP1VER || 0) * (seller.invoiceCount || 0);
+                acc.totalP2Amount += (seller.averageP2 || 0) * (seller.p2Count || 0);
+                acc.totalP2Count += seller.p2Count || 0;
+                return acc;
+            }, {
+                totalCount: 0,
+                sumBasket: 0,
+                sumFramesP1: 0,
+                sumLensesP1: 0,
+                totalP2Amount: 0,
+                totalP2Count: 0
+            });
+        },
+
+        calculateAverages(totals) {
+            return {
+                avgBasket: totals.totalCount ? totals.sumBasket / totals.totalCount : null,
+                avgFramesP1: totals.totalCount ? totals.sumFramesP1 / totals.totalCount : null,
+                avgLensesP1: totals.totalCount ? totals.sumLensesP1 / totals.totalCount : null,
+                avgP2Total: totals.totalP2Count ? totals.totalP2Amount / totals.totalP2Count : null
+            };
+        },
+
+        createSellerRow(seller) {
+            return `
+                <tr>
+                    <td class="text-center">${utils.getInitials(seller.sellerRef)}</td>
+                    <td class="text-center">${utils.formatCurrency(seller.averageBasket)}</td>
+                    <td class="text-center">${seller.invoiceCount}</td>
+                    <td class="text-center">${utils.formatCurrency(seller.averageP1MON)}</td>
+                    <td class="text-center">${utils.formatCurrency(seller.averageP1VER)}</td>
+                    <td class="text-center">${seller.p2Count > 0 ? utils.formatCurrency(seller.averageP2) : 'Aucun'}</td>
+                </tr>
+            `;
+        },
+
+        createTotalRow(totalStats) {
+            return `
+                <tr class="fw-bold">
+                    <td class="text-center">Total</td>
+                    <td class="text-center">${utils.formatCurrency(totalStats.averageBasket)}</td>
+                    <td class="text-center">${totalStats.invoiceCount}</td>
+                    <td class="text-center">${utils.formatCurrency(totalStats.averageP1MON)}</td>
+                    <td class="text-center">${utils.formatCurrency(totalStats.averageP1VER)}</td>
+                    <td class="text-center">${totalStats.p2Count > 0 ? utils.formatCurrency(totalStats.averageP2) : 'Aucun'}</td>
+                </tr>
+            `;
+        },
+
+        updateDisplay(stats, totalStats) {
+            if (!DOM.basketsBody) return;
+
+            const rows = [
+                ...stats.map(seller => this.createSellerRow(seller)),
+                this.createTotalRow(totalStats)
+            ];
+
+            DOM.basketsBody.innerHTML = rows.join('');
+            DOM.cardPm.textContent = utils.formatCurrency(totalStats.averageBasket);
+            DOM.cardP2.textContent = utils.formatCurrency(totalStats.averageP2);
+        }
+    };
+
+    // Gestionnaire des statistiques de montures
+    const frameStatsManager = {
+        calculateTotals(stats) {
+            return stats.reduce((acc, seller) => {
+                acc.totalFrames += seller.totalFrames || 0;
+                acc.totalPremiumFrames += seller.premiumFrames || 0;
+                acc.totalBonus += (seller.premiumFrames || 0) * CONFIG.BONUS_PER_FRAME;
+                return acc;
+            }, { totalFrames: 0, totalPremiumFrames: 0, totalBonus: 0 });
+        },
+
+        calculatePercentage(total, part) {
+            return total > 0 ? (part * 100 / total).toFixed(1) : 0;
+        },
+
+        createSellerRow(seller) {
+            const bonus = (seller.premiumFrames || 0) * CONFIG.BONUS_PER_FRAME;
+            const percentage = this.calculatePercentage(seller.totalFrames, seller.premiumFrames);
+
+            return `
+                <tr>
+                    <td class="text-center">${utils.getInitials(seller.sellerRef)}</td>
+                    <td class="text-center">${seller.totalFrames || 0}</td>
+                    <td class="text-center">${seller.premiumFrames || 0}</td>
+                    <td class="text-center">${percentage}%</td>
+                    <td class="text-center">${utils.formatCurrency(bonus)}</td>
+                </tr>
+            `;
+        },
+
+        createTotalRow(totals) {
+            const percentage = this.calculatePercentage(totals.totalFrames, totals.totalPremiumFrames);
+
+            return `
+                <tr class="fw-bold">
+                    <td class="text-center">Total</td>
+                    <td class="text-center">${totals.totalFrames}</td>
+                    <td class="text-center">${totals.totalPremiumFrames}</td>
+                    <td class="text-center">${percentage}%</td>
+                    <td class="text-center">${utils.formatCurrency(totals.totalBonus)}</td>
+                </tr>
+            `;
+        },
+
+        updateDisplay(stats) {
+            if (!DOM.framesBody) return;
+
+            const totals = this.calculateTotals(stats);
+            const rows = [
+                ...stats.map(seller => this.createSellerRow(seller)),
+                this.createTotalRow(totals)
+            ];
+
+            DOM.framesBody.innerHTML = rows.join('');
+        }
+    };
+
+    // Gestionnaire principal des données
     const dataManager = {
         async loadAllData() {
-            await Promise.all([
-                this.loadAverageBaskets(),
-                this.loadFrameStats()
-            ]);
+            try {
+                const [stats, totalStats] = await Promise.all([
+                    this.loadAverageBaskets(),
+                    this.loadTotalStats()
+                ]);
+                averageBasketManager.updateDisplay(stats, totalStats);
+                await this.loadFrameStats();
+            } catch (error) {
+                console.error('Erreur lors du chargement des données:', error);
+            }
         },
 
         async loadAverageBaskets() {
             try {
-                console.log('Config:', CONFIG);
-                console.log('Dates:', { startDate: STATE.startDate, endDate: STATE.endDate });
                 const stats = await utils.fetchApi(
                     `/invoices/average-baskets?startDate=${STATE.startDate}&endDate=${STATE.endDate}`
                 );
-                console.log('Statistiques reçues:', stats);
-                this.updateDisplay(stats);
+                return stats;
             } catch (error) {
-                console.error('Erreur chargement paniers moyens:', error, error.message);
+                console.error('Erreur chargement paniers moyens:', error);
             }
         },
 
-        updateDisplay(stats) {
-            if (!DOM.basketsBody) return;
-
-            // Calcul des totaux
-            let totalCount = 0;
-            let sumBasket = 0;       
-            let sumFramesP1 = 0; 
-            let sumLensesP1 = 0; 
-            let totalP2Amount = 0;   
-            let totalP2Count = 0;   
-
-            // Lignes des vendeurs
-            const rows = stats.map(seller => {
-                console.log('Données vendeur P2:', {
-                    ref: seller.sellerRef,
-                    amount: seller.totalAmount,
-                    p2Count: seller.p2Count,
-                    averageP2: seller.averageP2
-                });
-
-                totalCount += seller.invoiceCount || 0;
-                sumBasket += (seller.averageBasket || 0) * (seller.invoiceCount || 0);
-                sumFramesP1 += (seller.averageP1MON || 0) * (seller.invoiceCount || 0); 
-                sumLensesP1 += (seller.averageP1VER || 0) * (seller.invoiceCount || 0); 
-                
-                // Pour les P2, utiliser averageP2 * p2Count pour avoir le montant total
-                totalP2Amount += (seller.averageP2 || 0) * (seller.p2Count || 0);
-                totalP2Count += seller.p2Count || 0;
-
-                return `
-                    <tr>
-                        <td class="text-center">${utils.getInitials(seller.sellerRef)}</td>
-                        <td class="text-center">${utils.formatCurrency(seller.averageBasket)}</td>
-                        <td class="text-center">${seller.invoiceCount}</td>
-                        <td class="text-center">${utils.formatCurrency(seller.averageP1MON)}</td>
-                        <td class="text-center">${utils.formatCurrency(seller.averageP1VER)}</td>
-                        <td class="text-center">${seller.p2Count > 0 ? utils.formatCurrency(seller.averageP2) : 'Aucun'}</td>
-                    </tr>
-                `;
-            });
-
-            // Calcul des moyennes globalespour le P2 Total
-
-            const avgBasket = totalCount ? sumBasket / totalCount : 0;
-            const avgFramesP1 = totalCount ? sumFramesP1 / totalCount : 0;
-            const avgLensesP1 = totalCount ? sumLensesP1 / totalCount : 0;
-            const avgP2Total = totalP2Count ? totalP2Amount / totalP2Count : 0;
-
-            console.log('Variables P2 utilisées:', {
-                seller_totalAmountP2: stats[0]?.totalAmountP2, // exemple première ligne
-                seller_p2Count: stats[0]?.p2Count,
-                totalP2Amount,
-                totalP2Count
-            });
-
-            // Mise à jour des cartes de résumé
-            DOM.cardPm.textContent = utils.formatCurrency(avgBasket);
-            DOM.cardP2.textContent = utils.formatCurrency(avgP2Total);
-
-            // Ajout de la ligne Total avec gestion du cas "Aucun"
-            rows.push(`
-                <tr class="fw-bold">
-                    <td class="text-center">Total</td>
-                    <td class="text-center">${utils.formatCurrency(avgBasket)}</td>
-                    <td class="text-center">${totalCount}</td>
-                    <td class="text-center">${utils.formatCurrency(avgFramesP1)}</td>
-                    <td class="text-center">${utils.formatCurrency(avgLensesP1)}</td>
-                    <td class="text-center">${totalP2Count > 0 ? utils.formatCurrency(avgP2Total) : 'Aucun'}</td>
-                </tr>
-            `);
-
-            DOM.basketsBody.innerHTML = rows.join('');
+        async loadTotalStats() {
+            return await utils.fetchApi(
+                `/invoices/total-stats?startDate=${STATE.startDate}&endDate=${STATE.endDate}`
+            );
         },
 
         async loadFrameStats() {
@@ -139,58 +212,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 const stats = await utils.fetchApi(
                     `/invoices/frame-stats?startDate=${STATE.startDate}&endDate=${STATE.endDate}`
                 );
-                this.updateFrameStats(stats);
+                frameStatsManager.updateDisplay(stats);
             } catch (error) {
                 console.error('Erreur chargement statistiques montures:', error);
             }
-        },
-
-        updateFrameStats(stats) {
-            if (!DOM.framesBody) return;
-
-            let totalFrames = 0;
-            let totalPremiumFrames = 0;
-            let totalBonus = 0;
-            const BONUS_PER_FRAME = 5;
-
-            const rows = stats.map(seller => {
-                totalFrames += seller.totalFrames || 0;
-                totalPremiumFrames += seller.premiumFrames || 0;
-                const bonus = (seller.premiumFrames || 0) * BONUS_PER_FRAME;
-                totalBonus += bonus;
-
-                const percentage = seller.totalFrames > 0 
-                    ? (seller.premiumFrames * 100 / seller.totalFrames).toFixed(1) 
-                    : 0;
-
-                return `
-                    <tr>
-                        <td class="text-center">${utils.getInitials(seller.sellerRef)}</td>
-                        <td class="text-center">${seller.totalFrames || 0}</td>
-                        <td class="text-center">${seller.premiumFrames || 0}</td>
-                        <td class="text-center">${percentage}%</td>
-                        <td class="text-center">${utils.formatCurrency(bonus)}</td>
-                    </tr>
-                `;
-            });
-
-            // Calcul du pourcentage total
-            const totalPercentage = totalFrames > 0 
-                ? (totalPremiumFrames * 100 / totalFrames).toFixed(1) 
-                : 0;
-
-            // Ajout ligne Total
-            rows.push(`
-                <tr class="fw-bold">
-                    <td class="text-center">Total</td>
-                    <td class="text-center">${totalFrames}</td>
-                    <td class="text-center">${totalPremiumFrames}</td>
-                    <td class="text-center">${totalPercentage}%</td>
-                    <td class="text-center">${utils.formatCurrency(totalBonus)}</td>
-                </tr>
-            `);
-
-            DOM.framesBody.innerHTML = rows.join('');
         }
     };
 

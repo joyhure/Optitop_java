@@ -48,4 +48,18 @@ public interface InvoicesRepository extends JpaRepository<Invoices, Long> {
             "ORDER BY i.seller.sellerRef")
     List<Object[]> calculateInvoiceCounts(@Param("startDate") LocalDate startDate,
             @Param("endDate") LocalDate endDate);
+
+    @Query("SELECT SUM(i.totalInvoice) FROM Invoices i " +
+            "WHERE i.date BETWEEN :startDate AND :endDate " +
+            "AND i.isOptical = true")
+    Double calculateTotalAmount(@Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate);
+
+    @Query("SELECT COUNT(CASE WHEN i.status = 'facture' THEN 1 END) - " +
+            "COUNT(CASE WHEN i.status = 'avoir' THEN 1 END) " +
+            "FROM Invoices i " +
+            "WHERE i.date BETWEEN :startDate AND :endDate " +
+            "AND i.isOptical = true")
+    Long calculateTotalInvoiceCount(@Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate);
 }

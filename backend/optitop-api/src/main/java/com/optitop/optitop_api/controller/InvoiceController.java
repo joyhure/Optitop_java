@@ -38,6 +38,18 @@ public class InvoiceController {
         }
     }
 
+    @GetMapping("/total-stats")
+    public ResponseEntity<AverageBasketDTO> getTotalStats(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
+        try {
+            AverageBasketDTO stats = invoiceService.getTotalStats(startDate, endDate);
+            return ResponseEntity.ok(stats);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
     @GetMapping("/frame-stats")
     public ResponseEntity<List<FrameStatsDTO>> getFrameStats(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
@@ -68,4 +80,5 @@ public class InvoiceController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
         return ResponseEntity.ok(invoiceService.getSellerRevenueStats(startDate, endDate));
     }
+
 }

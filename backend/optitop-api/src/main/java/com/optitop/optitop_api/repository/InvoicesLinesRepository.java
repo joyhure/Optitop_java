@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.repository.query.Param;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -29,10 +28,11 @@ public interface InvoicesLinesRepository extends JpaRepository<InvoicesLines, Lo
                         @Param("endDate") LocalDate endDate);
 
         @Query("SELECT i.seller.sellerRef, " +
-                        "SUM(CASE WHEN i.pair = 1 THEN i.totalTtc ELSE 0 END) as totalAmount " +
+                        "SUM(i.totalTtc) as totalAmount " +
                         "FROM InvoicesLines i " +
                         "WHERE i.date BETWEEN :startDate AND :endDate " +
                         "AND i.family = 'MON' " +
+                        "AND i.pair = 1 " +
                         "GROUP BY i.seller.sellerRef " +
                         "ORDER BY i.seller.sellerRef")
         List<Object[]> calculateP1FramesTotalAmounts(
@@ -40,10 +40,12 @@ public interface InvoicesLinesRepository extends JpaRepository<InvoicesLines, Lo
                         @Param("endDate") LocalDate endDate);
 
         @Query("SELECT i.seller.sellerRef, " +
-                        "SUM(CASE WHEN i.pair = 1 THEN i.quantity ELSE 0 END) as count " +
+                        "COUNT(CASE WHEN i.status = 'facture' THEN 1 END) - " +
+                        "COUNT(CASE WHEN i.status = 'avoir' THEN 1 END) " +
                         "FROM InvoicesLines i " +
                         "WHERE i.date BETWEEN :startDate AND :endDate " +
                         "AND i.family = 'MON' " +
+                        "AND i.pair = 1 " +
                         "GROUP BY i.seller.sellerRef " +
                         "ORDER BY i.seller.sellerRef")
         List<Object[]> calculateP1FramesCounts(
@@ -91,12 +93,11 @@ public interface InvoicesLinesRepository extends JpaRepository<InvoicesLines, Lo
                         @Param("endDate") LocalDate endDate);
 
         @Query("SELECT i.seller.sellerRef as sellerRef, " +
-                        "(SELECT COUNT(f) FROM InvoicesLines f WHERE f.seller.sellerRef = i.seller.sellerRef " +
-                        "AND f.date BETWEEN :startDate AND :endDate " +
-                        "AND f.family = 'MON' AND f.totalTtc >= 200) - " +
-                        "(SELECT COUNT(a) FROM InvoicesLines a WHERE a.seller.sellerRef = i.seller.sellerRef " +
-                        "AND a.date BETWEEN :startDate AND :endDate " +
-                        "AND a.family = 'MON' AND a.totalTtc <= -200) as premiumFrames " +
+                        "SUM(CASE " +
+                        "WHEN i.totalTtc >= 200 THEN 1 " +
+                        "WHEN i.totalTtc <= -200 THEN -1 " +
+                        "ELSE 0 " +
+                        "END) as premiumFrames " +
                         "FROM InvoicesLines i " +
                         "WHERE i.date BETWEEN :startDate AND :endDate " +
                         "AND i.family = 'MON' " +
