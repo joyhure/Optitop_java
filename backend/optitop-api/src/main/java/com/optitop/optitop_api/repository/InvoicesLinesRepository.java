@@ -109,42 +109,6 @@ public interface InvoicesLinesRepository extends JpaRepository<InvoicesLines, Lo
         @Query("SELECT DISTINCT YEAR(i.date) as year FROM InvoicesLines i ORDER BY year DESC")
         List<Integer> findDistinctYears();
 
-        @Query("SELECT MONTH(i.date) as month, " +
-                        "SUM(DISTINCT i.totalInvoice) as monthlyRevenue " +
-                        "FROM InvoicesLines i " +
-                        "WHERE FUNCTION('YEAR', i.date) = :year " +
-                        "GROUP BY MONTH(i.date) " +
-                        "ORDER BY month")
-        List<Object[]> calculateMonthlyRevenue(@Param("year") int year);
-
-        @Query("SELECT " +
-                        "(SELECT COALESCE(SUM(DISTINCT i1.totalInvoice), 0) " +
-                        "FROM InvoicesLines i1 " +
-                        "WHERE i1.date BETWEEN :startDate AND :endDate) as totalCurrentPeriod, " +
-                        "(SELECT COALESCE(SUM(DISTINCT i2.totalInvoice), 0) " +
-                        "FROM InvoicesLines i2 " +
-                        "WHERE i2.date BETWEEN function('DATE_SUB', :startDate, 1, 'YEAR') " +
-                        "AND function('DATE_SUB', :endDate, 1, 'YEAR')) as totalPreviousPeriod")
-        List<Object[]> getTotalInvoicesForPeriodAndPreviousYear(
-                        @Param("startDate") LocalDate startDate,
-                        @Param("endDate") LocalDate endDate);
-
-        @Query("SELECT DISTINCT i.seller.sellerRef, " +
-                        "SUM(DISTINCT i.totalInvoice) as sellerAmount, " +
-                        "(SUM(DISTINCT i.totalInvoice) / " +
-                        "(SELECT COALESCE(SUM(DISTINCT s.totalInvoice), 0) " +
-                        "FROM InvoicesLines s " +
-                        "WHERE s.date BETWEEN :startDate AND :endDate)) * 100 as percentage " +
-                        "FROM InvoicesLines i " +
-                        "WHERE i.date BETWEEN :startDate AND :endDate " +
-                        "GROUP BY i.seller.sellerRef " +
-                        "ORDER BY sellerAmount DESC")
-        List<Object[]> getSellerRevenueStats(
-                        @Param("startDate") LocalDate startDate,
-                        @Param("endDate") LocalDate endDate);
-
-        List<InvoicesLines> findByDateBetween(LocalDate startDate, LocalDate endDate);
-
         @Query("SELECT i FROM InvoicesLines i LEFT JOIN FETCH i.seller WHERE i.date BETWEEN :startDate AND :endDate")
         List<InvoicesLines> findByDateBetweenWithSeller(
                         @Param("startDate") LocalDate startDate,

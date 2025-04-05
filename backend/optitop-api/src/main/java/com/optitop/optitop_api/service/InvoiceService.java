@@ -139,7 +139,7 @@ public class InvoiceService {
         }
 
         public Map<Integer, Double> getMonthlyRevenue(int year) {
-                return invoicesLinesRepository.calculateMonthlyRevenue(year)
+                return invoicesRepository.calculateMonthlyRevenue(year)
                                 .stream()
                                 .collect(Collectors.toMap(
                                                 row -> (Integer) row[0],
@@ -151,7 +151,7 @@ public class InvoiceService {
         public Map<String, Object> getPeriodRevenue(LocalDate startDate, LocalDate endDate) {
                 Map<String, Object> result = new HashMap<>();
 
-                List<Object[]> data = invoicesLinesRepository.getTotalInvoicesForPeriodAndPreviousYear(startDate,
+                List<Object[]> data = invoicesRepository.getTotalInvoicesForPeriodAndPreviousYear(startDate,
                                 endDate);
 
                 if (!data.isEmpty()) {
@@ -169,7 +169,7 @@ public class InvoiceService {
         public List<Map<String, Object>> getSellerRevenueStats(LocalDate startDate, LocalDate endDate) {
                 List<Map<String, Object>> result = new ArrayList<>();
 
-                List<Object[]> data = invoicesLinesRepository.getSellerRevenueStats(startDate, endDate);
+                List<Object[]> data = invoicesRepository.getSellerRevenueStats(startDate, endDate);
 
                 for (Object[] row : data) {
                         Map<String, Object> sellerStats = new HashMap<>();

@@ -14,9 +14,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const utils = {
         // Communication API
         async fetchApi(endpoint) {
-            const response = await fetch(`${CONFIG.API_BASE_URL}${endpoint}`);
-            if (!response.ok) throw new Error(`Erreur API: ${response.status}`);
-            return response.json();
+            try {
+                const response = await fetch(`${CONFIG.API_BASE_URL}${endpoint}`);
+                if (!response.ok) {
+                    throw new Error(`Erreur API: ${response.status}`);
+                }
+                return await response.json();
+            } catch (error) {
+                console.error(`Erreur lors de l'appel API ${endpoint}:`, error);
+                throw error;
+            }
         },
 
         async getMonthlyRevenue(year) {
@@ -77,7 +84,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return sellerRef ? sellerRef.substring(0, 2).toUpperCase() : 'XX';
         },
 
-        // Mises à jour UI
+        // Mises à jour Cards
         updateSummaryCard(data) {
             const totalRevenueElement = document.getElementById('total-revenue');
             const totalDeltaPercentElement = document.getElementById('total-delta-percent');
@@ -171,22 +178,34 @@ document.addEventListener('DOMContentLoaded', function() {
 
         async initialize() {
             try {
-                const startDate = sessionStorage.getItem('startDate');
-                const endDate = sessionStorage.getItem('endDate');
+                await this.testApiConnection();
+                const years = await utils.fetchApi('/invoices/years');
+                
+                if (!years?.length) {
+                    throw new Error('Aucune année disponible');
+                }
 
-                const [periodData, sellerData, years] = await Promise.all([
-                    utils.getPeriodRevenue(startDate, endDate),
-                    utils.getSellerStats(startDate, endDate),
-                    utils.fetchApi('/invoices/years')
-                ]);
-
-                utils.updateSummaryCard(periodData);
-                utils.updateSellersTable(sellerData);
                 this.displayYearSections(years);
                 await this.loadAllRevenueData(years);
             } catch (error) {
-                console.error('Erreur lors du chargement des données:', error);
+                console.error('Erreur d\'initialisation:', error);
+                this.displayErrorMessage('Erreur de chargement des données');
             }
+        },
+
+        async testApiConnection() {
+            try {
+                await fetch(`${CONFIG.API_BASE_URL}/health`);
+            } catch (error) {
+                throw new Error('API inaccessible');
+            }
+        },
+
+        displayErrorMessage(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'alert alert-danger';
+            errorDiv.textContent = message;
+            DOM.mainRevenue.prepend(errorDiv);
         },
 
         displayYearSections(years) {
@@ -198,14 +217,25 @@ document.addEventListener('DOMContentLoaded', function() {
         },
 
         async loadAllRevenueData(years) {
-            // Chargement des données
-            for (const year of years) {
-                const monthlyRevenue = await utils.getMonthlyRevenue(year);
-                this.revenueCache.set(year, monthlyRevenue);
+            try {
+                for (const year of years) {
+                    try {
+                        const [currentYear, previousYear] = await Promise.all([
+                            utils.getMonthlyRevenue(year),
+                            utils.getMonthlyRevenue(year - 1)
+                        ]);
+
+                        if (currentYear) this.revenueCache.set(year, currentYear);
+                        if (previousYear) this.revenueCache.set(year - 1, previousYear);
+                        
+                        this.updateTableRows(year);
+                    } catch (error) {
+                        console.error(`Erreur pour l'année ${year}:`, error);
+                    }
+                }
+            } catch (error) {
+                console.error('Erreur lors du chargement des données:', error);
             }
-            
-            // Mise à jour des tableaux
-            years.forEach(year => this.updateTableRows(year));
         },
 
         updateTableRows(year) {
@@ -235,9 +265,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 if (!isFutureMonth) {
                     yearTotal += revenue;
+                    cells[month].textContent = utils.formatCurrency(revenue);
+                } else {
+                    cells[month].textContent = 'À venir';
                 }
-                
-                cells[month].textContent = utils.formatCurrency(revenue, isFutureMonth);
             }
             cells[13].textContent = utils.formatCurrency(yearTotal);
         },
@@ -250,36 +281,33 @@ document.addEventListener('DOMContentLoaded', function() {
             const currentMonth = currentDate.getMonth() + 1;
             
             const cells = row.querySelectorAll('td');
-            const currentYearData = this.revenueCache.get(year) || {};
+            const yearData = this.revenueCache.get(year) || {};
             const previousYearData = this.revenueCache.get(year - 1) || {};
             
             let yearDeltaTotal = 0;
             let hasValidPreviousData = false;
             
             for (let month = 1; month <= 12; month++) {
-                const currentRevenue = currentYearData[month] || 0;
-                const previousRevenue = previousYearData[month] || 0;
+                const { current, previous } = this.hasValidDataForYear(year, month);
+                const currentRevenue = current ? yearData[month] : 0;
+                const previousRevenue = previous ? previousYearData[month] : 0;
                 const isFutureMonth = year === currentYear && month > currentMonth;
                 
-                let delta;
+                let delta = currentRevenue - previousRevenue;
+                
                 if (isFutureMonth) {
-                    cells[month].textContent = utils.formatDelta(null, true); // Affiche "À venir"
-                } else if (!previousYearData[month]) {
-                    cells[month].textContent = utils.formatDelta(undefined); // Affiche "Indéfini"
+                    cells[month].textContent = 'À venir';
+                } else if (!current || !previous) {
+                    cells[month].textContent = 'Inconnu';
                 } else {
                     hasValidPreviousData = true;
-                    delta = currentRevenue - previousRevenue;
-                    if (!isNaN(delta)) {
-                        yearDeltaTotal += delta;
-                    }
                     cells[month].textContent = utils.formatDelta(delta);
+                    yearDeltaTotal += delta;
                 }
             }
 
-            // Affichage du total annuel
             cells[13].textContent = hasValidPreviousData ? 
-                utils.formatDelta(yearDeltaTotal) : 
-                utils.formatDelta(undefined); // Affiche "Indéfini" si pas de données n-1
+                utils.formatDelta(yearDeltaTotal) : 'Inconnu';
         },
 
         updateDeltaPercentRow(year, row) {
@@ -310,7 +338,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (isFutureMonth) {
                     cells[month].textContent = 'À venir';
                 } else if (!previousYearData[month]) {
-                    cells[month].textContent = 'Indéfini';
+                    cells[month].textContent = 'Inconnu';
                 } else {
                     hasValidPreviousData = true;
                     cells[month].textContent = utils.formatDeltaPercent(currentRevenue, previousRevenue);
@@ -320,7 +348,18 @@ document.addEventListener('DOMContentLoaded', function() {
             // Affichage du total annuel en pourcentage
             cells[13].textContent = hasValidPreviousData ? 
                 utils.formatDeltaPercent(yearTotalCurrent, yearTotalPrevious) : 
-                'Indéfini';
+                'Inconnu';
+        },
+
+        // Ajouter dans dataManager
+        hasValidDataForYear(year, month) {
+            const currentYearData = this.revenueCache.get(year);
+            const previousYearData = this.revenueCache.get(year - 1);
+            
+            return {
+                current: currentYearData && currentYearData[month] !== undefined,
+                previous: previousYearData && previousYearData[month] !== undefined
+            };
         }
     };
 
