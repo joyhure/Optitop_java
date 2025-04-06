@@ -40,32 +40,40 @@
       </div>
     
       <div class="collapse" id="collapse-user-creation">
-        <div id="new-request-form" class="mb-3" style="display: none;">
-          <table class="table table-sm">
+        <div id="new-request-form" class="new-request-form" style="display: none;">
+          <table class="table">
             <tbody>
               <tr>
-                <td class="text-center align-middle"><input type="text" class="form-control form-control-sm" placeholder="Nom"></td>
-                <td class="text-center align-middle"><input type="text" class="form-control form-control-sm" placeholder="Prénom"></td>
-                <td class="text-center align-middle"><input type="text" class="form-control form-control-sm" placeholder="Login"></td>
-                <td class="text-center align-middle">
-                  <select class="form-select form-select-sm">
-                    <option value="">Sélectionner un rôle</option>
-                    <option value="collaborateur">Collaborateur</option>
-                    <option value="admin">Administrateur</option>
+              <td class="text-center align-middle mb-2 w-16">
+                  <select class="form-select form-select-sm fw-bold" id="ask-select">
+                    <option value="ajout">Ajouter</option>
+                    <option value="modification">Modifier</option>
+                    <option value="suppression">Supprimer</option>
                   </select>
                 </td>
-                <td class="text-center align-middle"><input type="email" class="form-control form-control-sm" placeholder="Email"></td>
-                <td class="text-center align-middle"><input type="text" class="form-control form-control-sm" placeholder="Observations"></td>
+                <td class="text-center align-middle"><input type="text" id="lastname" class="form-control form-control-sm" placeholder="Nom"></td>
+                <td class="text-center align-middle"><input type="text" id="firstname" class="form-control form-control-sm" placeholder="Prénom"></td>
+                <td class="text-center align-middle"><input type="email" id="email" class="form-control form-control-sm" placeholder="Email"></td>
+                <td class="text-center align-middle w-16">
+                  <select class="form-select form-select-sm" id="role-select">
+                    <option value="collaborator">Collaborateur</option>
+                    <option value="manager">Manager</option>
+                    <option value="supermanager">Super Manager</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </td>
+                <td class="text-center align-middle w-16">
+                  <div class="identifiant-container">
+                    <input type="text" id="identifiant" class="form-control form-control-sm" placeholder="Identifiant">
+                  </div>
+                </td>
                 <td class="text-center align-middle">
-                  <button class="btn btn-success btn-sm me-1" onclick="submitRequest()">Envoyer</button>
-                  <button class="btn btn-secondary btn-sm" onclick="cancelRequest()">Annuler</button>
+                  <button class="btn btn-success btn-sm py-1 mb-1" onclick="submitRequest()">Envoyer</button>
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
-    
-        <!-- Table existante -->
         <table id="accounts-ask-logs" class="table table-striped table-sm">
           <thead>
             <tr>
@@ -184,6 +192,7 @@
   <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
   <script src="assets/js/header.js"></script>
   <script src="assets/js/navbar.js"></script>
+  <script src="assets/js/accounts.js"></script>
 </body>
 
 </html>
