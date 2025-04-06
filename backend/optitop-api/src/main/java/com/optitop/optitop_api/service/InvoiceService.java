@@ -151,17 +151,17 @@ public class InvoiceService {
         public Map<String, Object> getPeriodRevenue(LocalDate startDate, LocalDate endDate) {
                 Map<String, Object> result = new HashMap<>();
 
-                List<Object[]> data = invoicesRepository.getTotalInvoicesForPeriodAndPreviousYear(startDate,
-                                endDate);
+                // Calcul des dates pour la période précédente
+                LocalDate previousStartDate = startDate.minusYears(1);
+                LocalDate previousEndDate = endDate.minusYears(1);
 
-                if (!data.isEmpty()) {
-                        Object[] firstRow = data.get(0);
-                        result.put("currentAmount", firstRow[0]);
-                        result.put("previousAmount", firstRow[1]);
-                } else {
-                        result.put("currentAmount", 0.0);
-                        result.put("previousAmount", 0.0);
-                }
+                // Récupération des montants
+                Double currentAmount = invoicesRepository.getCurrentPeriodTotal(startDate, endDate);
+                Double previousAmount = invoicesRepository.getCurrentPeriodTotal(previousStartDate, previousEndDate);
+
+                // Construction du résultat
+                result.put("currentAmount", currentAmount);
+                result.put("previousAmount", previousAmount);
 
                 return result;
         }

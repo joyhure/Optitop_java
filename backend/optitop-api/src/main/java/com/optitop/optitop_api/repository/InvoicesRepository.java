@@ -73,18 +73,6 @@ public interface InvoicesRepository extends JpaRepository<Invoices, Long> {
                         "ORDER BY month")
         List<Object[]> calculateMonthlyRevenue(@Param("year") int year);
 
-        @Query("SELECT " +
-                        "(SELECT COALESCE(SUM(i1.totalInvoice), 0) " +
-                        "FROM Invoices i1 " +
-                        "WHERE i1.date BETWEEN :startDate AND :endDate) as totalCurrentPeriod, " +
-                        "(SELECT COALESCE(SUM(i2.totalInvoice), 0) " +
-                        "FROM Invoices i2 " +
-                        "WHERE i2.date BETWEEN function('DATE_SUB', :startDate, 1, 'YEAR') " +
-                        "AND function('DATE_SUB', :endDate, 1, 'YEAR')) as totalPreviousPeriod")
-        List<Object[]> getTotalInvoicesForPeriodAndPreviousYear(
-                        @Param("startDate") LocalDate startDate,
-                        @Param("endDate") LocalDate endDate);
-
         @Query("SELECT DISTINCT i.seller.sellerRef, " +
                         "SUM(i.totalInvoice) as sellerAmount, " +
                         "(SUM(i.totalInvoice) / " +
@@ -100,5 +88,8 @@ public interface InvoicesRepository extends JpaRepository<Invoices, Long> {
                         @Param("endDate") LocalDate endDate);
 
         List<InvoicesLines> findByDateBetween(LocalDate startDate, LocalDate endDate);
+
+        @Query("SELECT COALESCE(SUM(i.totalInvoice), 0) FROM Invoices i WHERE i.date BETWEEN :startDate AND :endDate")
+        Double getCurrentPeriodTotal(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 
 }
