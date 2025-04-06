@@ -46,6 +46,7 @@
               <tr>
               <td class="text-center align-middle mb-2 w-16">
                   <select class="form-select form-select-sm fw-bold" id="ask-select">
+                    <option value="" selected disabled hidden>Demande</option>
                     <option value="ajout">Ajouter</option>
                     <option value="modification">Modifier</option>
                     <option value="suppression">Supprimer</option>
@@ -56,6 +57,7 @@
                 <td class="text-center align-middle"><input type="email" id="email" class="form-control form-control-sm" placeholder="Email"></td>
                 <td class="text-center align-middle w-16">
                   <select class="form-select form-select-sm" id="role-select">
+                    <option value="" selected disabled hidden>Rôle</option>
                     <option value="collaborator">Collaborateur</option>
                     <option value="manager">Manager</option>
                     <option value="supermanager">Super Manager</option>

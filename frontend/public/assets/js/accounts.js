@@ -24,16 +24,18 @@ function cancelRequest() {
 }
 
 function submitRequest() {
-    const role = document.querySelector('#role-select').value;
-    const identifiant = (role === 'collaborator' || role === 'manager')
-        ? document.querySelector('#identifiant-select').value
-        : document.querySelector('#identifiant').value;
+    const role = document.getElementById('role-select').value;
+    const askType = document.getElementById('ask-select').value;
+    
+    const identifiant = (role === 'collaborator' || role === 'manager') && askType === 'ajout'
+        ? document.getElementById('identifiant-select').value
+        : document.getElementById('identifiant').value;
 
     const formData = {
         nom: document.querySelector('#new-request-form input[placeholder="Nom"]').value || '',
         prenom: document.querySelector('#new-request-form input[placeholder="Prénom"]').value || '',
         login: document.querySelector('#new-request-form input[placeholder="Login"]').value || '',
-        role: document.querySelector('#role-select').value || 'collaborator',
+        role: document.querySelector('#role-select').value || '',
         email: document.querySelector('#new-request-form input[placeholder="Email"]').value || '',
         observations: document.querySelector('#new-request-form input[placeholder="Observations"]').value || '',
         identifiant: identifiant,
@@ -45,6 +47,7 @@ function submitRequest() {
 
 document.addEventListener('DOMContentLoaded', function() {
     const roleSelect = document.getElementById('role-select');
+    const askSelect = document.getElementById('ask-select');
     const identifiantInput = document.getElementById('identifiant');
     
     // Création du select pour l'identifiant
@@ -56,41 +59,43 @@ document.addEventListener('DOMContentLoaded', function() {
     // Insertion du select après l'input
     identifiantInput.parentNode.insertBefore(identifiantSelect, identifiantInput.nextSibling);
 
-    roleSelect.addEventListener('change', async function() {
-        const selectedRole = this.value;
-        console.log('Rôle sélectionné:', selectedRole); // Debug
+    // Fonction pour gérer l'affichage du bon champ identifiant
+    const updateIdentifiantField = async () => {
+        const selectedRole = roleSelect.value;
+        const selectedAskType = askSelect.value;
+        
+        console.log('Role:', selectedRole, 'Type:', selectedAskType); // Debug
 
-        if (selectedRole === 'collaborator' || selectedRole === 'manager') {
-            try {
-                const response = await fetch(`${CONFIG.API_BASE_URL}/sellers/available-sellers`);
-                console.log('Réponse API:', response); // Debug
-                
-                if (!response.ok) throw new Error('Erreur lors de la récupération des vendeurs');
-                
-                const sellers = await response.json();
-                console.log('Vendeurs disponibles:', sellers); // Debug
-                
-                // Modification ici pour gérer le format DTO
-                identifiantSelect.innerHTML = `
-                    <option value="">Vendeur</option>
-                    ${sellers.map(seller => `
-                        <option value="${seller.sellerRef}">${seller.sellerRef}</option>
-                    `).join('')}
-                `;
-                
-                // Afficher/masquer les éléments
-                identifiantInput.style.display = 'none';
-                identifiantSelect.style.display = 'block';
-                
-            } catch (error) {
-                console.error('Erreur:', error);
-                // Afficher un message d'erreur à l'utilisateur
-                alert('Impossible de récupérer la liste des vendeurs');
+        // Vérification que les deux valeurs sont sélectionnées et non vides
+        if (selectedRole && selectedAskType) {
+            if ((selectedRole === 'collaborator' || selectedRole === 'manager') && selectedAskType === 'ajout') {
+                try {
+                    const response = await fetch(`${CONFIG.API_BASE_URL}/sellers/available-sellers`);
+                    if (!response.ok) throw new Error('Erreur lors de la récupération des vendeurs');
+                    
+                    const sellers = await response.json();
+                    
+                    identifiantSelect.innerHTML = `
+                        <option value="" selected disabled>Sélectionner un vendeur</option>
+                        ${sellers.map(seller => `
+                            <option value="${seller.sellerRef}">${seller.sellerRef}</option>
+                        `).join('')}
+                    `;
+                    
+                    identifiantInput.style.display = 'none';
+                    identifiantSelect.style.display = 'block';
+                    
+                } catch (error) {
+                    console.error('Erreur:', error);
+                }
+            } else {
+                identifiantSelect.style.display = 'none';
+                identifiantInput.style.display = 'block';
             }
-        } else {
-            // Rôles admin ou supermanager
-            identifiantSelect.style.display = 'none';
-            identifiantInput.style.display = 'block';
         }
-    });
+    };
+
+    // Écouteurs d'événements
+    roleSelect.addEventListener('change', updateIdentifiantField);
+    askSelect.addEventListener('change', updateIdentifiantField);
 });
