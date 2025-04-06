@@ -17,7 +17,7 @@ public class Seller {
     @Column(name = "created_at", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdAt;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY, optional = true)
     @JoinColumn(name = "user_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "fk_seller_user"), nullable = true)
     private User user;
 
@@ -25,9 +25,8 @@ public class Seller {
     public Seller() {
     }
 
-    public Seller(String sellerRef, User user) {
+    public Seller(String sellerRef) {
         this.sellerRef = sellerRef;
-        this.user = user;
         this.createdAt = LocalDateTime.now();
     }
 
