@@ -95,26 +95,42 @@ document.addEventListener('DOMContentLoaded', function() {
 
         async initialize() {
             try {
+                // Récupération des années
                 const years = await apiService.fetchApi('/invoices/years');
                 if (!years?.length) throw new Error('Aucune année disponible');
 
+                // Affichage des sections
                 this.displayYearSections(years);
 
+                // Récupération des dates depuis sessionStorage
                 const startDate = sessionStorage.getItem('startDate');
                 const endDate = sessionStorage.getItem('endDate');
 
-                const [periodData, monthlyData] = await Promise.all([
-                    startDate && endDate ? 
-                        apiService.getPeriodRevenue(startDate, endDate) : 
-                        Promise.resolve({ currentAmount: null, previousAmount: null }),
-                    apiService.getMonthlyRevenue(new Date().getFullYear())
-                ]);
+                // Chargement des données mensuelles (toujours nécessaire)
+                const monthlyData = await apiService.getMonthlyRevenue(new Date().getFullYear());
+                if (monthlyData) {
+                    this.revenueCache.set(new Date().getFullYear(), monthlyData);
+                }
 
-                this.updateSummaryCard(periodData);
-                if (monthlyData) this.revenueCache.set(new Date().getFullYear(), monthlyData);
+                // Chargement des données de période si dates disponibles
+                if (startDate && endDate) {
+                    const [periodData, sellerStats] = await Promise.all([
+                        apiService.getPeriodRevenue(startDate, endDate),
+                        apiService.getSellerStats(startDate, endDate)
+                    ]);
+
+                    this.updateSummaryCard(periodData);
+                    this.updateSellersTable(sellerStats);
+                } else {
+                    this.updateSummaryCard({ currentAmount: null, previousAmount: null });
+                    this.updateSellersTable([]);
+                }
+
+                // Chargement des données annuelles
                 await this.loadAllRevenueData(years);
 
             } catch (error) {
+                console.error('Erreur de chargement:', error);
                 this.displayErrorMessage('Les données sont temporairement indisponibles');
             }
         },
@@ -311,12 +327,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const tbody = DOM.sellersRevenueBody;
             if (!tbody || !Array.isArray(data)) return;
             
-            // Tri des données par initiales vendeurs en ordre décroissant
+            // Tri des données par initiales vendeurs
             const sortedData = [...data].sort((a, b) => 
-                formatUtils.initiales(b.sellerRef).localeCompare(formatUtils.initiales(a.sellerRef))
+                formatUtils.initiales(a.sellerRef).localeCompare(formatUtils.initiales(b.sellerRef))
             );
             
-            // Génération du HTML avec les données triées
+            // Génération du HTML
             tbody.innerHTML = sortedData
                 .map(seller => `
                     <tr>
