@@ -94,11 +94,16 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         },
 
-        updateCollaboratorsData: async function() {
+        updateCollaboratorsData: async function(existingStats) {
             const startDate = sessionStorage.getItem('startDate');
             const endDate = sessionStorage.getItem('endDate');
             
             try {
+                // Utilisation des stats existantes ou nouvelle requête si nécessaire
+                const quotationStats = existingStats || await utils.fetchApi(
+                    `/quotations/stats?startDate=${startDate}&endDate=${endDate}`
+                );
+
                 // Récupération des statistiques de montures (Prime + %)
                 const frameStats = await utils.fetchApi(
                     `/invoices/frame-stats?startDate=${startDate}&endDate=${endDate}`
@@ -110,9 +115,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 );
 
                 // Récupération des stats de devis
-                const quotationStats = await utils.fetchApi(
-                    `/quotations/stats?startDate=${startDate}&endDate=${endDate}`
-                );
+                // const quotationStats = statsData;
 
                 // Récupération du CA par vendeur
                 const revenueStats = await utils.fetchApi(
@@ -178,9 +181,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const globalP2Average = totalP2Count > 0 
                     ? totalP2Amount / totalP2Count 
                     : 0;
-                const globalConcretizationRate = totalQuotations > 0
-                    ? (totalConcretized * 100 / totalQuotations)
-                    : 0;
+                const globalConcretizationRate = quotationStats.concretizationRate || 0;
 
                 // Ajout de la ligne Total au HTML
                 tbody.innerHTML = vendorRows + `
@@ -191,7 +192,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <td class="text-center">${totalP2Count}</td>
                         <td class="text-center">${totalP2Count > 0 ? utils.formatCurrency(globalP2Average) : 'Aucun'}</td>
                         <td class="text-center">${totalQuotations}</td>
-                        <td class="text-center">${utils.formatPercentage(globalConcretizationRate)}</td>
+                        <td class="text-center">${utils.formatPercentage(existingStats.concretizationRate || 0)}</td>
                         <td class="text-center">${utils.formatCurrency(totalRevenue)}</td>
                     </tr>
                 `;
@@ -235,10 +236,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 utils.updateRevenueData(periodData);
 
-                // Chargement des taux de concrétisation
+                // Chargement des taux de concrétisation une seule fois
                 const statsData = await utils.fetchApi(
                     `/quotations/stats?startDate=${startDate}&endDate=${endDate}`
                 );
+                
+                // Mise à jour du taux dans le résumé en haut
                 utils.updateConcretizationRates(statsData);
 
                 // Chargement du taux de concrétisation N-1
@@ -247,8 +250,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 );
                 utils.updatePreviousConcretizationRate(previousRateData);
 
-                // Ajout de la mise à jour des données collaborateurs
-                await utils.updateCollaboratorsData();
+                // Mise à jour du tableau collaborateurs avec les mêmes stats
+                await utils.updateCollaboratorsData(statsData); // On passe statsData en paramètre
 
             } catch (error) {
                 console.error('Erreur lors du chargement des données:', error);
