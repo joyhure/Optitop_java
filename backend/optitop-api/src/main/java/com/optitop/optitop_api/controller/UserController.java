@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/users")
 @CrossOrigin(origins = "http://localhost")
@@ -69,6 +71,14 @@ public class UserController {
             return ResponseEntity.ok(user.getLogin());
         }
         return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/logins")
+    public ResponseEntity<List<String>> getAllLogins() {
+        List<String> logins = userRepository.findAllLogins();
+        return logins.isEmpty()
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.ok(logins);
     }
 
     @PostMapping("/{id}/change-password")

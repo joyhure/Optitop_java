@@ -34,10 +34,8 @@ function submitRequest() {
     const formData = {
         nom: document.querySelector('#new-request-form input[placeholder="Nom"]').value || '',
         prenom: document.querySelector('#new-request-form input[placeholder="Prénom"]').value || '',
-        login: document.querySelector('#new-request-form input[placeholder="Login"]').value || '',
-        role: document.querySelector('#role-select').value || '',
         email: document.querySelector('#new-request-form input[placeholder="Email"]').value || '',
-        observations: document.querySelector('#new-request-form input[placeholder="Observations"]').value || '',
+        role: document.querySelector('#role-select').value || '',
         identifiant: identifiant,
     };
     
@@ -64,33 +62,101 @@ document.addEventListener('DOMContentLoaded', function() {
         const selectedRole = roleSelect.value;
         const selectedAskType = askSelect.value;
         
-        console.log('Role:', selectedRole, 'Type:', selectedAskType); // Debug
+        // Récupération de tous les champs à masquer/afficher
+        const fieldsToToggle = [
+            document.querySelector('#lastname').parentElement,
+            document.querySelector('#firstname').parentElement,
+            document.querySelector('#email').parentElement,
+            document.querySelector('#role-select').parentElement
+        ];
 
-        // Vérification que les deux valeurs sont sélectionnées et non vides
-        if (selectedRole && selectedAskType) {
-            if ((selectedRole === 'collaborator' || selectedRole === 'manager') && selectedAskType === 'ajout') {
+        if (selectedAskType === 'suppression') {
+            // Masquer les champs non nécessaires
+            fieldsToToggle.forEach(field => field.style.display = 'none');
+            
+            try {
+                const response = await fetch(`${CONFIG.API_BASE_URL}/users/logins`);
+                if (!response.ok) throw new Error('Erreur lors de la récupération des utilisateurs');
+                
+                const logins = await response.json();
+                
+                identifiantSelect.innerHTML = `
+                    <option value="" selected disabled hidden>Identifiant</option>
+                    ${logins.map(login => `
+                        <option value="${login}">${login}</option>
+                    `).join('')}
+                `;
+                
+                identifiantInput.style.display = 'none';
+                identifiantSelect.style.display = 'block';
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert('Erreur lors de la récupération des utilisateurs');
+            }
+        } else {
+            // Réafficher les champs pour les autres types de demande
+            fieldsToToggle.forEach(field => field.style.display = 'table-cell');
+            
+            // Logique existante pour ajout/modification
+            if (selectedRole && selectedAskType) {
                 try {
-                    const response = await fetch(`${CONFIG.API_BASE_URL}/sellers/available-sellers`);
-                    if (!response.ok) throw new Error('Erreur lors de la récupération des vendeurs');
+                    let endpoint = '';
                     
-                    const sellers = await response.json();
+                    if (selectedAskType === 'ajout' && (selectedRole === 'collaborator' || selectedRole === 'manager')) {
+                        endpoint = '/sellers/available-sellers';
+                    } else if (selectedAskType === 'modification') {
+                        endpoint = '/users/logins';
+                    }
                     
-                    identifiantSelect.innerHTML = `
-                        <option value="" selected disabled>Sélectionner un vendeur</option>
-                        ${sellers.map(seller => `
-                            <option value="${seller.sellerRef}">${seller.sellerRef}</option>
-                        `).join('')}
-                    `;
-                    
-                    identifiantInput.style.display = 'none';
-                    identifiantSelect.style.display = 'block';
+                    if (endpoint) {
+                        const response = await fetch(`${CONFIG.API_BASE_URL}${endpoint}`);
+                        if (!response.ok) throw new Error('Erreur lors de la récupération des données');
+                        
+                        const data = await response.json();
+                        
+                        identifiantSelect.innerHTML = `
+                            <option value="" selected disabled hidden>Identifiant</option>
+                            ${data.map(item => `
+                                <option value="${item}">${item}</option>
+                            `).join('')}
+                        `;
+                        
+                        identifiantInput.style.display = 'none';
+                        identifiantSelect.style.display = 'block';
+                    } else {
+                        identifiantSelect.style.display = 'none';
+                        identifiantInput.style.display = 'block';
+                    }
                     
                 } catch (error) {
                     console.error('Erreur:', error);
+                    alert('Erreur lors de la récupération des données');
                 }
-            } else {
-                identifiantSelect.style.display = 'none';
-                identifiantInput.style.display = 'block';
+            }
+        }
+
+        if (selectedAskType === 'ajout' && (selectedRole === 'collaborator' || selectedRole === 'manager')) {
+            try {
+                const response = await fetch(`${CONFIG.API_BASE_URL}/sellers/available-sellers`);
+                if (!response.ok) throw new Error('Erreur lors de la récupération des vendeurs');
+                
+                const sellers = await response.json();
+                console.log('Données reçues:', sellers); // Debug
+                
+                identifiantSelect.innerHTML = `
+                    <option value="" selected disabled hidden>Sélectionner un vendeur</option>
+                    ${sellers.map(seller => {
+                        console.log('Seller:', seller); // Debug
+                        return `<option value="${seller.sellerRef}">${seller.sellerRef}</option>`;
+                    }).join('')}
+                `;
+                
+                identifiantInput.style.display = 'none';
+                identifiantSelect.style.display = 'block';
+                
+            } catch (error) {
+                console.error('Erreur:', error);
+                alert('Erreur lors de la récupération des vendeurs');
             }
         }
     };
