@@ -268,6 +268,13 @@ async function loadPendingAccounts() {
                 <td class="text-center align-middle">${account.role || 'N/A'}</td>
                 <td class="text-center align-middle">${account.email || 'N/A'}</td>
                 <td class="text-center align-middle">${account.requestType || 'N/A'}</td>
+                <td class="text-center align-middle">
+                    <div class="d-flex justify-content-center gap-1">
+                        <button class="btn btn-action btn-success btn-sm" onclick="toggleAction(this)">Valider</button>
+                        <button class="btn btn-action btn-danger btn-sm" onclick="toggleAction(this)">Refuser</button>
+                    </div>
+
+                </td>
             </tr>
         `).join('');
     } catch (error) {

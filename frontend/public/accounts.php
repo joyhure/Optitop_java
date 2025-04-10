@@ -63,7 +63,7 @@
                   </div>
                 </td>
                 <td class="text-center align-middle">
-                  <button class="btn btn-success btn-sm py-1 mb-1" onclick="submitRequest()">Envoyer</button>
+                  <button class="btn btn-success btn-sm py-1" onclick="submitRequest()">Envoyer</button>
                 </td>
               </tr>
             </tbody>
@@ -101,10 +101,7 @@
               <td class="text-center align-middle"></td>
               <td class="text-center align-middle"></td>
               <td class="text-center align-middle"></td>
-              <td class="text-center align-middle">
-                <button class="btn btn-success py-1 mb-1" onclick="toggleAction(this)">Valider</button>
-                <button class="btn btn-danger py-1" onclick="toggleAction(this)">Refuser</button>
-              </td>
+              <td class="text-center align-middle"></td>
             </tr>
           </tbody>
         </table>
