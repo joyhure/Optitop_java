@@ -13,32 +13,52 @@ public class PendingAccount {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(name = "lastname", nullable = false, length = 100)
     private String lastname;
+
+    @Column(name = "firstname", nullable = false, length = 100)
     private String firstname;
+
+    @Column(name = "email", nullable = false, length = 255)
     private String email;
+
+    @Column(name = "login", nullable = false, length = 50, unique = true)
     private String login;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "role", nullable = false)
     private Role role;
-    @ManyToOne
-    @JoinColumn(name = "created_by_user_id", referencedColumnName = "id", nullable = true)
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "request_type", nullable = false)
+    private RequestType requestType;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by_user_id", referencedColumnName = "id", foreignKey = @ForeignKey(name = "fk_pending_account_created_by"), nullable = false)
     private User createdBy;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdAt;
 
+    public enum RequestType {
+        ajout, modification, suppression
+    }
+
     // Constructeurs
+
+    // Constructeur par défaut requis par JPA
     public PendingAccount() {
     }
 
-    public PendingAccount(String lastname, String firstname, String email, String login, Role role, User createdBy) {
+    public PendingAccount(String lastname, String firstname, String email,
+            String login, Role role, User createdBy, RequestType requestType) {
         this.lastname = lastname;
         this.firstname = firstname;
         this.email = email;
         this.login = login;
         this.role = role;
         this.createdBy = createdBy;
+        this.requestType = requestType;
         this.createdAt = LocalDateTime.now();
     }
 
@@ -101,5 +121,13 @@ public class PendingAccount {
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
+    }
+
+    public RequestType getRequestType() {
+        return requestType;
+    }
+
+    public void setRequestType(RequestType requestType) {
+        this.requestType = requestType;
     }
 }

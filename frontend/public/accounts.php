@@ -28,19 +28,12 @@
         </div>
         <h3 class="px-4 mb-0">Comptes Utilisateurs</h3>
       </div>
-      <h4 class="py-3">
-        <a class="text-decoration-none dropdown-toggle text-dark nav-link" data-bs-toggle="collapse" href="#collapse-user-creation" role="button" aria-expanded="false" aria-controls="collapse-asks">
-          Mes Demandes
-        </a>
-      </h4>
-      <div class="d-flex justify-content-start mb-3">
+      <div class="d-flex justify-content-start">
         <button class="btn btn-primary" onclick="showNewRequestForm()">
           <i class="bi bi-plus-circle me-2"></i>Nouvelle demande
         </button>
       </div>
-    
-      <div class="collapse" id="collapse-user-creation">
-        <div id="new-request-form" class="new-request-form" style="display: none;">
+      <div id="new-request-form" class="new-request-form" style="display: none;">
           <table class="table">
             <tbody>
               <tr>
@@ -76,6 +69,14 @@
             </tbody>
           </table>
         </div>
+      <h4 class="py-3">
+        <a class="text-decoration-none dropdown-toggle text-dark nav-link" data-bs-toggle="collapse" href="#collapse-user-creation" role="button" aria-expanded="false" aria-controls="collapse-asks">
+          Demandes en cours
+        </a>
+      </h4>
+    
+      <div class="collapse" id="collapse-user-creation">
+        
         <table id="accounts-ask-logs" class="table table-striped table-sm">
           <thead>
             <tr>
@@ -86,20 +87,20 @@
               <th scope="col" class="table-col-w8 text-center align-middle">Login</th>
               <th scope="col" class="table-col-w8 text-center align-middle">Rôle</th>
               <th scope="col" class="table-col-w8 text-center align-middle">Email</th>
-              <th scope="col" class="table-col-w8 text-center align-middle">Observations</th>
+              <th scope="col" class="table-col-w8 text-center align-middle">Demande</th>
               <th scope="col" class="table-col-w4 text-center align-middle">Action</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td class="text-center align-middle fw-bold">01/07/2024</td>
-              <td class="text-center align-middle">mdupanloup</td>
-              <td class="text-center align-middle">Haterisk</td>
-              <td class="text-center align-middle">Jack</td>
-              <td class="text-center align-middle">jhaterisk</td>
-              <td class="text-center align-middle">collaborateur</td>
-              <td class="text-center align-middle">jhaterisk@hotmail.com</td>
-              <td class="text-center align-middle">Urgent SVP !!!!</td>
+              <td class="text-center align-middle fw-bold"></td>
+              <td class="text-center align-middle"></td>
+              <td class="text-center align-middle"></td>
+              <td class="text-center align-middle"></td>
+              <td class="text-center align-middle"></td>
+              <td class="text-center align-middle"></td>
+              <td class="text-center align-middle"></td>
+              <td class="text-center align-middle"></td>
               <td class="text-center align-middle">
                 <button class="btn btn-success py-1 mb-1" onclick="toggleAction(this)">Valider</button>
                 <button class="btn btn-danger py-1" onclick="toggleAction(this)">Refuser</button>

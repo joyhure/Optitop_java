@@ -23,24 +23,94 @@ function cancelRequest() {
     form.querySelectorAll('input, select').forEach(input => input.value = '');
 }
 
-function submitRequest() {
-    const role = document.getElementById('role-select').value;
-    const askType = document.getElementById('ask-select').value;
-    
-    const identifiant = (role === 'collaborator' || role === 'manager') && askType === 'ajout'
-        ? document.getElementById('identifiant-select').value
-        : document.getElementById('identifiant').value;
+async function submitRequest() {
+    // Récupération et parsing de l'objet user
+    const userStr = sessionStorage.getItem('user');
+    if (!userStr) {
+        throw new Error('Utilisateur non connecté');
+    }
 
-    const formData = {
-        nom: document.querySelector('#new-request-form input[placeholder="Nom"]').value || '',
-        prenom: document.querySelector('#new-request-form input[placeholder="Prénom"]').value || '',
-        email: document.querySelector('#new-request-form input[placeholder="Email"]').value || '',
-        role: document.querySelector('#role-select').value || '',
-        identifiant: identifiant,
-    };
-    
-    console.log('Données à envoyer:', formData);
-    // TODO: Appel API
+    const user = JSON.parse(userStr);
+    console.log('User data:', user); // Debug
+
+    const askType = document.getElementById('ask-select').value;
+    if (!askType) {
+        alert('Veuillez sélectionner un type de demande');
+        return;
+    }
+
+    try {
+        const identifiantValue = document.getElementById('identifiant-select').style.display === 'block' 
+            ? document.getElementById('identifiant-select').value
+            : document.getElementById('identifiant').value;
+
+        // Base formData avec uniquement les champs requis
+        let formData = {
+            login: identifiantValue,
+            requestType: askType
+        };
+
+        // Ajout des champs selon le type de demande
+        if (askType === 'ajout') {
+            // Pour un ajout, tous les champs sont requis
+            formData = {
+                ...formData,
+                lastname: document.getElementById('lastname').value.trim(),
+                firstname: document.getElementById('firstname').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                role: document.getElementById('role-select').value
+            };
+
+            if (!formData.lastname || !formData.firstname || !formData.email || !formData.role || !formData.login) {
+                alert('Tous les champs sont obligatoires pour une création');
+                return;
+            }
+            if (!isValidEmail(formData.email)) {
+                alert('Format d\'email invalide');
+                return;
+            }
+        } else if (askType === 'modification') {
+            // Pour une modification, seuls les champs remplis sont envoyés
+            const roleValue = document.getElementById('role-select').value;
+            const lastnameValue = document.getElementById('lastname').value.trim();
+            const firstnameValue = document.getElementById('firstname').value.trim();
+            const emailValue = document.getElementById('email').value.trim();
+
+            if (roleValue) formData.role = roleValue;
+            if (lastnameValue) formData.lastname = lastnameValue;
+            if (firstnameValue) formData.firstname = firstnameValue;
+            if (emailValue) formData.email = emailValue;
+        }
+        // Pour une suppression, seuls login et requestType sont envoyés
+
+        console.log('Données à envoyer:', formData);
+
+        const response = await fetch(`${CONFIG.API_BASE_URL}/pending-accounts`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${user.id}`
+            },
+            body: JSON.stringify(formData)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Erreur lors de la soumission');
+        }
+
+        alert('Demande envoyée avec succès');
+        cancelRequest();
+        await loadPendingAccounts();
+        
+    } catch (error) {
+        console.error('Erreur:', error);
+        alert(error.message || 'Erreur lors de l\'envoi de la demande');
+    }
+}
+
+function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -141,12 +211,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (!response.ok) throw new Error('Erreur lors de la récupération des vendeurs');
                 
                 const sellers = await response.json();
-                console.log('Données reçues:', sellers); // Debug
+                console.log('Données reçues:', sellers);
                 
                 identifiantSelect.innerHTML = `
                     <option value="" selected disabled hidden>Sélectionner un vendeur</option>
                     ${sellers.map(seller => {
-                        console.log('Seller:', seller); // Debug
+                        console.log('Seller:', seller);
                         return `<option value="${seller.sellerRef}">${seller.sellerRef}</option>`;
                     }).join('')}
                 `;
@@ -164,4 +234,46 @@ document.addEventListener('DOMContentLoaded', function() {
     // Écouteurs d'événements
     roleSelect.addEventListener('change', updateIdentifiantField);
     askSelect.addEventListener('change', updateIdentifiantField);
+    loadPendingAccounts();
 });
+
+async function loadPendingAccounts() {
+    try {
+        const userStr = sessionStorage.getItem('user');
+        if (!userStr) {
+            throw new Error('Utilisateur non connecté');
+        }
+        const user = JSON.parse(userStr);
+        
+        const response = await fetch(`${CONFIG.API_BASE_URL}/pending-accounts`, {
+            headers: {
+                'Authorization': `Bearer ${user.id}`
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error('Erreur lors de la récupération des demandes');
+        }
+        
+        const pendingAccounts = await response.json();
+        
+        const tbody = document.querySelector('#accounts-ask-logs tbody');
+        tbody.innerHTML = pendingAccounts.map(account => `
+            <tr>
+                <td class="text-center align-middle">${new Date(account.createdAt).toLocaleDateString('fr-FR')}</td>
+                <td class="text-center align-middle">${account.createdByLogin || 'N/A'}</td>
+                <td class="text-center align-middle">${account.lastname || 'N/A'}</td>
+                <td class="text-center align-middle">${account.firstname || 'N/A'}</td>
+                <td class="text-center align-middle">${account.login || 'N/A'}</td>
+                <td class="text-center align-middle">${account.role || 'N/A'}</td>
+                <td class="text-center align-middle">${account.email || 'N/A'}</td>
+                <td class="text-center align-middle">${account.requestType || 'N/A'}</td>
+            </tr>
+        `).join('');
+    } catch (error) {
+        alert('Erreur lors du chargement des demandes');
+    }
+}
+
+// Appel de la fonction au chargement et après chaque soumission
+document.addEventListener('DOMContentLoaded', loadPendingAccounts);
