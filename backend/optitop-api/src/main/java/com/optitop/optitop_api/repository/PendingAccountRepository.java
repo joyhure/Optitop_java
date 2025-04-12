@@ -18,4 +18,7 @@ public interface PendingAccountRepository extends JpaRepository<PendingAccount, 
 
     @Query("SELECT pa FROM PendingAccount pa JOIN FETCH pa.createdBy ORDER BY pa.createdAt DESC")
     List<PendingAccount> findAllByOrderByCreatedAtDesc();
+
+    @Query("SELECT p.login FROM PendingAccount p")
+    List<String> findAllLogins();
 }

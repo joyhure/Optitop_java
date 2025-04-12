@@ -25,6 +25,5 @@ public interface SellerRepository extends JpaRepository<Seller, Integer> {
     Optional<Seller> findByUserId(Integer userId);
 
     // Trouve tous les vendeurs sans utilisateur associé
-    @Query("SELECT s FROM Seller s WHERE s.user IS NULL")
     List<Seller> findAllByUserIsNull();
 }
