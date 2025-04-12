@@ -119,10 +119,14 @@ if (!isset($_SESSION['user']) ||
       </div>      
     </section>
     
-    <section id="table-user" class="table-responsive small w-100">
+    <section id="table-user" class="table-responsive small w-100" style="display: none;">
       <h4 class="py-3">
-        <a class="text-decoration-none dropdown-toggle text-dark nav-link" data-bs-toggle="collapse" href="#collapse-user" role="button" aria-expanded="false" aria-controls="collapseRevenue2023">
-          Comptes Utilisateurs
+        <a class="text-decoration-none dropdown-toggle text-dark nav-link" 
+           data-bs-toggle="collapse" 
+           href="#collapse-user" 
+           role="button" 
+           aria-expanded="false">
+            Comptes Utilisateurs
         </a>
       </h4>
       <div class="collapse" id="collapse-user">

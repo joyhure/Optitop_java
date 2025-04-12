@@ -46,10 +46,28 @@ const accountsService = {
     },
 
     async getAllUsers() {
+        const user = utils.getCurrentUser();
+        
+        // Vérification préalable
+        if (user?.role !== 'admin') {
+            throw new Error('Accès non autorisé');
+        }
+
         const response = await fetch(`${CONFIG.API_BASE_URL}/users/all`, {
-            headers: { 'Authorization': `Bearer ${utils.getCurrentUser().id}` }
+            headers: { 
+                'Authorization': `Bearer ${user.id}`,
+                'Content-Type': 'application/json'
+            }
         });
-        if (!response.ok) throw new Error('Erreur lors de la récupération des utilisateurs');
+
+        if (response.status === 403) {
+            throw new Error('Accès non autorisé');
+        }
+
+        if (!response.ok) {
+            throw new Error('Erreur lors de la récupération des utilisateurs');
+        }
+
         return response.json();
     }
 };
@@ -129,6 +147,29 @@ const uiManager = {
                 <td class="text-center align-middle">${user.email || 'N/A'}</td>
             </tr>
         `).join('');
+    },
+
+    initializeAdminFeatures() {
+        const user = utils.getCurrentUser();
+        const tableUserSection = document.getElementById('table-user');
+        
+        if (tableUserSection) {
+            if (user?.role === 'admin') {
+                tableUserSection.style.display = 'block';
+                this.loadUsersTable();
+            } else {
+                tableUserSection.remove();
+            }
+        }
+    },
+
+    async loadUsersTable() {
+        try {
+            const users = await accountsService.getAllUsers();
+            this.updateUsersTable(users);
+        } catch (error) {
+            console.error('Erreur chargement utilisateurs:', error);
+        }
     }
 };
 
@@ -137,7 +178,7 @@ const accountsController = {
     async init() {
         this.setupEventListeners();
         await this.loadPendingAccounts();
-        await this.loadUsers();
+        uiManager.initializeAdminFeatures();
     },
 
     setupEventListeners() {
