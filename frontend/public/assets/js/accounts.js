@@ -296,7 +296,6 @@ async function submitRequest() {
 
         // Ajout des champs selon le type de demande
         if (askType === 'ajout') {
-            // Pour un ajout, tous les champs sont requis
             formData = {
                 ...formData,
                 lastname: document.getElementById('lastname').value.trim(),
@@ -314,7 +313,6 @@ async function submitRequest() {
                 return;
             }
         } else if (askType === 'modification') {
-            // Pour une modification, seuls les champs remplis sont envoyés
             const roleValue = document.getElementById('role-select').value;
             const lastnameValue = document.getElementById('lastname').value.trim();
             const firstnameValue = document.getElementById('firstname').value.trim();
@@ -325,7 +323,6 @@ async function submitRequest() {
             if (firstnameValue) formData.firstname = firstnameValue;
             if (emailValue) formData.email = emailValue;
         }
-        // Pour une suppression, seuls login et requestType sont envoyés
 
         console.log('Données à envoyer:', formData);
 
@@ -450,7 +447,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log('Données reçues:', sellers);
                 
                 identifiantSelect.innerHTML = `
-                    <option value="" selected disabled hidden>Sélectionner un vendeur</option>
+                    <option value="" selected disabled hidden>Vendeur</option>
                     ${sellers.map(seller => {
                         console.log('Seller:', seller);
                         return `<option value="${seller.sellerRef}">${seller.sellerRef}</option>`;
