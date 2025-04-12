@@ -1,0 +1,99 @@
+Project optitop { database_type: 'MySQL' }
+
+Table invoices {
+  id bigint [pk, not null]
+  invoice_ref varchar(255) [not null]
+  client varchar(255) [not null]
+  client_id varchar(255) [not null]
+  date date [not null]
+  seller_ref varchar(50)
+  total_invoice double [not null]
+  status varchar(255) [not null]
+  is_optical boolean [not null, default: false]
+  date_import datetime
+}
+
+Table invoices_lines {
+  id bigint [pk, not null]
+  date date [not null]
+  client_id varchar(255) [not null]
+  client varchar(255) [not null]
+  invoice_ref varchar(255) [not null]
+  family varchar(255)
+  quantity int [not null]
+  total_ttc double [not null]
+  seller_ref varchar(50) [not null]
+  total_invoice double [not null]
+  pair int
+  status varchar(255) [not null]
+  created_at timestamp [not null, default: `current_timestamp()`]
+}
+
+Table quotations {
+  id bigint [pk, not null]
+  client varchar(255) [not null]
+  client_id varchar(255) [not null]
+  created_at datetime
+  date date [not null]
+  seller_ref varchar(50)
+  is_validated boolean [not null, default: false]
+  action varchar(255)
+  comment varchar(255)
+}
+
+Table quotations_lines {
+  id bigint [pk, not null]
+  client varchar(255) [not null]
+  client_id varchar(255) [not null]
+  created_at datetime
+  date date [not null]
+  family varchar(255)
+  pair int
+  quantity int [not null]
+  quotation_ref varchar(255) [not null]
+  seller_ref varchar(50) [not null]
+  status varchar(255) [not null]
+  total_quotation double [not null]
+  total_ttc double [not null]
+}
+
+Table seller {
+  id int [pk, not null, increment]
+  seller_ref varchar(50) [not null, unique]
+  created_at timestamp [default: `current_timestamp()`]
+  user_id int
+}
+
+Table user {
+  id int [pk, not null, increment]
+  lastname varchar(255) [not null]
+  firstname varchar(255) [not null]
+  email varchar(255) [not null]
+  login varchar(255) [not null]
+  password varchar(255) [not null]
+  role varchar(255) [not null]
+  created_at datetime
+}
+
+Table pending_accounts {
+  id int [pk, not null, increment]
+  lastname varchar(255) [not null]
+  firstname varchar(255) [not null]
+  email varchar(255) [not null]
+  login varchar(255) [not null]
+  role varchar(255) [not null]
+  created_by_user_id int
+  created_at datetime
+}
+
+// Relations (clé étrangères)
+
+Ref: invoices_lines.invoice_ref > invoices.invoice_ref
+Ref: invoices.seller_ref > seller.seller_ref
+Ref: invoices_lines.seller_ref > seller.seller_ref
+
+Ref: quotations_lines.seller_ref > seller.seller_ref
+Ref: quotations.seller_ref > seller.seller_ref
+
+Ref: seller.user_id > user.id
+Ref: pending_accounts.created_by_user_id > user.id

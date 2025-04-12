@@ -1,10 +1,13 @@
 package com.optitop.optitop_api.controller;
 
-import com.optitop.optitop_api.dto.PasswordChangeRequest;
+import com.optitop.optitop_api.dto.PasswordChangeRequestDTO;
+import com.optitop.optitop_api.dto.UserDisplayDTO;
 import com.optitop.optitop_api.model.User;
 import com.optitop.optitop_api.repository.UserRepository;
+import com.optitop.optitop_api.service.PasswordService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,7 +16,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.http.HttpStatus;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/users")
@@ -22,6 +27,9 @@ public class UserController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private PasswordService passwordService;
 
     @GetMapping("/login/{login}")
     public ResponseEntity<User> getUserByLogin(@PathVariable String login) {
@@ -68,10 +76,18 @@ public class UserController {
         return ResponseEntity.notFound().build();
     }
 
+    @GetMapping("/logins")
+    public ResponseEntity<List<String>> getAllLogins() {
+        List<String> logins = userRepository.findAllLogins();
+        return logins.isEmpty()
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.ok(logins);
+    }
+
     @PostMapping("/{id}/change-password")
     public ResponseEntity<String> changePassword(
             @PathVariable Integer id,
-            @RequestBody PasswordChangeRequest request) {
+            @RequestBody PasswordChangeRequestDTO request) {
 
         // Validation des données
         if (request.getCurrentPassword() == null || request.getNewPassword() == null) {
@@ -83,21 +99,15 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
 
-        // Vérifier le mot de passe actuel
-        if (!user.getPassword().equals(request.getCurrentPassword())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("Mot de passe actuel incorrect");
-        }
-
         // Validation du nouveau mot de passe
-        String newPassword = request.getNewPassword();
-        if (!isValidPassword(newPassword)) {
+        if (!isValidPassword(request.getNewPassword())) {
             return ResponseEntity.badRequest()
                     .body("Le nouveau mot de passe ne respecte pas les critères de sécurité");
         }
 
-        // Mettre à jour le mot de passe
-        user.setPassword(request.getNewPassword());
+        // Hashage et mise à jour du mot de passe
+        String hashedPassword = passwordService.hashPassword(request.getNewPassword());
+        user.setPassword(hashedPassword);
         userRepository.save(user);
 
         return ResponseEntity.ok("Mot de passe modifié avec succès");
@@ -125,5 +135,25 @@ public class UserController {
             return false;
 
         return true;
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<UserDisplayDTO>> getAllUsers() {
+        try {
+            List<User> users = userRepository.findAll();
+            List<UserDisplayDTO> userDtos = users.stream()
+                    .map(user -> new UserDisplayDTO(
+                            user.getId(),
+                            user.getLogin(),
+                            user.getRole(),
+                            user.getLastname(),
+                            user.getFirstname(),
+                            user.getEmail(),
+                            user.getCreatedAt()))
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(userDtos);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }

@@ -4,14 +4,18 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Column;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import jakarta.persistence.ForeignKey;
+
 @Entity
-@Table(name = "quotations_import")
-public class QuotationImport {
+@Table(name = "quotations_lines")
+public class QuotationsLines {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,8 +42,9 @@ public class QuotationImport {
     @Column(nullable = false)
     private Double totalTtc;
 
-    @Column(nullable = false)
-    private String sellerRef;
+    @ManyToOne
+    @JoinColumn(name = "seller_ref", referencedColumnName = "seller_ref", nullable = true, foreignKey = @ForeignKey(name = "fk_quotations_lines_seller"))
+    private Seller seller;
 
     @Column(nullable = false)
     private Double totalQuotation;
@@ -118,12 +123,12 @@ public class QuotationImport {
         this.totalTtc = totalTtc;
     }
 
-    public String getSellerRef() {
-        return sellerRef;
+    public Seller getSeller() {
+        return seller;
     }
 
-    public void setSellerRef(String sellerRef) {
-        this.sellerRef = sellerRef;
+    public void setSeller(Seller seller) {
+        this.seller = seller;
     }
 
     public Double getTotalQuotation() {

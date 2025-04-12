@@ -5,7 +5,7 @@ import java.time.LocalDate;
 public class QuotationDTO {
     private final Long id;
     private LocalDate date;
-    private String sellerRef;
+    private String seller;
     private String client;
     private String action;
     private String comment;
@@ -24,8 +24,8 @@ public class QuotationDTO {
         return date;
     }
 
-    public String getSellerRef() {
-        return sellerRef;
+    public String getSeller() {
+        return seller;
     }
 
     public String getClient() {
@@ -45,8 +45,8 @@ public class QuotationDTO {
         this.date = date;
     }
 
-    public void setSellerRef(String sellerRef) {
-        this.sellerRef = sellerRef;
+    public void setSeller(String seller) {
+        this.seller = seller;
     }
 
     public void setClient(String client) {

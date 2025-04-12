@@ -40,23 +40,33 @@ public class QuotationController {
             @RequestParam String endDate,
             @RequestParam(required = false) String userRole,
             @RequestParam(required = false) String userSellerRef) {
+
+        logger.debug("Requête reçue - startDate: {}, endDate: {}, userRole: {}, userSellerRef: {}",
+                startDate, endDate, userRole, userSellerRef); // Ajout de logs
+
         try {
             LocalDate start = LocalDate.parse(startDate);
             LocalDate end = LocalDate.parse(endDate);
 
             List<Quotations> quotations;
-            if ("collaborator".equalsIgnoreCase(userRole)) {
+            if ("collaborator".equalsIgnoreCase(userRole) && userSellerRef != null) {
+                logger.debug("Recherche des devis pour le collaborateur: {}", userSellerRef);
                 quotations = quotationsRepository.findUnvalidatedByDateBetweenAndSellerRef(
                         start, end, userSellerRef);
             } else {
+                logger.debug("Recherche de tous les devis non validés");
                 quotations = quotationsRepository.findUnvalidatedByDateBetween(start, end);
             }
 
             logger.debug("Nombre de devis trouvés: {}", quotations.size());
 
-            return ResponseEntity.ok(quotations.stream()
+            List<QuotationDTO> dtos = quotations.stream()
                     .map(this::convertToDTO)
-                    .collect(Collectors.toList()));
+                    .collect(Collectors.toList());
+
+            logger.debug("DTOs générés: {}", dtos);
+
+            return ResponseEntity.ok(dtos);
         } catch (Exception e) {
             logger.error("Erreur lors de la récupération des devis non validés", e);
             return ResponseEntity.internalServerError().build();
@@ -122,10 +132,33 @@ public class QuotationController {
         }
     }
 
+    @GetMapping("/previous-concretization")
+    public ResponseEntity<Double> getPreviousConcretizationRate(
+            @RequestParam String startDate,
+            @RequestParam String endDate) {
+        try {
+            LocalDate start = LocalDate.parse(startDate).minusYears(1);
+            LocalDate end = LocalDate.parse(endDate).minusYears(1);
+
+            Double rate = quotationsRepository.getPreviousConcretizationRate(start, end);
+            return ResponseEntity.ok(rate != null ? rate : 0.0);
+        } catch (Exception e) {
+            logger.error("Erreur lors du calcul du taux de concrétisation N-1", e);
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
     private QuotationDTO convertToDTO(Quotations quotation) {
         QuotationDTO dto = new QuotationDTO(quotation.getId());
         dto.setDate(quotation.getDate());
-        dto.setSellerRef(quotation.getSellerRef());
+
+        // Récupération du seller depuis la quotation
+        if (quotation.getSeller() != null) {
+            dto.setSeller(quotation.getSeller().getSellerRef());
+        } else {
+            dto.setSeller("Non assigné"); // Valeur par défaut
+        }
+
         dto.setClient(quotation.getClient());
         dto.setAction(quotation.getAction() != null ? quotation.getAction().getValue() : null);
         dto.setComment(quotation.getComment());

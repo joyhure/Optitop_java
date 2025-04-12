@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-// Vérification PHP principale
 if (
   !isset($_SESSION['user']) ||
   !isset($_SESSION['user']['role']) ||

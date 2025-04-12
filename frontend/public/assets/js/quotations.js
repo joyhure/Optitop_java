@@ -31,8 +31,8 @@ document.addEventListener('DOMContentLoaded', function() {
             return new Date(dateString).toLocaleDateString('fr-FR');
         },
 
-        getInitials(sellerRef) {
-            return sellerRef?.substring(0, 2).toUpperCase() || 'XX';
+        getInitials(seller) {
+            return seller?.substring(0, 2).toUpperCase() || 'XX';
         },
 
         parseFrenchDate(dateStr) {
@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const startDate = sessionStorage.getItem('startDate');
                 const endDate = sessionStorage.getItem('endDate');
                 const userRole = STATE.userSession?.role?.toLowerCase();
-                const userSellerRef = STATE.userSession?.sellerRef;
+                const userSellerRef = STATE.userSession?.seller_ref; 
 
                 let url = `/quotations/unvalidated?startDate=${startDate}&endDate=${endDate}`;
                 
@@ -73,10 +73,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (userRole === 'collaborator') {
                     url += `&userRole=${userRole}&userSellerRef=${userSellerRef}`;
                 }
+
+                console.log('URL de requête:', url); // Debug
+                console.log('Session user:', STATE.userSession); // Debug
                 
                 const response = await utils.fetchApi(url);
                 const quotations = await response.json();
-                
                 return sortManager.sortQuotations(quotations, STATE.currentSort.field, STATE.currentSort.order);
             } catch (error) {
                 console.error('Erreur chargement:', error);
@@ -152,12 +154,12 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-    // 6. Gestionnaire de tri
+    // Gestionnaire de tri
     const sortManager = {
         sortQuotations(data, field, order) {
             const sortFunctions = {
                 date: (a, b) => new Date(a.date) - new Date(b.date),
-                name: (a, b) => (a.sellerRef || '').localeCompare(b.sellerRef || ''),
+                name: (a, b) => (a.seller || '').localeCompare(b.seller || ''),
                 client: (a, b) => (a.client || '').localeCompare(b.client || '')
             };
 
@@ -251,7 +253,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return `
                 <tr data-quotation-id="${quotation.id}">
                     <td>${utils.formatDate(quotation.date)}</td>
-                    <td class="text-center">${utils.getInitials(quotation.sellerRef)}</td>
+                    <td class="text-center">${utils.getInitials(quotation.seller)}</td>
                     <td>${quotation.client}</td>
                     <td>
                         <select class="form-select form-select-sm action-select" 

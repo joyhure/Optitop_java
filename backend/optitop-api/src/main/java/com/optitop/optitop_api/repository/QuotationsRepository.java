@@ -21,14 +21,15 @@ public interface QuotationsRepository extends JpaRepository<Quotations, Long> {
          * @return liste des devis non validés
          */
         @Query("SELECT q FROM Quotations q WHERE q.date BETWEEN :startDate AND :endDate " +
-                        "AND (q.status IS NULL OR q.status != 'Validé')")
+                        "AND (q.isValidated IS NULL OR q.isValidated = false)")
         List<Quotations> findUnvalidatedByDateBetween(
                         @Param("startDate") LocalDate startDate,
                         @Param("endDate") LocalDate endDate);
 
-        @Query("SELECT q FROM Quotations q WHERE q.date BETWEEN :startDate AND :endDate " +
-                        "AND (q.status IS NULL OR q.status != 'Validé') " +
-                        "AND q.sellerRef = :sellerRef")
+        @Query("SELECT q FROM Quotations q " +
+                        "WHERE q.date BETWEEN :startDate AND :endDate " +
+                        "AND q.seller.sellerRef = :sellerRef " +
+                        "AND (q.isValidated = false OR q.isValidated IS NULL)")
         List<Quotations> findUnvalidatedByDateBetweenAndSellerRef(
                         @Param("startDate") LocalDate startDate,
                         @Param("endDate") LocalDate endDate,
@@ -47,28 +48,36 @@ public interface QuotationsRepository extends JpaRepository<Quotations, Long> {
         @Query("SELECT COUNT(q) FROM Quotations q WHERE q.date BETWEEN :startDate AND :endDate")
         Long countQuotationsBetween(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 
-        @Query("SELECT COUNT(q) FROM Quotations q WHERE q.date BETWEEN :startDate AND :endDate AND q.status = 'Validé'")
+        @Query("SELECT COUNT(q) FROM Quotations q WHERE q.date BETWEEN :startDate AND :endDate AND q.isValidated = true")
         Long countValidatedQuotationsBetween(@Param("startDate") LocalDate startDate,
                         @Param("endDate") LocalDate endDate);
 
-        @Query("SELECT COUNT(q) FROM Quotations q WHERE q.date BETWEEN :startDate AND :endDate AND (q.status IS NULL OR q.status != 'Validé')")
+        @Query("SELECT COUNT(q) FROM Quotations q WHERE q.date BETWEEN :startDate AND :endDate AND (q.isValidated IS NULL OR q.isValidated = false)")
         Long countUnvalidatedQuotationsBetween(@Param("startDate") LocalDate startDate,
                         @Param("endDate") LocalDate endDate);
 
-        @Query("SELECT DISTINCT q.sellerRef FROM Quotations q " +
+        @Query("SELECT DISTINCT q.seller.sellerRef FROM Quotations q " +
                         "WHERE q.date BETWEEN :startDate AND :endDate " +
-                        "ORDER BY q.sellerRef")
+                        "ORDER BY q.seller.sellerRef")
         List<String> findDistinctSellersBetweenDates(
                         @Param("startDate") LocalDate startDate,
                         @Param("endDate") LocalDate endDate);
 
-        @Query("SELECT q.sellerRef, " +
+        @Query("SELECT q.seller.sellerRef as sellerRef, " +
                         "COUNT(q) as total, " +
-                        "COUNT(CASE WHEN q.status != 'Validé' OR q.status IS NULL THEN 1 END) as unvalidated " +
+                        "COUNT(CASE WHEN q.isValidated = false OR q.isValidated IS NULL THEN 1 END) as unvalidated " +
                         "FROM Quotations q " +
                         "WHERE q.date BETWEEN :startDate AND :endDate " +
-                        "GROUP BY q.sellerRef " +
-                        "ORDER BY q.sellerRef")
-        List<Object[]> getSellerStats(@Param("startDate") LocalDate startDate,
+                        "GROUP BY q.seller.sellerRef " +
+                        "ORDER BY q.seller.sellerRef")
+        List<Object[]> getSellerStats(
+                        @Param("startDate") LocalDate startDate,
+                        @Param("endDate") LocalDate endDate);
+
+        @Query("SELECT CAST(COUNT(CASE WHEN q.isValidated = true THEN 1 END) AS float) / CAST(COUNT(q) AS float) * 100 "
+                        +
+                        "FROM Quotations q WHERE q.date BETWEEN :startDate AND :endDate")
+        Double getPreviousConcretizationRate(
+                        @Param("startDate") LocalDate startDate,
                         @Param("endDate") LocalDate endDate);
 }

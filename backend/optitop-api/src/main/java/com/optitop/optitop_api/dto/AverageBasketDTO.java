@@ -8,6 +8,7 @@ public class AverageBasketDTO {
     private Double averageP1MON;
     private Double averageP1VER;
     private Double averageP2;
+    private Long p2Count;
 
     public AverageBasketDTO(String sellerRef, Double totalAmount, Long invoiceCount,
             Double totalAmountP1MON, Long countP1MON,
@@ -20,10 +21,11 @@ public class AverageBasketDTO {
         this.averageP1MON = calculateAverage(totalAmountP1MON, countP1MON);
         this.averageP1VER = calculateAverage(totalAmountP1VER, countP1VER);
         this.averageP2 = calculateAverage(totalAmountP2, countP2);
+        this.p2Count = countP2;
     }
 
     private Double calculateAverage(Double amount, Long count) {
-        return count != null && count > 0 && amount != null ? amount / count : 0.0;
+        return (count != null && count > 0 && amount != null) ? amount / count : null;
     }
 
     // Getters
@@ -53,5 +55,9 @@ public class AverageBasketDTO {
 
     public Double getAverageP2() {
         return averageP2;
+    }
+
+    public Long getP2Count() {
+        return p2Count;
     }
 }

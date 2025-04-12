@@ -1,3 +1,15 @@
+<?php
+session_start();
+
+if (
+  !isset($_SESSION['user']) ||
+  !isset($_SESSION['user']['role']) ||
+  !in_array($_SESSION['user']['role'], ['admin', 'supermanager', 'manager'])
+) {
+  header('Location: dashboard.php');
+  exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -29,7 +41,7 @@
         <h3 class="px-4 mb-0">Synthèse</h3>
       </div>
       <div class="container">
-        <table class="table table-bordered my-3">
+        <table class="table table-bordered">
           <thead>
             <tr>
               <th id="table-header" colspan="5">
@@ -38,11 +50,11 @@
             </tr>
             <tr>
               <th class="text-center" colspan="2">
-                <h5 class="text-secondary">Du [dd/mm/yyyy] au [dd/mm/yyyy]</h5>
+                <h5 id="period-dates" class="text-secondary">A définir</h5>
               </th>
               <th class="bg-secondary-subtle"></th>
               <th class="text-center" colspan="2">
-                <h5 class="text-secondary">Màj le [dd/mm/yyyy] à [hh:mm]</h5>
+                <h5 id="last-update" class="text-secondary">Inconnue</h5>
               </th>
             </tr>
             <tr>
@@ -56,20 +68,20 @@
           <tbody>
             <tr>
               <td class="text-center">N</td>
-              <td class="text-center">68 381 €</td>
-              <td rowspan="2" class="align-middle text-center">1500 €</td>
-              <td rowspan="2" class="align-middle text-center">2 %</td>
-              <td class="text-center">80 %</td>
+              <td id="current-revenue" class="text-center">-</td>
+              <td id="revenue-delta" rowspan="2" class="align-middle text-center">-</td>
+              <td id="revenue-delta-percent" rowspan="2" class="align-middle text-center">-</td>
+              <td id="current-rate" class="text-center">-</td>
             </tr>
             <tr>
               <td class="text-center">N-1</td>
-              <td class="text-center">69 350 €</td>
-              <td class="text-center">75 %</td>
+              <td id="previous-revenue" class="text-center">-</td>
+              <td id="previous-rate" class="text-center">-</td>
             </tr>
           </tbody>
         </table>
 
-        <table class="table table-bordered table-striped my-5">
+        <table class="table table-bordered table-striped">
           <thead>
 
             <tr>
@@ -95,47 +107,8 @@
               <th class="bg-secondary-subtle"></th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <td class="fw-bold text-center">BS</td>
-              <td class="text-center">50€</td>
-              <td class="text-center">15%</td>
-              <td class="text-center">31</td>
-              <td class="text-center">18 €</td>
-              <td class="text-center">42</td>
-              <td class="text-center">85 %</td>
-              <td class="text-center">26590 €</td>
-            </tr>
-            <tr>
-              <td class="fw-bold text-center">EG</td>
-              <td class="text-center">95€</td>
-              <td class="text-center">36%</td>
-              <td class="text-center">28</td>
-              <td class="text-center">22 €</td>
-              <td class="text-center">35</td>
-              <td class="text-center">75 %</td>
-              <td class="text-center">21263 €</td>
-            </tr>
-            <tr>
-              <td class="fw-bold text-center">IH</td>
-              <td class="text-center">35€</td>
-              <td class="text-center">11%</td>
-              <td class="text-center">25</td>
-              <td class="text-center">18 €</td>
-              <td class="text-center">37</td>
-              <td class="text-center">85 %</td>
-              <td class="text-center">19575 €</td>
-            </tr>
-            <tr>
-              <td class="fw-bold text-center">IR</td>
-              <td class="text-center">50€</td>
-              <td class="text-center">15%</td>
-              <td class="text-center">31</td>
-              <td class="text-center">18 €</td>
-              <td class="text-center">42</td>
-              <td class="text-center">85 %</td>
-              <td class="text-center">15617 €</td>
-            </tr>
+          <tbody id="collaborators-data">
+            <!-- Le contenu sera généré dynamiquement par JavaScript -->
           </tbody>
         </table>
       </div>
@@ -148,6 +121,7 @@
   <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
   <script src="assets/js/header.js"></script>
   <script src="assets/js/navbar.js"></script>
+  <script src="assets/js/summary.js"></script>
 </body>
 
 </html>

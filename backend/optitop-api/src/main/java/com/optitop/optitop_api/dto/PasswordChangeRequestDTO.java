@@ -1,6 +1,6 @@
 package com.optitop.optitop_api.dto;
 
-public class PasswordChangeRequest {
+public class PasswordChangeRequestDTO {
     private String currentPassword;
     private String newPassword;
 
