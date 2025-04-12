@@ -24,6 +24,9 @@ public class PendingAccountService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private EmailService emailService;
+
     private final PendingAccountRepository pendingAccountRepository;
     private final UserRepository userRepository;
 
@@ -117,10 +120,12 @@ public class PendingAccountService {
                 String rawPassword = generateSecurePassword();
                 newUser.setPassword(passwordEncoder.encode(rawPassword));
 
-                // TODO: Envoyer email avec mot de passe en clair
-                System.out.println("Mot de passe généré pour " + newUser.getLogin() + ": " + rawPassword);
-
-                userRepository.save(newUser);
+                try {
+                    emailService.sendPasswordEmail(newUser.getEmail(), newUser.getLogin(), rawPassword);
+                    userRepository.save(newUser);
+                } catch (Exception e) {
+                    throw new RuntimeException("Erreur lors de l'envoi de l'email : " + e.getMessage());
+                }
                 break;
 
             case modification:
