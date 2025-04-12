@@ -1,6 +1,153 @@
+// Configuration
 const CONFIG = {
-    API_BASE_URL: 'http://localhost:8080/api'
+    API_BASE_URL: 'http://localhost:8080/api',
+    BUTTON_CONFIG: {
+        validate: { class: 'success', text: 'Valider' },
+        reject: { class: 'danger', text: 'Refuser' }
+    }
 };
+
+// Service API
+const accountsService = {
+    async getPendingAccounts(userId) {
+        const response = await fetch(`${CONFIG.API_BASE_URL}/pending-accounts`, {
+            headers: { 'Authorization': `Bearer ${userId}` }
+        });
+        if (!response.ok) throw new Error('Erreur lors de la récupération des demandes');
+        return response.json();
+    },
+
+    async validateAccount(accountId, userId) {
+        const response = await fetch(`${CONFIG.API_BASE_URL}/pending-accounts/validate/${accountId}`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${userId}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Erreur lors de la validation');
+        }
+    },
+
+    // ... autres appels API
+};
+
+// Utilitaires
+const utils = {
+    isValidEmail: (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email),
+    
+    hasPermission: (user) => {
+        const authorizedRoles = ['admin', 'manager', 'supermanager'];
+        return authorizedRoles.includes(user?.role);
+    },
+    
+    getCurrentUser: () => {
+        const userStr = sessionStorage.getItem('user');
+        if (!userStr) throw new Error('Utilisateur non connecté');
+        return JSON.parse(userStr);
+    }
+};
+
+// Gestionnaire du rendu UI
+const uiManager = {
+    renderActionButtons(account, user) {
+        const isAdmin = user?.role === 'admin';
+        if (!account.id) {
+            console.error('Account sans ID:', account);
+            return '';
+        }
+        return `
+            <button class="btn btn-action btn-success btn-sm" 
+                data-action="validate"
+                data-account-id="${account.id}"
+                onclick="accountsController.handleAction(this)"
+                ${!isAdmin ? 'disabled title="Action réservée aux administrateurs"' : ''}>
+                Valider
+            </button>
+            <button class="btn btn-action btn-danger btn-sm" 
+                data-action="reject"
+                data-account-id="${account.id}"
+                onclick="accountsController.handleAction(this)"
+                ${!isAdmin ? 'disabled title="Action réservée aux administrateurs"' : ''}>
+                Refuser
+            </button>
+        `;
+    },
+
+    updateTable(pendingAccounts, user) {
+        const tbody = document.querySelector('#accounts-ask-logs tbody');
+        tbody.innerHTML = pendingAccounts.map(account => `
+            <tr>
+                <td class="text-center align-middle">${new Date(account.createdAt).toLocaleDateString('fr-FR')}</td>
+                <td class="text-center align-middle">${account.createdByLogin || 'N/A'}</td>
+                <td class="text-center align-middle">${account.lastname || 'N/A'}</td>
+                <td class="text-center align-middle">${account.firstname || 'N/A'}</td>
+                <td class="text-center align-middle">${account.login || 'N/A'}</td>
+                <td class="text-center align-middle">${account.role || 'N/A'}</td>
+                <td class="text-center align-middle">${account.email || 'N/A'}</td>
+                <td class="text-center align-middle">${account.requestType || 'N/A'}</td>
+                <td class="text-center align-middle">
+                    <div class="d-flex justify-content-center gap-1">
+                        ${this.renderActionButtons(account, user)}
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+    }
+};
+
+// Contrôleur principal
+const accountsController = {
+    async init() {
+        this.setupEventListeners();
+        await this.loadPendingAccounts();
+    },
+
+    setupEventListeners() {
+        document.getElementById('role-select')?.addEventListener('change', this.handleFieldUpdate);
+        document.getElementById('ask-select')?.addEventListener('change', this.handleFieldUpdate);
+    },
+
+    async loadPendingAccounts() {
+        try {
+            const user = utils.getCurrentUser();
+            const pendingAccounts = await accountsService.getPendingAccounts(user.id);
+            uiManager.updateTable(pendingAccounts, user);
+        } catch (error) {
+            console.error('Erreur:', error);
+            alert('Erreur lors du chargement des demandes');
+        }
+    },
+
+    async handleAction(button) {
+        try {
+            const accountId = button.getAttribute('data-account-id');
+            if (!accountId || isNaN(parseInt(accountId))) {
+                throw new Error('ID de demande invalide');
+            }
+
+            const user = utils.getCurrentUser();
+            if (!user || user.role !== 'admin') {
+                throw new Error('Action non autorisée');
+            }
+
+            const action = button.getAttribute('data-action');
+            if (action !== 'validate') return;
+
+            await accountsService.validateAccount(accountId, user.id);
+            await this.loadPendingAccounts();
+            alert('Demande validée avec succès');
+        } catch (error) {
+            console.error('Erreur:', error);
+            alert(error.message);
+        }
+    }
+};
+
+// Initialisation
+document.addEventListener('DOMContentLoaded', () => accountsController.init());
 
 function showNewRequestForm() {
     // Affiche le formulaire
@@ -64,7 +211,7 @@ async function submitRequest() {
                 alert('Tous les champs sont obligatoires pour une création');
                 return;
             }
-            if (!isValidEmail(formData.email)) {
+            if (!utils.isValidEmail(formData.email)) {
                 alert('Format d\'email invalide');
                 return;
             }
@@ -100,39 +247,12 @@ async function submitRequest() {
 
         alert('Demande envoyée avec succès');
         cancelRequest();
-        await loadPendingAccounts();
+        await accountsController.loadPendingAccounts();
         
     } catch (error) {
         console.error('Erreur:', error);
         alert(error.message || 'Erreur lors de l\'envoi de la demande');
     }
-}
-
-function isValidEmail(email) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
-
-function hasPermission(user) {
-    const authorizedRoles = ['admin', 'manager', 'supermanager'];
-    return authorizedRoles.includes(user?.role);
-}
-
-const buttonConfig = {
-    validate: { class: 'success', text: 'Valider' },
-    reject: { class: 'danger', text: 'Refuser' }
-};
-
-function renderActionButton(type, user, accountId) {
-    const config = buttonConfig[type];
-    const isAdmin = user?.role === 'admin';
-    
-    return `
-        <button class="btn btn-action btn-${config.class} btn-sm"
-            onclick="toggleAction(this, ${accountId})"
-            ${!isAdmin ? 'disabled title="Action réservée aux administrateurs"' : ''}>
-            ${config.text}
-        </button>
-    `;
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -252,113 +372,5 @@ document.addEventListener('DOMContentLoaded', function() {
     // Écouteurs d'événements
     roleSelect.addEventListener('change', updateIdentifiantField);
     askSelect.addEventListener('change', updateIdentifiantField);
-    loadPendingAccounts();
+    accountsController.loadPendingAccounts();
 });
-
-async function loadPendingAccounts() {
-    try {
-        const userStr = sessionStorage.getItem('user');
-        if (!userStr) {
-            throw new Error('Utilisateur non connecté');
-        }
-        const user = JSON.parse(userStr);
-        
-        const response = await fetch(`${CONFIG.API_BASE_URL}/pending-accounts`, {
-            headers: {
-                'Authorization': `Bearer ${user.id}`
-            }
-        });
-        
-        if (!response.ok) {
-            throw new Error('Erreur lors de la récupération des demandes');
-        }
-        
-        const pendingAccounts = await response.json();
-        
-        const tbody = document.querySelector('#accounts-ask-logs tbody');
-        tbody.innerHTML = pendingAccounts.map(account => `
-            <tr>
-                <td class="text-center align-middle">${new Date(account.createdAt).toLocaleDateString('fr-FR')}</td>
-                <td class="text-center align-middle">${account.createdByLogin || 'N/A'}</td>
-                <td class="text-center align-middle">${account.lastname || 'N/A'}</td>
-                <td class="text-center align-middle">${account.firstname || 'N/A'}</td>
-                <td class="text-center align-middle">${account.login || 'N/A'}</td>
-                <td class="text-center align-middle">${account.role || 'N/A'}</td>
-                <td class="text-center align-middle">${account.email || 'N/A'}</td>
-                <td class="text-center align-middle">${account.requestType || 'N/A'}</td>
-                <td class="text-center align-middle">
-                    <div class="d-flex justify-content-center gap-1">
-                        ${renderActionButtons(account, user)}
-                    </div>
-                </td>
-            </tr>
-        `).join('');
-    } catch (error) {
-        alert('Erreur lors du chargement des demandes');
-    }
-}
-
-// Appel de la fonction au chargement et après chaque soumission
-document.addEventListener('DOMContentLoaded', loadPendingAccounts);
-
-async function toggleAction(button) {
-    try {
-        const accountId = button.getAttribute('data-account-id');
-        if (!accountId || isNaN(parseInt(accountId))) {
-            console.error('ID invalide:', accountId);
-            throw new Error('ID de demande invalide');
-        }
-
-        const user = JSON.parse(sessionStorage.getItem('user'));
-        if (!user || user.role !== 'admin') {
-            throw new Error('Action non autorisée');
-        }
-
-        const action = button.getAttribute('data-action');
-        if (action !== 'validate') return;
-
-        const response = await fetch(`${CONFIG.API_BASE_URL}/pending-accounts/validate/${accountId}`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${user.id}`,
-                'Content-Type': 'application/json'
-            }
-        });
-
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || 'Erreur lors de la validation');
-        }
-
-        await loadPendingAccounts();
-        alert('Demande validée avec succès');
-    } catch (error) {
-        console.error('Erreur:', error);
-        alert(error.message);
-    }
-}
-
-function renderActionButtons(account, user) {
-    const isAdmin = user?.role === 'admin';
-    // Vérifions que account.id existe
-    if (!account.id) {
-        console.error('Account sans ID:', account);
-        return '';
-    }
-    return `
-        <button class="btn btn-action btn-success btn-sm" 
-            data-action="validate"
-            data-account-id="${account.id}"
-            onclick="toggleAction(this)"
-            ${!isAdmin ? 'disabled title="Action réservée aux administrateurs"' : ''}>
-            Valider
-        </button>
-        <button class="btn btn-action btn-danger btn-sm" 
-            data-action="reject"
-            data-account-id="${account.id}"
-            onclick="toggleAction(this)"
-            ${!isAdmin ? 'disabled title="Action réservée aux administrateurs"' : ''}>
-            Refuser
-        </button>
-    `;
-}
