@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -56,6 +57,20 @@ public class PendingAccountController {
         }
     }
 
+    @PostMapping("/validate/{id}")
+    public ResponseEntity<?> validatePendingAccount(
+            @PathVariable Integer id,
+            @RequestHeader("Authorization") String authHeader) {
+        try {
+            Integer userId = Integer.valueOf(authHeader.replace("Bearer ", ""));
+            pendingAccountService.validatePendingAccount(id, userId);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", e.getMessage()));
+        }
+    }
+
     @GetMapping
     public ResponseEntity<List<PendingAccountDisplayDTO>> getAllPendingAccounts() {
         try {
@@ -63,6 +78,7 @@ public class PendingAccountController {
 
             List<PendingAccountDisplayDTO> displayDtos = pendingAccounts.stream()
                     .map(account -> new PendingAccountDisplayDTO(
+                            account.getId(),
                             account.getLastname(),
                             account.getFirstname(),
                             account.getEmail(),

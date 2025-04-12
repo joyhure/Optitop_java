@@ -1,4 +1,3 @@
-// Ajout en haut du fichier
 const CONFIG = {
     API_BASE_URL: 'http://localhost:8080/api'
 };
@@ -123,13 +122,13 @@ const buttonConfig = {
     reject: { class: 'danger', text: 'Refuser' }
 };
 
-function renderActionButton(type, user) {
+function renderActionButton(type, user, accountId) {
     const config = buttonConfig[type];
     const isAdmin = user?.role === 'admin';
     
     return `
         <button class="btn btn-action btn-${config.class} btn-sm"
-            onclick="toggleAction(this)"
+            onclick="toggleAction(this, ${accountId})"
             ${!isAdmin ? 'disabled title="Action réservée aux administrateurs"' : ''}>
             ${config.text}
         </button>
@@ -289,8 +288,7 @@ async function loadPendingAccounts() {
                 <td class="text-center align-middle">${account.requestType || 'N/A'}</td>
                 <td class="text-center align-middle">
                     <div class="d-flex justify-content-center gap-1">
-                        ${renderActionButton('validate', user)}
-                        ${renderActionButton('reject', user)}
+                        ${renderActionButtons(account, user)}
                     </div>
                 </td>
             </tr>
@@ -302,3 +300,65 @@ async function loadPendingAccounts() {
 
 // Appel de la fonction au chargement et après chaque soumission
 document.addEventListener('DOMContentLoaded', loadPendingAccounts);
+
+async function toggleAction(button) {
+    try {
+        const accountId = button.getAttribute('data-account-id');
+        if (!accountId || isNaN(parseInt(accountId))) {
+            console.error('ID invalide:', accountId);
+            throw new Error('ID de demande invalide');
+        }
+
+        const user = JSON.parse(sessionStorage.getItem('user'));
+        if (!user || user.role !== 'admin') {
+            throw new Error('Action non autorisée');
+        }
+
+        const action = button.getAttribute('data-action');
+        if (action !== 'validate') return;
+
+        const response = await fetch(`${CONFIG.API_BASE_URL}/pending-accounts/validate/${accountId}`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${user.id}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Erreur lors de la validation');
+        }
+
+        await loadPendingAccounts();
+        alert('Demande validée avec succès');
+    } catch (error) {
+        console.error('Erreur:', error);
+        alert(error.message);
+    }
+}
+
+function renderActionButtons(account, user) {
+    const isAdmin = user?.role === 'admin';
+    // Vérifions que account.id existe
+    if (!account.id) {
+        console.error('Account sans ID:', account);
+        return '';
+    }
+    return `
+        <button class="btn btn-action btn-success btn-sm" 
+            data-action="validate"
+            data-account-id="${account.id}"
+            onclick="toggleAction(this)"
+            ${!isAdmin ? 'disabled title="Action réservée aux administrateurs"' : ''}>
+            Valider
+        </button>
+        <button class="btn btn-action btn-danger btn-sm" 
+            data-action="reject"
+            data-account-id="${account.id}"
+            onclick="toggleAction(this)"
+            ${!isAdmin ? 'disabled title="Action réservée aux administrateurs"' : ''}>
+            Refuser
+        </button>
+    `;
+}

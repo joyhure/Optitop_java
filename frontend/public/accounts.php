@@ -116,50 +116,9 @@ if (!isset($_SESSION['user']) ||
             </tr>
           </tbody>
         </table>
-      </div>
-      
+      </div>      
     </section>
-    <section id="table-user-actions" class="table-responsive small w-100">
-    <h4 class="py-3">
-        <a class="text-decoration-none dropdown-toggle text-dark nav-link" data-bs-toggle="collapse" href="#collapse-gestion" role="button" aria-expanded="false" aria-controls="collapse-gestion">
-          Gestion des Demandes
-        </a>
-      </h4>
-      <div class="collapse show" id="collapse-gestion">
-        <table class="table table-striped table-sm">
-          <thead>
-            <tr>
-              <th scope="col" class="table-col-w4 text-center align-middle">Date</th>
-              <th scope="col" class="table-col-w4 text-center align-middle">Initiateur</th>
-              <th scope="col" class="table-col-w8 text-center align-middle">Nom</th>
-              <th scope="col" class="table-col-w8 text-center align-middle">Prénom</th>
-              <th scope="col" class="table-col-w8 text-center align-middle">Login</th>
-              <th scope="col" class="table-col-w8 text-center align-middle">Rôle</th>
-              <th scope="col" class="table-col-w8 text-center align-middle">Email</th>
-              <th scope="col" class="table-col-w8 text-center align-middle">Observations</th>
-              <th scope="col" class="table-col-w4 text-center align-middle">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="text-center align-middle fw-bold">01/07/2024</td>
-              <td class="text-center align-middle">mdupanloup</td>
-              <td class="text-center align-middle">Haterisk</td>
-              <td class="text-center align-middle">Jack</td>
-              <td class="text-center align-middle">jhaterisk</td>
-              <td class="text-center align-middle">collaborateur</td>
-              <td class="text-center align-middle">jhaterisk@hotmail.com</td>
-              <td class="text-center align-middle">Urgent SVP !!!!</td>
-              <td class="text-center align-middle">
-                <button class="btn btn-success py-1 mb-1" onclick="toggleAction(this)">Valider</button>
-                <button class="btn btn-danger py-1" onclick="toggleAction(this)">Refuser</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      
-    </section>
+    
     <section id="table-user" class="table-responsive small w-100">
       <h4 class="py-3">
         <a class="text-decoration-none dropdown-toggle text-dark nav-link" data-bs-toggle="collapse" href="#collapse-user" role="button" aria-expanded="false" aria-controls="collapseRevenue2023">
