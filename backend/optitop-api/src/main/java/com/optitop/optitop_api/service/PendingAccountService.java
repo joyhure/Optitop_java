@@ -148,6 +148,23 @@ public class PendingAccountService {
         pendingAccountRepository.delete(pending);
     }
 
+    @Transactional
+    public void rejectPendingAccount(Integer pendingAccountId, Integer validatorId) {
+        // Récupération de la demande en attente
+        PendingAccount pending = pendingAccountRepository.findById(pendingAccountId)
+                .orElseThrow(() -> new RuntimeException("Demande non trouvée"));
+
+        // Vérification du validateur
+        User validator = userRepository.findById(validatorId)
+                .orElseThrow(() -> new RuntimeException("Validateur non trouvé"));
+        if (validator.getRole() != User.Role.admin) {
+            throw new RuntimeException("Action non autorisée");
+        }
+
+        // Suppression de la demande
+        pendingAccountRepository.delete(pending);
+    }
+
     private String generateSecurePassword() {
         // Génération d'un mot de passe fort de 12 caractères
         String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%&*()_+-=[]|";

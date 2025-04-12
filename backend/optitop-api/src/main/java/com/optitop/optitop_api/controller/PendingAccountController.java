@@ -71,6 +71,20 @@ public class PendingAccountController {
         }
     }
 
+    @PostMapping("/reject/{id}")
+    public ResponseEntity<?> rejectPendingAccount(
+            @PathVariable Integer id,
+            @RequestHeader("Authorization") String authHeader) {
+        try {
+            Integer userId = Integer.valueOf(authHeader.replace("Bearer ", ""));
+            pendingAccountService.rejectPendingAccount(id, userId);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", e.getMessage()));
+        }
+    }
+
     @GetMapping
     public ResponseEntity<List<PendingAccountDisplayDTO>> getAllPendingAccounts() {
         try {

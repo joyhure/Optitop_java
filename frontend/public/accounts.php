@@ -122,33 +122,29 @@ if (!isset($_SESSION['user']) ||
     <section id="table-user" class="table-responsive small w-100">
       <h4 class="py-3">
         <a class="text-decoration-none dropdown-toggle text-dark nav-link" data-bs-toggle="collapse" href="#collapse-user" role="button" aria-expanded="false" aria-controls="collapseRevenue2023">
-          Comptes Utilisateurs Existants
+          Comptes Utilisateurs
         </a>
       </h4>
       <div class="collapse" id="collapse-user">
-        <table class="table table-striped table-sm">
+        <table id="users-table" class="table table-striped table-sm">
           <thead>
             <tr>
-              <th scope="col" class="table-col-w8 text-center align-middle">Date Validation</th>
-              <th scope="col" class="table-col-w8 text-center align-middle">Nom</th>
-              <th scope="col" class="table-col-w8 text-center align-middle">Prénom</th>
+              <th scope="col" class="table-col-w8 text-center align-middle">Date Création</th>
               <th scope="col" class="table-col-w8 text-center align-middle">Login</th>
               <th scope="col" class="table-col-w8 text-center align-middle">Rôle</th>
+              <th scope="col" class="table-col-w8 text-center align-middle">Nom</th>
+              <th scope="col" class="table-col-w8 text-center align-middle">Prénom</th>
               <th scope="col" class="table-col-w8 text-center align-middle">Email</th>
-              <th scope="col" class="table-col-w8 text-center align-middle">Action</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td class="text-center align-middle fw-bold">01/07/2024</td>
-              <td class="text-center align-middle">Haterisk</td>
-              <td class="text-center align-middle">Jack</td>
-              <td class="text-center align-middle">jhaterisk</td>
-              <td class="text-center align-middle">collaborateur</td>
-              <td class="text-center align-middle">jhaterisk@hotmail.com</td>
-              <td class="text-center align-middle">
-                <button class="btn btn-danger" onclick="toggleAction(this)">Supprimer</button>
-              </td>
+              <td class="text-center align-middle fw-bold"></td>
+              <td class="text-center align-middle"></td>
+              <td class="text-center align-middle"></td>
+              <td class="text-center align-middle"></td>
+              <td class="text-center align-middle"></td>
+              <td class="text-center align-middle"></td>
             </tr>
           </tbody>
         </table>

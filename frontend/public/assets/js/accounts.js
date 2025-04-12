@@ -31,7 +31,27 @@ const accountsService = {
         }
     },
 
-    // ... autres appels API
+    async rejectAccount(accountId, userId) {
+        const response = await fetch(`${CONFIG.API_BASE_URL}/pending-accounts/reject/${accountId}`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${userId}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Erreur lors du rejet');
+        }
+    },
+
+    async getAllUsers() {
+        const response = await fetch(`${CONFIG.API_BASE_URL}/users/all`, {
+            headers: { 'Authorization': `Bearer ${utils.getCurrentUser().id}` }
+        });
+        if (!response.ok) throw new Error('Erreur lors de la récupération des utilisateurs');
+        return response.json();
+    }
 };
 
 // Utilitaires
@@ -95,6 +115,20 @@ const uiManager = {
                 </td>
             </tr>
         `).join('');
+    },
+
+    updateUsersTable(users) {
+        const tbody = document.querySelector('#users-table tbody');
+        tbody.innerHTML = users.map(user => `
+            <tr>
+                <td class="text-center align-middle">${new Date(user.createdAt).toLocaleDateString('fr-FR')}</td>
+                <td class="text-center align-middle">${user.login || 'N/A'}</td>
+                <td class="text-center align-middle">${user.role || 'N/A'}</td>
+                <td class="text-center align-middle">${user.lastname || 'N/A'}</td>
+                <td class="text-center align-middle">${user.firstname || 'N/A'}</td>
+                <td class="text-center align-middle">${user.email || 'N/A'}</td>
+            </tr>
+        `).join('');
     }
 };
 
@@ -103,6 +137,7 @@ const accountsController = {
     async init() {
         this.setupEventListeners();
         await this.loadPendingAccounts();
+        await this.loadUsers();
     },
 
     setupEventListeners() {
@@ -134,14 +169,36 @@ const accountsController = {
             }
 
             const action = button.getAttribute('data-action');
-            if (action !== 'validate') return;
+            
+            switch(action) {
+                case 'validate':
+                    await accountsService.validateAccount(accountId, user.id);
+                    alert('Demande validée avec succès');
+                    break;
+                case 'reject':
+                    if (confirm('Êtes-vous sûr de vouloir refuser cette demande ?')) {
+                        await accountsService.rejectAccount(accountId, user.id);
+                        alert('Demande refusée avec succès');
+                    }
+                    break;
+                default:
+                    return;
+            }
 
-            await accountsService.validateAccount(accountId, user.id);
             await this.loadPendingAccounts();
-            alert('Demande validée avec succès');
         } catch (error) {
             console.error('Erreur:', error);
             alert(error.message);
+        }
+    },
+
+    async loadUsers() {
+        try {
+            const users = await accountsService.getAllUsers();
+            uiManager.updateUsersTable(users);
+        } catch (error) {
+            console.error('Erreur:', error);
+            alert('Erreur lors du chargement des utilisateurs');
         }
     }
 };

@@ -1,11 +1,13 @@
 package com.optitop.optitop_api.controller;
 
 import com.optitop.optitop_api.dto.PasswordChangeRequestDTO;
+import com.optitop.optitop_api.dto.UserDisplayDTO;
 import com.optitop.optitop_api.model.User;
 import com.optitop.optitop_api.repository.UserRepository;
 import com.optitop.optitop_api.service.PasswordService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/users")
@@ -132,5 +135,25 @@ public class UserController {
             return false;
 
         return true;
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<UserDisplayDTO>> getAllUsers() {
+        try {
+            List<User> users = userRepository.findAll();
+            List<UserDisplayDTO> userDtos = users.stream()
+                    .map(user -> new UserDisplayDTO(
+                            user.getId(),
+                            user.getLogin(),
+                            user.getRole(),
+                            user.getLastname(),
+                            user.getFirstname(),
+                            user.getEmail(),
+                            user.getCreatedAt()))
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(userDtos);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 }
