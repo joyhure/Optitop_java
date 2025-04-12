@@ -8,9 +8,11 @@ import org.springframework.stereotype.Service;
 import com.optitop.optitop_api.dto.PendingAccountDTO;
 import com.optitop.optitop_api.model.PendingAccount;
 import com.optitop.optitop_api.model.PendingAccount.RequestType;
+import com.optitop.optitop_api.model.Seller;
 import com.optitop.optitop_api.model.User;
 import com.optitop.optitop_api.repository.PendingAccountRepository;
 import com.optitop.optitop_api.repository.UserRepository;
+import com.optitop.optitop_api.repository.SellerRepository;
 
 import jakarta.transaction.Transactional;
 
@@ -23,6 +25,12 @@ public class PendingAccountService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private EmailService emailService;
+
+    @Autowired
+    private SellerRepository sellerRepository;
 
     private final PendingAccountRepository pendingAccountRepository;
     private final UserRepository userRepository;
@@ -117,10 +125,27 @@ public class PendingAccountService {
                 String rawPassword = generateSecurePassword();
                 newUser.setPassword(passwordEncoder.encode(rawPassword));
 
-                // TODO: Envoyer email avec mot de passe en clair
-                System.out.println("Mot de passe généré pour " + newUser.getLogin() + ": " + rawPassword);
+                try {
+                    // Sauvegarde de l'utilisateur et récupération de l'ID généré
+                    User savedUser = userRepository.save(newUser);
 
-                userRepository.save(newUser);
+                    // Si c'est un collaborator ou manager, mettre à jour le seller
+                    if (savedUser.getRole() == User.Role.collaborator ||
+                            savedUser.getRole() == User.Role.manager) {
+                        // Recherche du seller par login
+                        Seller seller = sellerRepository.findBySellerRef(savedUser.getLogin())
+                                .orElseThrow(() -> new RuntimeException(
+                                        "Seller non trouvé pour le login : " + savedUser.getLogin()));
+
+                        // Mise à jour de l'user_id
+                        seller.setUser(savedUser);
+                        sellerRepository.save(seller);
+                    }
+
+                    emailService.sendPasswordEmail(newUser.getEmail(), newUser.getLogin(), rawPassword);
+                } catch (Exception e) {
+                    throw new RuntimeException("Erreur lors de l'envoi de l'email : " + e.getMessage());
+                }
                 break;
 
             case modification:

@@ -3,6 +3,7 @@ package com.optitop.optitop_api.controller;
 import com.optitop.optitop_api.dto.PasswordChangeRequestDTO;
 import com.optitop.optitop_api.dto.UserDisplayDTO;
 import com.optitop.optitop_api.model.User;
+import com.optitop.optitop_api.repository.PendingAccountRepository;
 import com.optitop.optitop_api.repository.UserRepository;
 import com.optitop.optitop_api.service.PasswordService;
 
@@ -30,6 +31,9 @@ public class UserController {
 
     @Autowired
     private PasswordService passwordService;
+
+    @Autowired
+    private PendingAccountRepository pendingAccountRepository;
 
     @GetMapping("/login/{login}")
     public ResponseEntity<User> getUserByLogin(@PathVariable String login) {
@@ -78,10 +82,18 @@ public class UserController {
 
     @GetMapping("/logins")
     public ResponseEntity<List<String>> getAllLogins() {
-        List<String> logins = userRepository.findAllLogins();
-        return logins.isEmpty()
+        // Récupérer les logins qui ont une demande en cours
+        List<String> pendingLogins = pendingAccountRepository.findAllLogins();
+
+        // Récupérer tous les logins et filtrer
+        List<String> availableLogins = userRepository.findAllLogins()
+                .stream()
+                .filter(login -> !pendingLogins.contains(login))
+                .collect(Collectors.toList());
+
+        return availableLogins.isEmpty()
                 ? ResponseEntity.noContent().build()
-                : ResponseEntity.ok(logins);
+                : ResponseEntity.ok(availableLogins);
     }
 
     @PostMapping("/{id}/change-password")
