@@ -113,21 +113,40 @@ function isValidEmail(email) {
     return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
+function hasPermission(user) {
+    const authorizedRoles = ['admin', 'manager', 'supermanager'];
+    return authorizedRoles.includes(user?.role);
+}
+
+const buttonConfig = {
+    validate: { class: 'success', text: 'Valider' },
+    reject: { class: 'danger', text: 'Refuser' }
+};
+
+function renderActionButton(type, user) {
+    const config = buttonConfig[type];
+    const isAdmin = user?.role === 'admin';
+    
+    return `
+        <button class="btn btn-action btn-${config.class} btn-sm"
+            onclick="toggleAction(this)"
+            ${!isAdmin ? 'disabled title="Action réservée aux administrateurs"' : ''}>
+            ${config.text}
+        </button>
+    `;
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const roleSelect = document.getElementById('role-select');
     const askSelect = document.getElementById('ask-select');
     const identifiantInput = document.getElementById('identifiant');
-    
-    // Création du select pour l'identifiant
     const identifiantSelect = document.createElement('select');
     identifiantSelect.className = 'form-select form-select-sm';
     identifiantSelect.id = 'identifiant-select';
     identifiantSelect.style.display = 'none';
-    
-    // Insertion du select après l'input
     identifiantInput.parentNode.insertBefore(identifiantSelect, identifiantInput.nextSibling);
 
-    // Fonction pour gérer l'affichage du bon champ identifiant
+    // Fonction pour gérer l'affichage identifiant
     const updateIdentifiantField = async () => {
         const selectedRole = roleSelect.value;
         const selectedAskType = askSelect.value;
@@ -270,10 +289,9 @@ async function loadPendingAccounts() {
                 <td class="text-center align-middle">${account.requestType || 'N/A'}</td>
                 <td class="text-center align-middle">
                     <div class="d-flex justify-content-center gap-1">
-                        <button class="btn btn-action btn-success btn-sm" onclick="toggleAction(this)">Valider</button>
-                        <button class="btn btn-action btn-danger btn-sm" onclick="toggleAction(this)">Refuser</button>
+                        ${renderActionButton('validate', user)}
+                        ${renderActionButton('reject', user)}
                     </div>
-
                 </td>
             </tr>
         `).join('');
