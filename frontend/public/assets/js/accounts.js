@@ -215,18 +215,22 @@ const accountsController = {
                 case 'validate':
                     await accountsService.validateAccount(accountId, user.id);
                     alert('Demande validée avec succès');
+                    // Recharger les deux tableaux
+                    await Promise.all([
+                        this.loadPendingAccounts(),
+                        this.loadUsers()
+                    ]);
                     break;
                 case 'reject':
                     if (confirm('Êtes-vous sûr de vouloir refuser cette demande ?')) {
                         await accountsService.rejectAccount(accountId, user.id);
                         alert('Demande refusée avec succès');
+                        await this.loadPendingAccounts();
                     }
                     break;
                 default:
                     return;
             }
-
-            await this.loadPendingAccounts();
         } catch (error) {
             console.error('Erreur:', error);
             alert(error.message);
