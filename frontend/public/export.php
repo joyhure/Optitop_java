@@ -4,7 +4,7 @@ session_start();
 // Vérification PHP principale
 if (!isset($_SESSION['user']) || 
     !isset($_SESSION['user']['role']) || 
-    !in_array($_SESSION['user']['role'], ['admin', 'supermanager'])) {
+    !in_array($_SESSION['user']['role'], ['admin', 'supermanager', 'manager'])) {
     header('Location: dashboard.php');
     exit();
 }
