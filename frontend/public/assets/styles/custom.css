@@ -197,6 +197,18 @@
     pointer-events: none !important;
 }
 
+a.card-dashboard:hover {
+    background-color: #D0E5FF !important; 
+    transform: translateY(-3px);
+    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+    border-color: #d0d4d9 !important;
+}
+
+a.card-dashboard:hover .svg-feature {
+    background-color: #f8f9fa;
+    fill: #2989DD;
+}
+
 /* Navigation styles */
 .nav-pills .nav-link {
     border-radius: 0 !important;
@@ -290,6 +302,22 @@ th {
 
 .btn-success.py-1 {
     background-color: #198754;
+}
+
+.hover-overlay::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(var(--bs-primary-rgb), 0.05);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.hover-overlay:hover::after {
+    opacity: 1;
 }
 
 

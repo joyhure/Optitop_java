@@ -297,18 +297,11 @@ document.addEventListener('DOMContentLoaded', function() {
         },
 
         updateSummaryCard(data) {
-            console.log('updateSummaryCard appelé avec:', data);
             
             const totalRevenueElement = DOM.totalRevenue;
             const totalDeltaPercentElement = DOM.totalDeltaPercent;
         
-            console.log('Éléments DOM:', { 
-                totalRevenue: totalRevenueElement, 
-                totalDeltaPercent: totalDeltaPercentElement 
-            });
-        
             if (!data || data.currentAmount === null || data.previousAmount === null) {
-                console.log('Données invalides, affichage des tirets');
                 totalRevenueElement.textContent = '-';
                 totalDeltaPercentElement.textContent = '-';
                 return;
@@ -316,8 +309,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
             const currentAmount = data.currentAmount || 0;
             const previousAmount = data.previousAmount || 0;
-        
-            console.log('Montants calculés:', { currentAmount, previousAmount });
         
             totalRevenueElement.textContent = formatUtils.currency(currentAmount);
             totalDeltaPercentElement.textContent = formatUtils.deltaPercent(currentAmount, previousAmount);
