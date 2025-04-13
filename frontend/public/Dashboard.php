@@ -16,7 +16,7 @@
   <?php
   $pageTitle = "Dashboard";
   require_once 'components/header.html';
-  require_once 'components/navbar.php'; 
+  require_once 'components/navbar.php';
   ?>
   <main id="main-dashboard" class="d-flex justify-content-around flex-wrap my-3">
 
@@ -29,31 +29,24 @@
       </div>
       <div id="first-line" class="flex-row d-flex justify-content-between align-items-center">
         <a id="ca" href="revenue.php" class="text-decoration-none card card-dashboard my-3 px-1 pt-2 shadow-sm hover-overlay" style="transition: all 0.3s ease;">
-                <div class="feature-icon d-inline-flex align-items-center justify-content-center fs-2">
-                    <svg class="bi svg-feature rounded text-primary" width="1em" height="1em">
-                        <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#currency-euro"></use>
-                    </svg>
-                </div>
-                <h2 id="total-revenue" class="text-center pt-2 text-dark">-</h2>
+          <div class="feature-icon d-inline-flex align-items-center justify-content-center fs-2">
+            <svg class="bi svg-feature rounded text-primary" width="1em" height="1em">
+              <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#currency-euro"></use>
+            </svg>
+          </div>
+          <h2 id="total-revenue" class="text-center pt-2 text-dark">-</h2>
         </a>
 
-        <div id="quotation" class="card my-3 px-1 pt-2">
+        <a id="quotation" href="quotations.php" class="text-decoration-none card card-dashboard my-3 px-1 pt-2 shadow-sm hover-overlay" style="transition: all 0.3s ease;">
           <div class="feature-icon d-inline-flex align-items-center justify-content-center fs-2">
             <svg class="bi svg-feature rounded" width="1em" height="1em">
               <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#clipboard2"></use>
             </svg>
           </div>
-          <p class="p-2">Concrétisation : %<br>
-            Devis non validés : <br>
-            Devis validés : <br>
-            <a href="quotations.php" class="icon-link">
-              Accès aux détails
-              <svg class="bi">
-                <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#chevron-right"></use>
-              </svg>
-            </a>
+          <h3 class="text-center pt-2 text-dark">Concrétisation</h3>
+          <h2 id="store-concretization-rate" class="text-center pt-2 text-dark">-</h2>
           </p>
-        </div>
+        </a>
       </div>
       <div id="second-line" class="flex-row d-flex justify-content-between align-items-center">
         <div id="average-basket" class="card my-3 px-1 pt-2">

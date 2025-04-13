@@ -16,6 +16,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         }).format(amount);
     };
 
+    const formatPercent = (value) => {
+        return new Intl.NumberFormat(CONFIG.LOCALE, {
+            style: 'percent',
+            minimumFractionDigits: 1,
+            maximumFractionDigits: 1
+        }).format(value/100);
+    };
+
     // Mise à jour des données personnelles
     const user = JSON.parse(sessionStorage.getItem('user'));
     if (user?.firstname) {
@@ -56,6 +64,49 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
+    // Récupération et affichage du taux de concrétisation
+    const loadStoreRate = async () => {
+        try {
+            const startDate = sessionStorage.getItem('startDate');
+            const endDate = sessionStorage.getItem('endDate');
+
+            console.log('Dates récupérées:', { startDate, endDate });
+
+            if (startDate && endDate) {
+                const url = `${CONFIG.API_BASE_URL}/quotations/stats?startDate=${startDate}&endDate=${endDate}`;
+                console.log('URL de requête:', url);
+
+                const response = await fetch(url);
+                console.log('Statut de la réponse:', response.status);
+
+                if (!response.ok) throw new Error('Erreur lors de la récupération du taux de concrétisation');
+
+                const data = await response.json();
+                console.log('Données reçues:', data);
+
+                const rateElement = document.getElementById('store-concretization-rate');
+                console.log('Élément trouvé:', rateElement);
+                
+                if (rateElement && data.concretizationRate !== undefined) {
+                    const formattedRate = formatPercent(data.concretizationRate);
+                    console.log('Taux formaté:', formattedRate);
+                    rateElement.textContent = formattedRate;
+                } else {
+                    console.error("L'élément store-concretization-rate n'a pas été trouvé dans le DOM ou le taux n'est pas défini");
+                }
+            } else {
+                console.error('Dates manquantes dans le sessionStorage');
+            }
+        } catch (error) {
+            console.error('Erreur:', error);
+            const rateElement = document.getElementById('store-concretization-rate');
+            if (rateElement) {
+                rateElement.textContent = '-';
+            }
+        }
+    };
+
     // Chargement initial
     await loadTotalRevenue();
+    await loadStoreRate();
 });
