@@ -73,9 +73,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (userRole === 'collaborator') {
                     url += `&userRole=${userRole}&userSellerRef=${userSellerRef}`;
                 }
-
-                console.log('URL de requête:', url); // Debug
-                console.log('Session user:', STATE.userSession); // Debug
                 
                 const response = await utils.fetchApi(url);
                 const quotations = await response.json();
@@ -124,7 +121,6 @@ document.addEventListener('DOMContentLoaded', function() {
             if (stats.concretizationRate !== undefined) {
                 document.getElementById('store-concretization-rate').textContent = 
                     `${stats.concretizationRate.toFixed(1)}%`;
-                console.log("taux de concret :", stats.concretizationRate);
             }
 
             // Mise à jour des nombres de devis

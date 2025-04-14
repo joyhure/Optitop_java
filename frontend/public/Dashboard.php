@@ -16,75 +16,9 @@
   <?php
   $pageTitle = "Dashboard";
   require_once 'components/header.html';
-  require_once 'components/navbar.php'; 
+  require_once 'components/navbar.php';
   ?>
   <main id="main-dashboard" class="d-flex justify-content-around flex-wrap my-3">
-    <section id="personal-section" class="col w-25">
-      <div class="d-flex flex-column justify-content-center align-items-center mb-4 mt-3">
-        <svg class="bi d-block mx-auto mb-1" width="30" height="30">
-          <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#person-circle"></use>
-        </svg>
-        <h4>[firstName]</h4>
-      </div>
-      <div id="first-line" class="flex-row d-flex justify-content-between align-items-center">
-        <div id="ca" class="card my-3 px-1 pt-2">
-          <div class="feature-icon d-inline-flex align-items-center justify-content-center fs-2">
-            <svg class="bi svg-feature rounded" width="1em" height="1em">
-              <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#currency-euro"></use>
-            </svg>
-          </div>
-          <p class="p-2">CA : €<br>
-            Nombre de factures : <br>
-            % du CA Magasin : %<br>
-            <br>
-          </p>
-        </div>
-
-        <div id="quotation" class="card my-3 px-1 pt-2">
-          <div class="feature-icon d-inline-flex align-items-center justify-content-center fs-2">
-            <svg class="bi svg-feature rounded" width="1em" height="1em">
-              <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#clipboard2"></use>
-            </svg>
-          </div>
-          <p class="p-2">Concrétisation : %<br>
-            Devis non validés : <br>
-            Devis validés : <br>
-            <a href="quotations.php" class="icon-link">
-              Accès aux détails
-              <svg class="bi">
-                <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#chevron-right"></use>
-              </svg>
-            </a>
-          </p>
-        </div>
-      </div>
-      <div id="second-line" class="flex-row d-flex justify-content-between align-items-center">
-        <div id="average-basket" class="card my-3 px-1 pt-2">
-          <div class="feature-icon d-inline-flex align-items-center justify-content-center fs-2">
-            <svg class="bi svg-feature rounded" width="1em" height="1em">
-              <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#cart4"></use>
-            </svg>
-          </div>
-          <p class="p-2">Panier Moyen (opt) : €<br>
-            Nombre de factures : <br>
-            PM verres : <br>
-            PM Montures : <br>
-          </p>
-        </div>
-        <div id="bonus" class="card my-3 px-1 pt-2">
-          <div class="feature-icon d-inline-flex align-items-center justify-content-center fs-2">
-            <svg class="bi svg-feature rounded" width="1em" height="1em">
-              <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#piggy-bank"></use>
-            </svg>
-          </div>
-          <p class="p-2">Montures primées : %<br>
-            Prime : €<br>
-            Nombre : <br>
-            <br>
-          </p>
-        </div>
-      </div>
-    </section>
 
     <section id="shop-selection" class="feature col w-25">
       <div class="d-flex flex-column justify-content-center align-items-center mb-4 mt-3">
@@ -94,76 +28,98 @@
         <h4>Magasin</h4>
       </div>
       <div id="first-line" class="flex-row d-flex justify-content-between align-items-center">
-        <div id="ca" class="card my-3 px-1 pt-2">
+        <a id="ca" href="revenue.php" class="text-decoration-none card card-dashboard my-3 px-1 pt-2" style="transition: all 0.3s ease;">
           <div class="feature-icon d-inline-flex align-items-center justify-content-center fs-2">
-            <svg class="bi svg-feature rounded" width="1em" height="1em">
+            <svg class="bi svg-feature rounded text-primary" width="1em" height="1em">
               <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#currency-euro"></use>
             </svg>
           </div>
-          <p class="p-2">CA : €<br>
-            Nombre de factures : <br>
-            <br>
-            <a href="revenue.php" class="icon-link">
-              Accès aux détails
-              <svg class="bi">
-                <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#chevron-right"></use>
-              </svg>
-            </a>
-          </p>
-        </div>
+          <h2 id="total-revenue" class="text-center pt-2 text-dark">-</h2>
+        </a>
 
-        <div id="quotation" class="card my-3 px-1 pt-2">
+        <a id="quotation" href="quotations.php" class="text-decoration-none card card-dashboard my-3 px-1 pt-2" style="transition: all 0.3s ease;">
           <div class="feature-icon d-inline-flex align-items-center justify-content-center fs-2">
             <svg class="bi svg-feature rounded" width="1em" height="1em">
               <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#clipboard2"></use>
             </svg>
           </div>
-          <p class="p-2">Concrétisation : %<br>
-            Devis non validés : <br>
-            Devis validés : <br>
-            <a href="quotations.php" class="icon-link">
-              Accès aux détails
-              <svg class="bi">
-                <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#chevron-right"></use>
-              </svg>
-            </a>
-          </p>
-        </div>
+          <h2 id="store-concretization-rate" class="text-center pt-2 text-dark">-</h2>
+        </a>
       </div>
       <div id="second-line" class="flex-row d-flex justify-content-between align-items-center">
-        <div id="average-basket" class="card my-3 px-1 pt-2">
+        <a id="average-basket" href="average-basket.php" class="text-decoration-none card card-dashboard my-3 px-1 pt-2" style="transition: all 0.3s ease;">
           <div class="feature-icon d-inline-flex align-items-center justify-content-center fs-2">
             <svg class="bi svg-feature rounded" width="1em" height="1em">
               <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#cart4"></use>
             </svg>
           </div>
-          <p class="p-2">Panier Moyen (opt) : €<br>
-            Nombre de factures : <br>
-            <br>
-            <a href="average-basket.php" class="icon-link">
-              Accès aux détails
-              <svg class="bi">
-                <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#chevron-right"></use>
-              </svg>
-            </a>
-          </p>
-        </div>
-        <div id="bonus" class="card my-3 px-1 pt-2">
-          <div class="feature-icon d-inline-flex align-items-center justify-content-center fs-2">
+          <div class="p-2">
+            Panier Moyen (opt) : <h4 id="store-average-basket" class="text-dark text-center">-</h4>
+            Panier Moyen P2 : <h4 id="store-average-p2" class="text-dark text-center mb-0">-</h4>
+          </div>
+        </a>
+        <a id="bonus" href="average-basket.php" class="text-decoration-none card card-dashboard my-3 px-3 pt-2" style="transition: all 0.3s ease;">
+          <div class="feature-icon d-inline-flex align-items-center justify-content-center fs-2 mb-2">
             <svg class="bi svg-feature rounded" width="1em" height="1em">
               <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#piggy-bank"></use>
             </svg>
           </div>
-          <p class="p-2">Montures primées : %<br>
-            Prime : €<br>
-            Nombre : <br>
-            <a href="average-basket.php" class="icon-link">
-              Accès aux détails
-              <svg class="bi">
-                <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#chevron-right"></use>
-              </svg>
-            </a>
-          </p>
+          <div class="p-2">
+            Montures Primées : <h4 id="store-rate-premium-frame" class="text-dark text-center mb-0">-</h4>
+            Nombre : <h4 id="store-nb-premium-frame" class="text-dark text-center mb-0">-</h4>
+          </div>
+        </a>
+      </div>
+    </section>
+    <section id="personal-section" class="col w-25">
+      <div class="d-flex flex-column justify-content-center align-items-center mb-4 mt-3">
+        <svg class="bi d-block mx-auto mb-1" width="30" height="30">
+          <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#person-circle"></use>
+        </svg>
+        <h4>-</h4>
+      </div>
+      <div id="first-line" class="flex-row d-flex justify-content-between align-items-center">
+        <div id="personal-ca" class="card card-dashboard my-3 px-3 pt-2" style="transition: all 0.3s ease;">
+          <div class="feature-icon d-inline-flex align-items-center justify-content-center fs-2 mb-2">
+            <svg class="bi svg-feature rounded" width="1em" height="1em">
+              <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#currency-euro"></use>
+            </svg>
+          </div>
+          <h2 id="personal-revenue" class="text-center text-dark">-</h2>
+          % CA Magasin : <h4 id="personal-revenue-percent" class="text-dark text-center mb-0 pb-2">-</h4>
+        </div>
+        <a id="personal-quotations" href="quotations.php" class="text-decoration-none card card-dashboard my-3 px-3 pt-2" style="transition: all 0.3s ease;">
+          <div class="feature-icon d-inline-flex align-items-center justify-content-center fs-2 mb-2">
+            <svg class="bi svg-feature rounded" width="1em" height="1em">
+              <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#clipboard2"></use>
+            </svg>
+          </div>
+          <h2 id="personal-concretization-rate" class="text-center text-dark">-</h2>
+          Nb Non validés : <h4 id="personal-unvalidated-quotations" class="text-dark text-center mb-0 pb-2">-</h4>
+        </a>
+      </div>
+      <div id="second-line" class="flex-row d-flex justify-content-between align-items-center">
+        <div id="personal-basket-container" class="card card-dashboard my-3 px-3 pt-2" style="transition: all 0.3s ease;">
+          <div class="feature-icon d-inline-flex align-items-center justify-content-center fs-2 mb-2">
+            <svg class="bi svg-feature rounded" width="1em" height="1em">
+              <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#cart4"></use>
+            </svg>
+          </div>
+          <div class="p-2">
+            Panier Moyen (opt) : <h4 id="personal-average-basket-value" class="text-dark text-center">-</h4>
+            Panier Moyen P2 : <h4 id="personal-average-p2-value" class="text-dark text-center mb-0">-</h4>
+          </div>
+        </div>
+        <div id="personal-bonus-frame-card" class="card card-dashboard my-3 px-3 pt-2" style="transition: all 0.3s ease;">
+          <div class="feature-icon d-inline-flex align-items-center justify-content-center fs-2 mb-2">
+            <svg class="bi svg-feature rounded" width="1em" height="1em">
+              <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#piggy-bank"></use>
+            </svg>
+          </div>
+          <div class="p-2">
+            Montures primées : <h4 id="personal-rate-premium-frame" class="text-dark text-center">-</h4>
+            Prime Montures : <h4 id="personal-bonus-frame" class="text-dark text-center mb-0">-</h4>
+          </div>
         </div>
       </div>
     </section>
@@ -174,6 +130,7 @@
   <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
   <script src="assets/js/header.js"></script>
   <script src="assets/js/navbar.js"></script>
+  <script src="assets/js/dashboard.js"></script>
 </body>
 
 </html>
