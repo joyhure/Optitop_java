@@ -7,6 +7,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         BONUS_PER_FRAME: 5
     };
 
+    // Fonction pour désactiver les liens pour les collaborateurs
+    const disableLinksForCollaborators = () => {
+        const user = JSON.parse(sessionStorage.getItem('user'));
+        if (user?.role === 'collaborator') {
+            const shopLinks = document.querySelectorAll('#shop-selection a');
+            shopLinks.forEach(link => {
+                link.classList.add('collaborator-disabled-link');
+            });
+        }
+    };
+
     const utils = {
         async fetchApi(endpoint, options = {}) {
             try {
@@ -328,4 +339,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadPersonalQuotationStats();
     await loadPersonalAverageBaskets();
     await loadPersonalFrameStats();  // Ajout de l'appel à la nouvelle fonction
+    
+    // Désactiver les liens pour les collaborateurs
+    disableLinksForCollaborators();
 });

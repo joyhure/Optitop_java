@@ -320,4 +320,18 @@ th {
     opacity: 1;
 }
 
+/* Style pour les liens désactivés des collaborateurs */
+.collaborator-disabled-link {
+    pointer-events: none !important;
+    cursor: default !important;
+    text-decoration: none !important;
+    color: inherit !important;
+    transition: none !important;
+}
+
+.collaborator-disabled-link:hover {
+    transform: none !important;
+    box-shadow: none !important;
+}
+
 
