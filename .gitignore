@@ -10,4 +10,5 @@ node_modules/
 
 # Ressources
 Ressources/Fichiers .csv/Originaux/*.csv
+/Ressources/id&pass
 Ressources/id&pass
