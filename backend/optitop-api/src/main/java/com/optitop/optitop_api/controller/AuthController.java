@@ -21,7 +21,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "http://localhost")
+@CrossOrigin(origins = { "http://localhost", "http://10.0.2.2", "http://optitop.local" })
 public class AuthController {
 
     @Autowired
