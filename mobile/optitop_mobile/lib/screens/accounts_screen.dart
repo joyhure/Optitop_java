@@ -134,8 +134,8 @@ class _AccountsScreenState extends State<AccountsScreen> {
                     itemBuilder: (context, i) {
                       final user = users[i];
                       return ListTile(
-                        title: Text('${user.firstname} ${user.lastname}'),
-                        subtitle: Text('Login: ${user.login} - Rôle: ${user.role}'),
+                        title: Text('${user.firstname} ${user.lastname} - ${user.role}'),
+                        subtitle: Text(user.login),
                       );
                     },
                   );

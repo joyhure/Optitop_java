@@ -17,7 +17,7 @@ class AccountsService {
       );
 
       if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
+        final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
         return data.map((json) => AccountRequest.fromJson(json)).toList();
       } else {
         throw Exception('Échec du chargement des demandes : ${response.body}');
@@ -67,23 +67,18 @@ class AccountsService {
 
   // Récupérer tous les comptes utilisateurs (admin uniquement)
   Future<List<User>> getAllUsers(int userId) async {
-    try {
-      final response = await http.get(
-        Uri.parse('${AppConstants.apiBaseUrl}/users/all'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $userId',
-        },
-      );
-
-      if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
-        return data.map((json) => User.fromJson(json)).toList();
-      } else {
-        throw Exception('Échec du chargement des utilisateurs : ${response.body}');
-      }
-    } catch (e) {
-      rethrow;
+    final response = await http.get(
+      Uri.parse('${AppConstants.apiBaseUrl}/users/all'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $userId',
+      },
+    );
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
+      return data.map((json) => User.fromJson(json)).toList();
+    } else {
+      throw Exception('Échec du chargement des utilisateurs : ${response.body}');
     }
   }
 }

@@ -16,6 +16,8 @@ class User {
   });
 
   factory User.fromJson(Map<String, dynamic> json) {
+    print('lastname: ${json['lastname']} (${json['lastname'].runtimeType})');
+    print('firstname: ${json['firstname']} (${json['firstname'].runtimeType})');
     return User(
       id: json['id'],
       login: json['login'] ?? '',
