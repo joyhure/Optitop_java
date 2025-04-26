@@ -15,13 +15,7 @@ class AuthService extends ChangeNotifier {
 
   Future<void> login(String login, String password) async {
     try {
-      print('Tentative de connexion...');
       final url = '${AppConstants.apiBaseUrl}/auth/login';
-      print('URL complète: $url');
-      print('Données envoyées: ${json.encode({
-        'login': login,
-        'password': password,
-      })}');
       
       final response = await http.post(
         Uri.parse(url),
@@ -35,28 +29,21 @@ class AuthService extends ChangeNotifier {
         }),
       );
 
-      print('Status code: ${response.statusCode}');
-      print('Response headers: ${response.headers}');
-      print('Response body: ${response.body}');
-
       if (response.statusCode == 200) {
         final userData = json.decode(response.body);
         _currentUser = User.fromJson(userData);
         
-        // Vérifier si l'utilisateur a les droits appropriés
         if (!AppConstants.adminRoles.contains(_currentUser!.role)) {
           _currentUser = null;
           throw Exception('Accès non autorisé : rôle insuffisant');
         }
         
-        // Stocker les données utilisateur
         await _storage.write(key: 'user', value: json.encode(userData));
         notifyListeners();
       } else {
         throw Exception('Identifiants incorrects');
       }
     } catch (e) {
-      print('Erreur de connexion: $e');
       rethrow;
     }
   }
