@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
+import 'accounts_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -77,12 +78,19 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _handleLogin() async {
     if (_formKey.currentState!.validate()) {
       setState(() => _isLoading = true);
-      
+
       try {
         await context.read<AuthService>().login(
           _loginController.text,
           _passwordController.text,
         );
+        if (!mounted) return;
+
+        if (context.read<AuthService>().isAuthenticated) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const AccountsScreen()),
+          );
+        }
       } catch (e) {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
