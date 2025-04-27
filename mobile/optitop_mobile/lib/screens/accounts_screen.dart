@@ -181,20 +181,29 @@ class _NewAccountRequestDialogState extends State<_NewAccountRequestDialog> {
     try {
       final userId = context.read<AuthService>().currentUser?.id ?? 0;
       
-      if (_requestType == 'ajout' && (_role == 'collaborator' || _role == 'manager')) {
-        // Charge les vendeurs disponibles
-        final sellers = await AccountsService().getAvailableSellers(userId);
-        setState(() {
-          _availableSellers = sellers;
-          _login = null;
-        });
-      } else if (_requestType != 'ajout') {
-        // Charge les logins existants pour modification/suppression
+      if (_requestType == 'suppression') {
+        // Pour suppression, charge tous les utilisateurs
         final users = await AccountsService().getAllUsers(userId);
         setState(() {
           _availableLogins = users
               .map((user) => user.login)
               .toList();
+          _login = null;
+        });
+      } else if (_requestType == 'modification') {
+        // Pour modification, charge aussi tous les utilisateurs
+        final users = await AccountsService().getAllUsers(userId);
+        setState(() {
+          _availableLogins = users
+              .map((user) => user.login)
+              .toList();
+          _login = null;
+        });
+      } else if (_requestType == 'ajout' && (_role == 'collaborator' || _role == 'manager')) {
+        // Pour ajout de collaborator/manager, charge les vendeurs disponibles
+        final sellers = await AccountsService().getAvailableSellers(userId);
+        setState(() {
+          _availableSellers = sellers;
           _login = null;
         });
       }
@@ -266,32 +275,8 @@ class _NewAccountRequestDialogState extends State<_NewAccountRequestDialog> {
   }
 
   Widget _buildLoginField() {
-    if (_requestType == 'ajout') {
-      if (_role == 'collaborator' || _role == 'manager') {
-        return DropdownButtonFormField<String>(
-          value: _login,
-          decoration: const InputDecoration(
-            labelText: 'Vendeur',
-            border: OutlineInputBorder(),
-          ),
-          items: _availableSellers.map((seller) => DropdownMenuItem(
-            value: seller['sellerRef'],
-            child: Text('${seller['sellerRef']}'),
-          )).toList(),
-          onChanged: (value) => setState(() => _login = value),
-          validator: (value) => value == null ? 'Champ requis' : null,
-        );
-      } else {
-        return TextFormField(
-          decoration: const InputDecoration(
-            labelText: 'Login',
-            border: OutlineInputBorder(),
-          ),
-          onSaved: (value) => _login = value,
-          validator: (value) => value?.isEmpty ?? true ? 'Champ requis' : null,
-        );
-      }
-    } else {
+    if (_requestType == 'suppression' || _requestType == 'modification') {
+      // Pour suppression et modification, affiche la liste des logins existants
       return DropdownButtonFormField<String>(
         value: _login,
         decoration: const InputDecoration(
@@ -304,6 +289,31 @@ class _NewAccountRequestDialogState extends State<_NewAccountRequestDialog> {
         )).toList(),
         onChanged: (value) => setState(() => _login = value),
         validator: (value) => value == null ? 'Champ requis' : null,
+      );
+    } else if (_requestType == 'ajout' && (_role == 'collaborator' || _role == 'manager')) {
+      // Pour ajout de collaborator/manager, affiche les vendeurs disponibles
+      return DropdownButtonFormField<String>(
+        value: _login,
+        decoration: const InputDecoration(
+          labelText: 'Vendeur',
+          border: OutlineInputBorder(),
+        ),
+        items: _availableSellers.map((seller) => DropdownMenuItem(
+          value: seller['sellerRef'],
+          child: Text('${seller['sellerRef']}'),
+        )).toList(),
+        onChanged: (value) => setState(() => _login = value),
+        validator: (value) => value == null ? 'Champ requis' : null,
+      );
+    } else {
+      // Pour autres cas (ajout admin/supermanager), champ texte libre
+      return TextFormField(
+        decoration: const InputDecoration(
+          labelText: 'Login',
+          border: OutlineInputBorder(),
+        ),
+        onSaved: (value) => _login = value,
+        validator: (value) => value?.isEmpty ?? true ? 'Champ requis' : null,
       );
     }
   }
@@ -338,12 +348,20 @@ class _NewAccountRequestDialogState extends State<_NewAccountRequestDialog> {
                   DropdownMenuItem(value: 'modification', child: Text('Modification')),
                   DropdownMenuItem(value: 'suppression', child: Text('Suppression')),
                 ],
-                onChanged: (value) => setState(() => _requestType = value!),
+                onChanged: (value) {
+                  setState(() {
+                    _requestType = value!;
+                    _login = null; // Reset login
+                  });
+                  _loadAvailableLoginsOrSellers(); // Recharge les options selon le type
+                },
               ),
               const SizedBox(height: 16),
 
-              if (_requestType != 'suppression') ...[                
-              
+              if (_requestType == 'suppression') ...[
+                const SizedBox(height: 16),
+                _buildLoginField(),
+              ] else ...[
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
                   value: _role,
