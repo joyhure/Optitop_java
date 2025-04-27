@@ -22,9 +22,18 @@ class _AccountsScreenState extends State<AccountsScreen> {
   @override
   void initState() {
     super.initState();
-    final userId = context.read<AuthService>().currentUser?.id ?? 0;
-    _pendingAccountsFuture = AccountsService().getPendingAccounts(userId);
-    _usersFuture = AccountsService().getAllUsers(userId);
+    _initializeData();
+  }
+
+  void _initializeData() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final userId = context.read<AuthService>().currentUser?.id ?? 0;
+      setState(() {
+        _pendingAccountsFuture = AccountsService().getPendingAccounts(userId);
+        _usersFuture = AccountsService().getAllUsers(userId);
+      });
+    });
   }
 
   void _refresh() {
@@ -35,18 +44,89 @@ class _AccountsScreenState extends State<AccountsScreen> {
     });
   }
 
+  Future<void> _handleLogout() async {
+    if (!mounted) return;
+    final auth = context.read<AuthService>();
+    
+    final shouldLogout = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Déconnexion'),
+        content: const Text('Voulez-vous vraiment vous déconnecter ?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Annuler'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Se déconnecter'),
+          ),
+        ],
+      ),
+    );
+
+    if (!mounted) return;
+    if (shouldLogout == true) {
+      await auth.logout();
+      if (!mounted) return;
+      Navigator.of(context).pushReplacementNamed('/login');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthService>();
     final isAdmin = auth.isAdmin;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Gestion des comptes')),
+      appBar: AppBar(
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(
+              'assets/images/logo_optitop.png',
+              height: 40,
+              // Ajouter errorBuilder pour gérer les erreurs de chargement
+              errorBuilder: (context, error, stackTrace) {
+                return const Icon(Icons.store, size: 32);  
+              },
+            ),
+          ],
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: 'Déconnexion',
+            onPressed: _handleLogout,
+          ),
+          const SizedBox(width: 8), 
+        ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(
+            color: Colors.grey[100], 
+            height: 1,
+          ),
+        ),
+      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            Padding(
+              padding: const EdgeInsets.only(bottom: 24),
+              child: Text(
+                'Gestion des comptes',
+                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  color: Theme.of(context).primaryColor,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+
             // 1. Bouton nouvelle demande
             ElevatedButton.icon(
               icon: const Icon(Icons.add),
