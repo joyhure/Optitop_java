@@ -169,30 +169,33 @@ class _NewAccountRequestDialogState extends State<_NewAccountRequestDialog> {
   String? _email;
   bool _isLoading = false;
   List<String> _availableLogins = [];
+  List<Map<String, String>> _availableSellers = [];
 
   @override
   void initState() {
     super.initState();
-    _loadAvailableLogins();
+    _loadAvailableLoginsOrSellers();
   }
 
-  Future<void> _loadAvailableLogins() async {
+  Future<void> _loadAvailableLoginsOrSellers() async {
     try {
       final userId = context.read<AuthService>().currentUser?.id ?? 0;
-      final response = await http.get(
-        Uri.parse('${AppConstants.apiBaseUrl}/users/all'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $userId',
-        },
-      );
-      if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
+      
+      if (_requestType == 'ajout' && (_role == 'collaborator' || _role == 'manager')) {
+        // Charge les vendeurs disponibles
+        final sellers = await AccountsService().getAvailableSellers(userId);
         setState(() {
-          _availableLogins = data
-              .map((user) => (user['login'] ?? '').toString())
-              .where((login) => login.isNotEmpty)
+          _availableSellers = sellers;
+          _login = null;
+        });
+      } else if (_requestType != 'ajout') {
+        // Charge les logins existants pour modification/suppression
+        final users = await AccountsService().getAllUsers(userId);
+        setState(() {
+          _availableLogins = users
+              .map((user) => user.login)
               .toList();
+          _login = null;
         });
       }
     } catch (e) {
@@ -262,6 +265,49 @@ class _NewAccountRequestDialogState extends State<_NewAccountRequestDialog> {
     }
   }
 
+  Widget _buildLoginField() {
+    if (_requestType == 'ajout') {
+      if (_role == 'collaborator' || _role == 'manager') {
+        return DropdownButtonFormField<String>(
+          value: _login,
+          decoration: const InputDecoration(
+            labelText: 'Vendeur',
+            border: OutlineInputBorder(),
+          ),
+          items: _availableSellers.map((seller) => DropdownMenuItem(
+            value: seller['sellerRef'],
+            child: Text('${seller['sellerRef']} - ${seller['name']}'),
+          )).toList(),
+          onChanged: (value) => setState(() => _login = value),
+          validator: (value) => value == null ? 'Champ requis' : null,
+        );
+      } else {
+        return TextFormField(
+          decoration: const InputDecoration(
+            labelText: 'Login',
+            border: OutlineInputBorder(),
+          ),
+          onSaved: (value) => _login = value,
+          validator: (value) => value?.isEmpty ?? true ? 'Champ requis' : null,
+        );
+      }
+    } else {
+      return DropdownButtonFormField<String>(
+        value: _login,
+        decoration: const InputDecoration(
+          labelText: 'Login',
+          border: OutlineInputBorder(),
+        ),
+        items: _availableLogins.map((login) => DropdownMenuItem(
+          value: login,
+          child: Text(login),
+        )).toList(),
+        onChanged: (value) => setState(() => _login = value),
+        validator: (value) => value == null ? 'Champ requis' : null,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -296,36 +342,8 @@ class _NewAccountRequestDialogState extends State<_NewAccountRequestDialog> {
               ),
               const SizedBox(height: 16),
 
-              // Login
-              if (_requestType == 'ajout')
-                TextFormField(
-                  decoration: const InputDecoration(
-                    labelText: 'Login',
-                    border: OutlineInputBorder(),
-                  ),
-                  onSaved: (value) => _login = value,
-                  validator: (value) =>
-                      value?.isEmpty ?? true ? 'Champ requis' : null,
-                )
-              else
-                DropdownButtonFormField<String>(
-                  value: _login,
-                  decoration: const InputDecoration(
-                    labelText: 'Login',
-                    border: OutlineInputBorder(),
-                  ),
-                  items: _availableLogins
-                      .map((login) => DropdownMenuItem(
-                            value: login,
-                            child: Text(login),
-                          ))
-                      .toList(),
-                  onChanged: (value) => setState(() => _login = value),
-                  validator: (value) =>
-                      value == null ? 'Champ requis' : null,
-                ),
-
-              if (_requestType != 'suppression') ...[
+              if (_requestType != 'suppression') ...[                
+              
                 const SizedBox(height: 16),
                 DropdownButtonFormField<String>(
                   value: _role,
@@ -340,11 +358,20 @@ class _NewAccountRequestDialogState extends State<_NewAccountRequestDialog> {
                     DropdownMenuItem(value: 'admin', child: Text('Admin')),
                     
                   ],
-                  onChanged: (value) => setState(() => _role = value),
+                  onChanged: (value) {
+                    setState(() {
+                      _role = value;
+                      _login = null; // Reset login when role changes
+                    });
+                    _loadAvailableLoginsOrSellers(); // Reload login options based on role
+                  },
                   validator: (value) => _requestType == 'ajout' && value == null
                       ? 'Champ requis'
                       : null,
                 ),
+
+                const SizedBox(height: 16),
+              _buildLoginField(),
 
                 const SizedBox(height: 16),
                 TextFormField(

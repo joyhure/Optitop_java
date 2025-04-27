@@ -81,4 +81,23 @@ class AccountsService {
       throw Exception('Échec du chargement des utilisateurs : ${response.body}');
     }
   }
+
+  Future<List<Map<String, String>>> getAvailableSellers(int userId) async {
+    final response = await http.get(
+      Uri.parse('${AppConstants.apiBaseUrl}/sellers/available-sellers'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $userId',
+      },
+    );
+    if (response.statusCode == 200) {
+      final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
+      return data.map((seller) => {
+        'sellerRef': seller['sellerRef']?.toString() ?? '',
+        'name': seller['name']?.toString() ?? ''
+      }).toList();
+    } else {
+      throw Exception('Échec du chargement des vendeurs disponibles');
+    }
+  }
 }
