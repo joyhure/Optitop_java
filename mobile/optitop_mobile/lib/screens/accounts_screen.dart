@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import '../services/auth_service.dart';
 import '../services/accounts_service.dart';
 import '../models/account_request.dart';
 import '../models/user.dart';
+import '../config/constants.dart';
 
 class AccountsScreen extends StatefulWidget {
   const AccountsScreen({super.key});
@@ -149,21 +152,272 @@ class _AccountsScreenState extends State<AccountsScreen> {
   }
 }
 
-// Formulaire de nouvelle demande (à compléter selon tes besoins)
-class _NewAccountRequestDialog extends StatelessWidget {
+class _NewAccountRequestDialog extends StatefulWidget {
   const _NewAccountRequestDialog();
 
   @override
+  State<_NewAccountRequestDialog> createState() => _NewAccountRequestDialogState();
+}
+
+class _NewAccountRequestDialogState extends State<_NewAccountRequestDialog> {
+  final _formKey = GlobalKey<FormState>();
+  String _requestType = 'ajout';
+  String? _role;
+  String? _login;
+  String? _firstname;
+  String? _lastname;
+  String? _email;
+  bool _isLoading = false;
+  List<String> _availableLogins = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadAvailableLogins();
+  }
+
+  Future<void> _loadAvailableLogins() async {
+    try {
+      final userId = context.read<AuthService>().currentUser?.id ?? 0;
+      final response = await http.get(
+        Uri.parse('${AppConstants.apiBaseUrl}/users/all'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $userId',
+        },
+      );
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
+        setState(() {
+          _availableLogins = data
+              .map((user) => (user['login'] ?? '').toString())
+              .where((login) => login.isNotEmpty)
+              .toList();
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erreur: $e')),
+        );
+      }
+    }
+  }
+
+  Future<void> _submitForm() async {
+    if (!_formKey.currentState!.validate()) return;
+    _formKey.currentState!.save();
+
+    setState(() => _isLoading = true);
+
+    try {
+      final userId = context.read<AuthService>().currentUser?.id ?? 0;
+      Map<String, dynamic> formData = {
+        'requestType': _requestType,
+        'login': _login,
+      };
+
+      if (_requestType == 'ajout') {
+        formData.addAll({
+          'lastname': _lastname,
+          'firstname': _firstname,
+          'email': _email,
+          'role': _role,
+        });
+      } else if (_requestType == 'modification') {
+        if (_role != null) formData['role'] = _role;
+        if (_lastname != null) formData['lastname'] = _lastname;
+        if (_firstname != null) formData['firstname'] = _firstname;
+        if (_email != null) formData['email'] = _email;
+      }
+
+      final response = await http.post(
+        Uri.parse('${AppConstants.apiBaseUrl}/pending-accounts'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $userId',
+        },
+        body: json.encode(formData),
+      );
+
+      if (response.statusCode == 201) {
+        if (!mounted) return;
+        Navigator.of(context).pop(true);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Demande envoyée avec succès')),
+        );
+      } else {
+        throw Exception('Erreur lors de l\'envoi de la demande');
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erreur: $e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Nouvelle demande'),
-      content: const Text('Formulaire à implémenter ici.'),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Fermer'),
+    return Dialog(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'Nouvelle demande',
+                style: Theme.of(context).textTheme.titleLarge,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              
+              // Type de demande
+              DropdownButtonFormField<String>(
+                value: _requestType,
+                decoration: const InputDecoration(
+                  labelText: 'Type de demande',
+                  border: OutlineInputBorder(),
+                ),
+                items: const [
+                  DropdownMenuItem(value: 'ajout', child: Text('Ajout')),
+                  DropdownMenuItem(value: 'modification', child: Text('Modification')),
+                  DropdownMenuItem(value: 'suppression', child: Text('Suppression')),
+                ],
+                onChanged: (value) => setState(() => _requestType = value!),
+              ),
+              const SizedBox(height: 16),
+
+              // Login
+              if (_requestType == 'ajout')
+                TextFormField(
+                  decoration: const InputDecoration(
+                    labelText: 'Login',
+                    border: OutlineInputBorder(),
+                  ),
+                  onSaved: (value) => _login = value,
+                  validator: (value) =>
+                      value?.isEmpty ?? true ? 'Champ requis' : null,
+                )
+              else
+                DropdownButtonFormField<String>(
+                  value: _login,
+                  decoration: const InputDecoration(
+                    labelText: 'Login',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: _availableLogins
+                      .map((login) => DropdownMenuItem(
+                            value: login,
+                            child: Text(login),
+                          ))
+                      .toList(),
+                  onChanged: (value) => setState(() => _login = value),
+                  validator: (value) =>
+                      value == null ? 'Champ requis' : null,
+                ),
+
+              if (_requestType != 'suppression') ...[
+                const SizedBox(height: 16),
+                DropdownButtonFormField<String>(
+                  value: _role,
+                  decoration: const InputDecoration(
+                    labelText: 'Rôle',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: const [
+                    DropdownMenuItem(value: 'collaborator', child: Text('Collaborateur')),
+                    DropdownMenuItem(value: 'manager', child: Text('Manager')),
+                    DropdownMenuItem(value: 'supermanager', child: Text('SuperManager')),
+                    DropdownMenuItem(value: 'admin', child: Text('Admin')),
+                    
+                  ],
+                  onChanged: (value) => setState(() => _role = value),
+                  validator: (value) => _requestType == 'ajout' && value == null
+                      ? 'Champ requis'
+                      : null,
+                ),
+
+                const SizedBox(height: 16),
+                TextFormField(
+                  decoration: const InputDecoration(
+                    labelText: 'Nom',
+                    border: OutlineInputBorder(),
+                  ),
+                  onSaved: (value) => _lastname = value,
+                  validator: (value) => _requestType == 'ajout' && (value?.isEmpty ?? true)
+                      ? 'Champ requis'
+                      : null,
+                ),
+
+                const SizedBox(height: 16),
+                TextFormField(
+                  decoration: const InputDecoration(
+                    labelText: 'Prénom',
+                    border: OutlineInputBorder(),
+                  ),
+                  onSaved: (value) => _firstname = value,
+                  validator: (value) => _requestType == 'ajout' && (value?.isEmpty ?? true)
+                      ? 'Champ requis'
+                      : null,
+                ),
+
+                const SizedBox(height: 16),
+                TextFormField(
+                  decoration: const InputDecoration(
+                    labelText: 'Email',
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.emailAddress,
+                  onSaved: (value) => _email = value,
+                  validator: (value) {
+                    if (_requestType == 'ajout' && (value?.isEmpty ?? true)) {
+                      return 'Champ requis';
+                    }
+                    if (value?.isNotEmpty ?? false) {
+                      final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+                      if (!emailRegex.hasMatch(value!)) {
+                        return 'Email invalide';
+                      }
+                    }
+                    return null;
+                  },
+                ),
+              ],
+
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('Annuler'),
+                  ),
+                  const SizedBox(width: 8),
+                  ElevatedButton(
+                    onPressed: _isLoading ? null : _submitForm,
+                    child: _isLoading
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Text('Envoyer'),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
-      ],
+      ),
     );
   }
 }
