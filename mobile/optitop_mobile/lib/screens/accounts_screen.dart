@@ -89,12 +89,12 @@ class _AccountsScreenState extends State<AccountsScreen> {
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthService>();
-    final isAdmin = auth.isAdmin;
+    final isAdmin = auth.currentUser?.role == 'admin';
 
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.grey[100],
-        elevation: 2,  // Ombre légère
+        elevation: 2,
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -178,28 +178,29 @@ class _AccountsScreenState extends State<AccountsScreen> {
                     final demande = demandes[i];
                     return ListTile(
                       title: Text('${demande.firstname} ${demande.lastname} (${demande.requestType})'),
-                      subtitle: Text('Login: ${demande.login} - Rôle: ${demande.role}'),
-                      trailing: isAdmin
-                          ? Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconButton(
-                                  icon: const Icon(Icons.check, color: Colors.green),
-                                  onPressed: () async {
-                                    await AccountsService().validateAccount(demande.id, auth.currentUser!.id);
-                                    _refresh();
-                                  },
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.close, color: Colors.red),
-                                  onPressed: () async {
-                                    await AccountsService().rejectAccount(demande.id, auth.currentUser!.id);
-                                    _refresh();
-                                  },
-                                ),
-                              ],
-                            )
-                          : null,
+                      subtitle: Text('${demande.login} - ${demande.role}'),
+                      // Affiche les boutons uniquement pour les admins
+                      trailing: isAdmin // Maintenant cela ne s'applique qu'aux vrais admins
+                        ? Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.check, color: Colors.green),
+                                onPressed: () async {
+                                  await AccountsService().validateAccount(demande.id, auth.currentUser!.id);
+                                  _refresh();
+                                },
+                              ),
+                              IconButton(
+                                icon: const Icon(Icons.close, color: Colors.red),
+                                onPressed: () async {
+                                  await AccountsService().rejectAccount(demande.id, auth.currentUser!.id);
+                                  _refresh();
+                                },
+                              ),
+                            ],
+                          )
+                        : null,
                     );
                   },
                 );
@@ -208,7 +209,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
             const SizedBox(height: 24),
 
             // 3. Liste des comptes utilisateurs (admin uniquement)
-            if (isAdmin) ...[
+            if (isAdmin) ...[  // Ne s'affiche que pour les vrais admins
               ExpansionTile(
                 title: Text(
                   'Comptes utilisateurs', 
