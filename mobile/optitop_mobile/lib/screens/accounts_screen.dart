@@ -18,6 +18,7 @@ class AccountsScreen extends StatefulWidget {
 class _AccountsScreenState extends State<AccountsScreen> {
   late Future<List<AccountRequest>> _pendingAccountsFuture;
   late Future<List<User>> _usersFuture;
+  bool _isUserListExpanded = false;  // Pour gérer l'état déplié/plié
 
   @override
   void initState() {
@@ -81,6 +82,8 @@ class _AccountsScreenState extends State<AccountsScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.grey[100],
+        elevation: 2,  // Ombre légère
         title: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -195,34 +198,48 @@ class _AccountsScreenState extends State<AccountsScreen> {
 
             // 3. Liste des comptes utilisateurs (admin uniquement)
             if (isAdmin) ...[
-              Text('Comptes utilisateurs', style: Theme.of(context).textTheme.titleMedium),
-              FutureBuilder<List<User>>(
-                future: _usersFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  if (snapshot.hasError) {
-                    return Text('Erreur : ${snapshot.error}');
-                  }
-                  final users = snapshot.data ?? [];
-                  if (users.isEmpty) {
-                    return const Text('Aucun utilisateur.');
-                  }
-                  return ListView.separated(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount: users.length,
-                    separatorBuilder: (_, __) => const Divider(),
-                    itemBuilder: (context, i) {
-                      final user = users[i];
-                      return ListTile(
-                        title: Text('${user.firstname} ${user.lastname} - ${user.role}'),
-                        subtitle: Text(user.login),
+              ExpansionTile(
+                title: Text(
+                  'Comptes utilisateurs', 
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                initiallyExpanded: _isUserListExpanded,
+                onExpansionChanged: (expanded) {
+                  setState(() => _isUserListExpanded = expanded);
+                },
+                children: [
+                  FutureBuilder<List<User>>(
+                    future: _usersFuture,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      if (snapshot.hasError) {
+                        return Text('Erreur : ${snapshot.error}');
+                      }
+                      final users = snapshot.data ?? [];
+                      if (users.isEmpty) {
+                        return const Padding(
+                          padding: EdgeInsets.all(16.0),
+                          child: Text('Aucun utilisateur.'),
+                        );
+                      }
+                      return ListView.separated(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: users.length,
+                        separatorBuilder: (_, __) => const Divider(),
+                        itemBuilder: (context, i) {
+                          final user = users[i];
+                          return ListTile(
+                            title: Text('${user.firstname} ${user.lastname} - ${user.role}'),
+                            subtitle: Text(user.login),
+                          );
+                        },
                       );
                     },
-                  );
-                },
+                  ),
+                ],
               ),
             ],
           ],
