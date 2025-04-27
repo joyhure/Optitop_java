@@ -18,7 +18,7 @@ class AccountsScreen extends StatefulWidget {
 class _AccountsScreenState extends State<AccountsScreen> {
   late Future<List<AccountRequest>> _pendingAccountsFuture;
   late Future<List<User>> _usersFuture;
-  bool _isUserListExpanded = false;  // Pour gérer l'état déplié/plié
+  bool _isUserListExpanded = false;
 
   @override
   void initState() {
