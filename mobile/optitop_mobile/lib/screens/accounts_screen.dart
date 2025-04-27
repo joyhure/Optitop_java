@@ -276,7 +276,7 @@ class _NewAccountRequestDialogState extends State<_NewAccountRequestDialog> {
           ),
           items: _availableSellers.map((seller) => DropdownMenuItem(
             value: seller['sellerRef'],
-            child: Text('${seller['sellerRef']} - ${seller['name']}'),
+            child: Text('${seller['sellerRef']}'),
           )).toList(),
           onChanged: (value) => setState(() => _login = value),
           validator: (value) => value == null ? 'Champ requis' : null,
