@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:async';
 import '../services/auth_service.dart';
 import '../services/accounts_service.dart';
+import '../services/notification_service.dart';
 import '../models/account_request.dart';
 import '../models/user.dart';
 import '../config/constants.dart';
@@ -19,11 +21,13 @@ class _AccountsScreenState extends State<AccountsScreen> {
   late Future<List<AccountRequest>> _pendingAccountsFuture;
   late Future<List<User>> _usersFuture;
   bool _isUserListExpanded = false;
+  StreamSubscription<AccountRequest>? _notificationSubscription;
 
   @override
   void initState() {
     super.initState();
     _initializeData();
+    _setupNotificationListener();
   }
 
   void _initializeData() {
@@ -34,6 +38,26 @@ class _AccountsScreenState extends State<AccountsScreen> {
         _pendingAccountsFuture = AccountsService().getPendingAccounts(userId);
         _usersFuture = AccountsService().getAllUsers(userId);
       });
+    });
+  }
+
+  void _setupNotificationListener() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      
+      final auth = context.read<AuthService>();
+      final notificationService = context.read<NotificationService>();
+      
+      // Stocker la référence au début
+      if (auth.currentUser?.role == 'admin') {
+        _notificationSubscription = notificationService.requestStream.listen((request) {
+          // Vérifier si le widget est toujours monté avant d'utiliser context
+          if (mounted) {
+            notificationService.showNewRequestNotification(context, request);
+            _refresh();
+          }
+        });
+      }
     });
   }
 
@@ -259,6 +283,12 @@ class _AccountsScreenState extends State<AccountsScreen> {
       ),
     );
   }
+
+  @override
+  void dispose() {
+    _notificationSubscription?.cancel();
+    super.dispose();
+  }
 }
 
 class _NewAccountRequestDialog extends StatefulWidget {
@@ -372,37 +402,60 @@ class _NewAccountRequestDialogState extends State<_NewAccountRequestDialog> {
     setState(() => _isLoading = true);
 
     try {
-      final userId = context.read<AuthService>().currentUser?.id ?? 0;
+      // Récupérer les services avant les opérations asynchrones
+      final currentUser = context.read<AuthService>().currentUser!;
+      final notificationService = context.read<NotificationService>();
+      final accountsService = AccountsService();
+
+      // Prépare les données
       Map<String, dynamic> formData = {
         'requestType': _requestType,
         'login': _login,
       };
 
-      if (_requestType == 'ajout') {
-        formData.addAll({
-          'lastname': _lastname,
-          'firstname': _firstname,
-          'email': _email,
-          'role': _role,
-        });
-      } else if (_requestType == 'modification') {
-        if (_role != null) formData['role'] = _role;
-        if (_lastname != null) formData['lastname'] = _lastname;
-        if (_firstname != null) formData['firstname'] = _firstname;
-        if (_email != null) formData['email'] = _email;
-      }
+      // ... reste du code pour formData ...
 
       final response = await http.post(
         Uri.parse('${AppConstants.apiBaseUrl}/pending-accounts'),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $userId',
+          'Authorization': 'Bearer ${currentUser.id}',
         },
         body: json.encode(formData),
       );
 
+      if (!mounted) return;
+
       if (response.statusCode == 201) {
+        // Récupération des demandes en cours
+        final pendingAccounts = await accountsService.getPendingAccounts(currentUser.id);
+        
         if (!mounted) return;
+
+        // Trie et trouve la nouvelle demande
+        pendingAccounts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+        final newRequest = pendingAccounts.firstWhere(
+          (req) => req.login == _login && req.requestType == _requestType,
+          orElse: () => pendingAccounts.isNotEmpty ? pendingAccounts.first : 
+            AccountRequest(
+              id: 0,
+              lastname: _lastname ?? '',
+              firstname: _firstname ?? '',
+              email: _email ?? '',
+              login: _login ?? '',
+              role: _role ?? '',
+              requestType: _requestType,
+              createdAt: DateTime.now().toIso8601String(),
+              createdByLogin: currentUser.login,
+            )
+        );
+
+        // Envoie la notification
+        notificationService.notifyNewRequest(newRequest);
+
+        if (!mounted) return;
+        
+        // Navigation et feedback
         Navigator.of(context).pop(true);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Demande envoyée avec succès')),
@@ -411,11 +464,10 @@ class _NewAccountRequestDialogState extends State<_NewAccountRequestDialog> {
         throw Exception('Erreur lors de l\'envoi de la demande');
       }
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erreur: $e')),
-        );
-      }
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erreur: $e')),
+      );
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);

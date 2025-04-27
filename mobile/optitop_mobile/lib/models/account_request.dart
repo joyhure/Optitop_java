@@ -1,5 +1,5 @@
 class AccountRequest {
-  final int id;
+  final int id; 
   final String lastname;
   final String firstname;
   final String email;
@@ -23,7 +23,7 @@ class AccountRequest {
 
   factory AccountRequest.fromJson(Map<String, dynamic> json) {
     return AccountRequest(
-      id: json['id'],
+      id: json['id'] ?? 0,
       lastname: json['lastname'] ?? '',
       firstname: json['firstname'] ?? '',
       email: json['email'] ?? '',
