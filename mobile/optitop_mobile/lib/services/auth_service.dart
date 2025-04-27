@@ -49,9 +49,31 @@ class AuthService extends ChangeNotifier {
   }
 
   Future<void> logout() async {
-    await _storage.delete(key: 'user');
-    _currentUser = null;
-    notifyListeners();
+    try {
+      // Appel à l'API pour la déconnexion
+      final response = await http.post(
+        Uri.parse('${AppConstants.apiBaseUrl}/auth/logout'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ${_currentUser?.id}',
+        },
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception('Erreur lors de la déconnexion côté serveur');
+      }
+
+      // Si la déconnexion serveur réussit, on nettoie localement
+      await _storage.delete(key: 'user');
+      _currentUser = null;
+      notifyListeners();
+    } catch (e) {
+      // En cas d'erreur on tente quand même de nettoyer localement
+      await _storage.delete(key: 'user');
+      _currentUser = null;
+      notifyListeners();
+      throw Exception('Erreur lors de la déconnexion: $e');
+    }
   }
 
   Future<void> loadUserFromStorage() async {

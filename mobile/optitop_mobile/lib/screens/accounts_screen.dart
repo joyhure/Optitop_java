@@ -46,32 +46,43 @@ class _AccountsScreenState extends State<AccountsScreen> {
   }
 
   Future<void> _handleLogout() async {
-    if (!mounted) return;
     final auth = context.read<AuthService>();
     
     final shouldLogout = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text('Déconnexion'),
         content: const Text('Voulez-vous vraiment vous déconnecter ?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
+            onPressed: () => Navigator.of(dialogContext).pop(false),
             child: const Text('Annuler'),
           ),
           TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
+            onPressed: () => Navigator.of(dialogContext).pop(true),
             child: const Text('Se déconnecter'),
           ),
         ],
       ),
-    );
+    ) ?? false;
 
     if (!mounted) return;
-    if (shouldLogout == true) {
-      await auth.logout();
-      if (!mounted) return;
-      Navigator.of(context).pushReplacementNamed('/login');
+    
+    if (shouldLogout) {
+      try {
+        await auth.logout();
+        if (!mounted) return;
+        
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          '/login',
+          (route) => false,
+        );
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erreur lors de la déconnexion: $e')),
+        );
+      }
     }
   }
 
