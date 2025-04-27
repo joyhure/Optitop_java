@@ -41,7 +41,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
     final isAdmin = auth.isAdmin;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Gestion des comptes utilisateurs')),
+      appBar: AppBar(title: const Text('Gestion des comptes')),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -170,6 +170,9 @@ class _NewAccountRequestDialogState extends State<_NewAccountRequestDialog> {
   bool _isLoading = false;
   List<String> _availableLogins = [];
   List<Map<String, String>> _availableSellers = [];
+  User? _selectedUser;
+  bool _hasChanges = false;
+  Map<String, dynamic> _originalValues = {};
 
   @override
   void initState() {
@@ -214,6 +217,43 @@ class _NewAccountRequestDialogState extends State<_NewAccountRequestDialog> {
         );
       }
     }
+  }
+
+  Future<void> _loadUserData(String login) async {
+    try {
+      final userId = context.read<AuthService>().currentUser?.id ?? 0;
+      final users = await AccountsService().getAllUsers(userId);
+      final user = users.firstWhere((u) => u.login == login);
+      setState(() {
+        _selectedUser = user;
+        _originalValues = {
+          'role': user.role,
+          'firstname': user.firstname,
+          'lastname': user.lastname,
+          'email': user.email,
+        };
+        _role = user.role;
+        _firstname = user.firstname;
+        _lastname = user.lastname;
+        _email = user.email;
+      });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erreur: $e')),
+        );
+      }
+    }
+  }
+
+  void _checkChanges() {
+    setState(() {
+      _hasChanges = false;
+      if (_role != _originalValues['role']) _hasChanges = true;
+      if (_firstname != _originalValues['firstname']) _hasChanges = true;
+      if (_lastname != _originalValues['lastname']) _hasChanges = true;
+      if (_email != _originalValues['email']) _hasChanges = true;
+    });
   }
 
   Future<void> _submitForm() async {
@@ -358,7 +398,96 @@ class _NewAccountRequestDialogState extends State<_NewAccountRequestDialog> {
               ),
               const SizedBox(height: 16),
 
-              if (_requestType == 'suppression') ...[
+              if (_requestType == 'modification') ...[
+                DropdownButtonFormField<String>(
+                  value: _login,
+                  decoration: const InputDecoration(
+                    labelText: 'Login',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: _availableLogins.map((login) => DropdownMenuItem(
+                    value: login,
+                    child: Text(login),
+                  )).toList(),
+                  onChanged: (value) {
+                    setState(() => _login = value);
+                    if (value != null) {
+                      _loadUserData(value);
+                    }
+                  },
+                  validator: (value) => value == null ? 'Champ requis' : null,
+                ),
+                const SizedBox(height: 16),
+
+                if (_selectedUser != null) ...[
+                  DropdownButtonFormField<String>(
+                    value: _role,
+                    decoration: const InputDecoration(
+                      labelText: 'Rôle',
+                      border: OutlineInputBorder(),
+                    ),
+                    items: const [
+                      DropdownMenuItem(value: 'collaborator', child: Text('Collaborateur')),
+                      DropdownMenuItem(value: 'manager', child: Text('Manager')),
+                      DropdownMenuItem(value: 'supermanager', child: Text('SuperManager')),
+                      DropdownMenuItem(value: 'admin', child: Text('Admin')),
+                    ],
+                    onChanged: (value) {
+                      setState(() => _role = value);
+                      _checkChanges();
+                    },
+                  ),
+                  const SizedBox(height: 16),
+
+                  TextFormField(
+                    initialValue: _selectedUser?.lastname,
+                    decoration: const InputDecoration(
+                      labelText: 'Nom',
+                      border: OutlineInputBorder(),
+                    ),
+                    onChanged: (value) {
+                      _lastname = value;
+                      _checkChanges();
+                    },
+                  ),
+                  const SizedBox(height: 16),
+
+                  TextFormField(
+                    initialValue: _selectedUser?.firstname,
+                    decoration: const InputDecoration(
+                      labelText: 'Prénom',
+                      border: OutlineInputBorder(),
+                    ),
+                    onChanged: (value) {
+                      _firstname = value;
+                      _checkChanges();
+                    },
+                  ),
+                  const SizedBox(height: 16),
+
+                  TextFormField(
+                    initialValue: _selectedUser?.email,
+                    decoration: const InputDecoration(
+                      labelText: 'Email',
+                      border: OutlineInputBorder(),
+                    ),
+                    keyboardType: TextInputType.emailAddress,
+                    onChanged: (value) {
+                      _email = value;
+                      _checkChanges();
+                    },
+                    validator: (value) {
+                      if (value?.isNotEmpty ?? false) {
+                        final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+                        if (!emailRegex.hasMatch(value!)) {
+                          return 'Email invalide';
+                        }
+                      }
+                      return null;
+                    },
+                  ),
+                ],
+              ] else if (_requestType == 'suppression') ...[
                 const SizedBox(height: 16),
                 _buildLoginField(),
               ] else ...[
@@ -448,7 +577,9 @@ class _NewAccountRequestDialogState extends State<_NewAccountRequestDialog> {
                   ),
                   const SizedBox(width: 8),
                   ElevatedButton(
-                    onPressed: _isLoading ? null : _submitForm,
+                    onPressed: (_requestType == 'modification' && !_hasChanges) || _isLoading 
+                      ? null 
+                      : _submitForm,
                     child: _isLoading
                         ? const SizedBox(
                             width: 20,
