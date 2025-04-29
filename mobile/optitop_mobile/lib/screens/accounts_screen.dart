@@ -402,18 +402,26 @@ class _NewAccountRequestDialogState extends State<_NewAccountRequestDialog> {
     setState(() => _isLoading = true);
 
     try {
-      // Récupérer les services avant les opérations asynchrones
       final currentUser = context.read<AuthService>().currentUser!;
       final notificationService = context.read<NotificationService>();
       final accountsService = AccountsService();
 
-      // Prépare les données
+      // Prépare toutes les données du formulaire
       Map<String, dynamic> formData = {
         'requestType': _requestType,
         'login': _login,
+        'role': _role,
+        'lastname': _lastname,
+        'firstname': _firstname,
+        'email': _email, 
+        'createdByLogin': currentUser.login
       };
 
-      // ... reste du code pour formData ...
+      // Retire les champs null pour une demande de suppression
+      if (_requestType == 'suppression') {
+        formData.removeWhere((key, value) => 
+          !['requestType', 'login', 'createdByLogin'].contains(key));
+      }
 
       final response = await http.post(
         Uri.parse('${AppConstants.apiBaseUrl}/pending-accounts'),
