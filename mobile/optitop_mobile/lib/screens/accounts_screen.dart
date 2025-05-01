@@ -323,29 +323,27 @@ class _NewAccountRequestDialogState extends State<_NewAccountRequestDialog> {
     try {
       final userId = context.read<AuthService>().currentUser?.id ?? 0;
       
-      if (_requestType == 'suppression') {
-        // Pour suppression, charge tous les utilisateurs
+      // Récupérer d'abord toutes les demandes en cours
+      final pendingRequests = await AccountsService().getPendingAccounts(userId);
+      final pendingLogins = pendingRequests.map((req) => req.login).toSet();
+      
+      if (_requestType == 'suppression' || _requestType == 'modification') {
+        // Charge tous les utilisateurs et filtre ceux qui ont des demandes en cours
         final users = await AccountsService().getAllUsers(userId);
         setState(() {
           _availableLogins = users
               .map((user) => user.login)
-              .toList();
-          _login = null;
-        });
-      } else if (_requestType == 'modification') {
-        // Pour modification, charge aussi tous les utilisateurs
-        final users = await AccountsService().getAllUsers(userId);
-        setState(() {
-          _availableLogins = users
-              .map((user) => user.login)
+              .where((login) => !pendingLogins.contains(login)) // Filtrage ici
               .toList();
           _login = null;
         });
       } else if (_requestType == 'ajout' && (_role == 'collaborator' || _role == 'manager')) {
-        // Pour ajout de collaborator/manager, charge les vendeurs disponibles
+        // Pour ajout de collaborator/manager, charge et filtre les vendeurs disponibles
         final sellers = await AccountsService().getAvailableSellers(userId);
         setState(() {
-          _availableSellers = sellers;
+          _availableSellers = sellers
+              .where((seller) => !pendingLogins.contains(seller['sellerRef']))
+              .toList();
           _login = null;
         });
       }
