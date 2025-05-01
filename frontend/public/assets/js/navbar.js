@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
         { title: "Paniers Moyens & Primes", href: "average-basket.php", requiresRole: ['admin', 'supermanager', 'manager'] },
         { title: "CA", href: "revenue.php", requiresRole: ['admin', 'supermanager', 'manager'] },
         { title: "Synthèse", href: "summary.php", requiresRole: ['admin', 'supermanager', 'manager'] },
-        { title: "Exportation", href: "export.php", requiresRole: ['admin', 'supermanager','manager'] },
+        { title: "Importation", href: "import.php", requiresRole: ['admin', 'supermanager','manager'] },
         { title: "Comptes", href: "accounts.php", requiresRole: ['admin', 'supermanager','manager'] }
     ];
 

@@ -15,7 +15,7 @@ if (!isset($_SESSION['user']) ||
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Exportation</title>
+  <title>Importation</title>
   <meta name="author" content="Joy Huré">
   <link rel="icon" href="assets/images/favicon.png">
   <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
@@ -25,7 +25,7 @@ if (!isset($_SESSION['user']) ||
 
 <body>
   <?php
-  $pageTitle = "Exportation";
+  $pageTitle = "Importation";
   require_once 'components/header.html';
   require_once 'components/navbar.php';
   ?>
@@ -37,7 +37,7 @@ if (!isset($_SESSION['user']) ||
             <use xlink:href="../node_modules/bootstrap-icons/bootstrap-icons.svg#file-earmark-arrow-up"></use>
           </svg>
         </div>
-        <h3 class="px-4 mb-0">Exportation des données de vente</h3>
+        <h3 class="px-4 mb-0">Importation des données de vente</h3>
       </div>
       <form id="importForm" class="m-5">
         <div class="mb-3">
@@ -56,6 +56,6 @@ if (!isset($_SESSION['user']) ||
   <script src="../node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
   <script src="assets/js/header.js"></script>
   <script src="assets/js/navbar.js"></script>
-  <script src="assets/js/export.js"></script>
+  <script src="assets/js/import.js"></script>
 </body>
 </html>
