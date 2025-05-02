@@ -21,9 +21,19 @@ import com.optitop.optitop_api.model.Quotations.QuotationAction;
 import com.optitop.optitop_api.repository.QuotationsRepository;
 import com.optitop.optitop_api.service.QuotationService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+
 @RestController
 @RequestMapping("/api/quotations")
 @CrossOrigin(origins = "http://localhost")
+@Tag(name = "Devis (QuotationController)", description = "Gestion des devis et de leurs statistiques")
 public class QuotationController {
 
     private static final Logger logger = LoggerFactory.getLogger(QuotationController.class);
@@ -34,15 +44,17 @@ public class QuotationController {
     @Autowired
     private QuotationService quotationService;
 
+    @Operation(summary = "Récupérer les devis non validés", description = "Retourne la liste des devis non validés pour une période donnée, filtré par vendeur si l'utilisateur est un collaborateur")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Liste des devis récupérée avec succès", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = QuotationDTO.class)))),
+            @ApiResponse(responseCode = "500", description = "Erreur serveur lors de la récupération")
+    })
     @GetMapping("/unvalidated")
     public ResponseEntity<List<QuotationDTO>> getUnvalidatedQuotations(
-            @RequestParam String startDate,
-            @RequestParam String endDate,
-            @RequestParam(required = false) String userRole,
-            @RequestParam(required = false) String userSellerRef) {
-
-        logger.debug("Requête reçue - startDate: {}, endDate: {}, userRole: {}, userSellerRef: {}",
-                startDate, endDate, userRole, userSellerRef); // Ajout de logs
+            @Parameter(description = "Date de début (YYYY-MM-DD)") @RequestParam String startDate,
+            @Parameter(description = "Date de fin (YYYY-MM-DD)") @RequestParam String endDate,
+            @Parameter(description = "Rôle de l'utilisateur") @RequestParam(required = false) String userRole,
+            @Parameter(description = "Référence du vendeur") @RequestParam(required = false) String userSellerRef) {
 
         try {
             LocalDate start = LocalDate.parse(startDate);
@@ -58,13 +70,9 @@ public class QuotationController {
                 quotations = quotationsRepository.findUnvalidatedByDateBetween(start, end);
             }
 
-            logger.debug("Nombre de devis trouvés: {}", quotations.size());
-
             List<QuotationDTO> dtos = quotations.stream()
                     .map(this::convertToDTO)
                     .collect(Collectors.toList());
-
-            logger.debug("DTOs générés: {}", dtos);
 
             return ResponseEntity.ok(dtos);
         } catch (Exception e) {
@@ -73,6 +81,11 @@ public class QuotationController {
         }
     }
 
+    @Operation(summary = "Mettre à jour un lot de devis", description = "Met à jour les actions et commentaires d'un lot de devis")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Mise à jour effectuée avec succès"),
+            @ApiResponse(responseCode = "500", description = "Erreur lors de la mise à jour", content = @Content(mediaType = "application/json", schema = @Schema(example = "{\"error\": \"Erreur lors de la mise à jour des devis\"}")))
+    })
     @PutMapping("/batch-update")
     public ResponseEntity<?> batchUpdate(@RequestBody List<QuotationUpdateDTO> updates) {
         try {
@@ -84,6 +97,10 @@ public class QuotationController {
         }
     }
 
+    @Operation(summary = "Récupérer les actions possibles", description = "Liste toutes les actions possibles pour un devis")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Liste des actions récupérée", content = @Content(mediaType = "application/json", schema = @Schema(example = "{\"VOIR_OPTICIEN\": \"Voir opticien\", \"NON_VALIDE\": \"Non validé\"}")))
+    })
     @GetMapping("/actions")
     public ResponseEntity<Map<String, String>> getActions() {
         try {
@@ -99,10 +116,14 @@ public class QuotationController {
         }
     }
 
+    @Operation(summary = "Statistiques des devis", description = "Récupère les statistiques globales et par vendeur des devis sur une période")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Statistiques calculées avec succès", content = @Content(mediaType = "application/json", schema = @Schema(implementation = QuotationStatsDTO.class)))
+    })
     @GetMapping("/stats")
     public ResponseEntity<QuotationStatsDTO> getQuotationStats(
-            @RequestParam String startDate,
-            @RequestParam String endDate) {
+            @Parameter(description = "Date de début (YYYY-MM-DD)") @RequestParam String startDate,
+            @Parameter(description = "Date de fin (YYYY-MM-DD)") @RequestParam String endDate) {
         try {
             LocalDate start = LocalDate.parse(startDate);
             LocalDate end = LocalDate.parse(endDate);
@@ -132,10 +153,14 @@ public class QuotationController {
         }
     }
 
+    @Operation(summary = "Taux de concrétisation N-1", description = "Calcule le taux de concrétisation pour la même période l'année précédente")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Taux calculé avec succès", content = @Content(mediaType = "application/json", schema = @Schema(type = "number", format = "double", example = "75.5")))
+    })
     @GetMapping("/previous-concretization")
     public ResponseEntity<Double> getPreviousConcretizationRate(
-            @RequestParam String startDate,
-            @RequestParam String endDate) {
+            @Parameter(description = "Date de début (YYYY-MM-DD)") @RequestParam String startDate,
+            @Parameter(description = "Date de fin (YYYY-MM-DD)") @RequestParam String endDate) {
         try {
             LocalDate start = LocalDate.parse(startDate).minusYears(1);
             LocalDate end = LocalDate.parse(endDate).minusYears(1);
@@ -156,7 +181,7 @@ public class QuotationController {
         if (quotation.getSeller() != null) {
             dto.setSeller(quotation.getSeller().getSellerRef());
         } else {
-            dto.setSeller("Non assigné"); // Valeur par défaut
+            dto.setSeller("Non assigné");
         }
 
         dto.setClient(quotation.getClient());

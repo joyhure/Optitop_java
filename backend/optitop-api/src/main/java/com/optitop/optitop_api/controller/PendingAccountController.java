@@ -24,9 +24,19 @@ import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.Collections;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
 @RestController
 @RequestMapping("/api/pending-accounts")
 @CrossOrigin(origins = "http://localhost")
+@Tag(name = "Demandes sur les comptes (PendingAccountController)", description = "Gestion des demandes de création, modification et suppression de comptes")
 public class PendingAccountController {
 
     private final PendingAccountService pendingAccountService;
@@ -35,10 +45,17 @@ public class PendingAccountController {
         this.pendingAccountService = pendingAccountService;
     }
 
+    @Operation(summary = "Créer une demande de compte", description = "Crée une nouvelle demande de création, modification ou suppression de compte")
+    @SecurityRequirement(name = "bearerAuth")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Demande créée avec succès", content = @Content(mediaType = "application/json", schema = @Schema(type = "object", example = "{\"message\": \"Demande créée avec succès\"}"))),
+            @ApiResponse(responseCode = "400", description = "Données invalides", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PendingAccountDTO.class))),
+            @ApiResponse(responseCode = "500", description = "Erreur serveur")
+    })
     @PostMapping
     public ResponseEntity<?> createPendingAccount(
-            @Valid @RequestBody PendingAccountDTO dto,
-            @RequestHeader("Authorization") String authHeader) {
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Détails de la demande", required = true, content = @Content(schema = @Schema(implementation = PendingAccountDTO.class))) @Valid @RequestBody PendingAccountDTO dto,
+            @Parameter(description = "Token d'authentification (Bearer {userId})", required = true) @RequestHeader("Authorization") String authHeader) {
 
         Integer userId = Integer.valueOf(authHeader.replace("Bearer ", ""));
 
@@ -57,10 +74,17 @@ public class PendingAccountController {
         }
     }
 
+    @Operation(summary = "Valider une demande", description = "Valide une demande sur un compte (création, modification ou suppression). Réservé aux administrateurs.")
+    @SecurityRequirement(name = "bearerAuth")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Demande validée avec succès"),
+            @ApiResponse(responseCode = "403", description = "Accès non autorisé"),
+            @ApiResponse(responseCode = "404", description = "Demande non trouvée")
+    })
     @PostMapping("/validate/{id}")
     public ResponseEntity<?> validatePendingAccount(
-            @PathVariable Integer id,
-            @RequestHeader("Authorization") String authHeader) {
+            @Parameter(description = "ID de la demande à valider") @PathVariable Integer id,
+            @Parameter(description = "Token d'authentification (Bearer {userId})") @RequestHeader("Authorization") String authHeader) {
         try {
             Integer userId = Integer.valueOf(authHeader.replace("Bearer ", ""));
             pendingAccountService.validatePendingAccount(id, userId);
@@ -71,10 +95,17 @@ public class PendingAccountController {
         }
     }
 
+    @Operation(summary = "Rejeter une demande", description = "Rejette une demande sur un compte. Réservé aux administrateurs.")
+    @SecurityRequirement(name = "bearerAuth")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Demande rejetée avec succès"),
+            @ApiResponse(responseCode = "403", description = "Accès non autorisé"),
+            @ApiResponse(responseCode = "404", description = "Demande non trouvée")
+    })
     @PostMapping("/reject/{id}")
     public ResponseEntity<?> rejectPendingAccount(
-            @PathVariable Integer id,
-            @RequestHeader("Authorization") String authHeader) {
+            @Parameter(description = "ID de la demande à rejeter") @PathVariable Integer id,
+            @Parameter(description = "Token d'authentification (Bearer {userId})") @RequestHeader("Authorization") String authHeader) {
         try {
             Integer userId = Integer.valueOf(authHeader.replace("Bearer ", ""));
             pendingAccountService.rejectPendingAccount(id, userId);
@@ -85,6 +116,11 @@ public class PendingAccountController {
         }
     }
 
+    @Operation(summary = "Lister toutes les demandes", description = "Récupère la liste de toutes les demandes en attente")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Liste des demandes récupérée avec succès", content = @Content(mediaType = "application/json", schema = @Schema(implementation = PendingAccountDisplayDTO.class))),
+            @ApiResponse(responseCode = "500", description = "Erreur serveur")
+    })
     @GetMapping
     public ResponseEntity<List<PendingAccountDisplayDTO>> getAllPendingAccounts() {
         try {

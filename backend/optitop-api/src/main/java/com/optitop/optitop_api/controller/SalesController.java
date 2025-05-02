@@ -18,9 +18,18 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.optitop.optitop_api.service.SalesService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+
 @RestController
 @RequestMapping("/api/sales")
 @CrossOrigin(origins = "http://localhost")
+@Tag(name = "Import des données de ventes (SalesController)", description = "Import des données de ventes (lignes de factures et de devis) depuis un fichier CSV")
 public class SalesController {
 
     private static final Logger logger = LoggerFactory.getLogger(SalesController.class);
@@ -34,8 +43,19 @@ public class SalesController {
      * @param file CSV file to import
      * @return ResponseEntity with success or error message
      */
-    @PostMapping("/import")
-    public ResponseEntity<?> importSales(@RequestParam("file") MultipartFile file) {
+    @Operation(summary = "Importer un fichier de ventes", description = "Importe un fichier CSV contenant les données de ventes (factures et devis). "
+            +
+            "Le fichier doit contenir les colonnes suivantes : " +
+            "Date, C., Num client, Client, Référence, Famille, Quantité, Total TTC, " +
+            "Total facture/devis, Paire, Status, Vendeur")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Import réussi", content = @Content(mediaType = "application/json", schema = @Schema(type = "object", example = "{\"message\": \"Import réussi\"}"))),
+            @ApiResponse(responseCode = "400", description = "Fichier invalide ou mal formaté", content = @Content(mediaType = "application/json", schema = @Schema(type = "object", example = "{\"error\": \"Format de fichier invalide\"}"))),
+            @ApiResponse(responseCode = "500", description = "Erreur lors de l'import", content = @Content(mediaType = "application/json", schema = @Schema(type = "object", example = "{\"error\": \"Erreur lors de l'import: message d'erreur\"}")))
+    })
+    @PostMapping(value = "/import", consumes = "multipart/form-data")
+    public ResponseEntity<?> importSales(
+            @Parameter(description = "Fichier CSV à importer (encodage UTF-8)", required = true, schema = @Schema(type = "string", format = "binary")) @RequestParam("file") MultipartFile file) {
         try {
             logger.info("Starting import of file: {}", file.getOriginalFilename());
 

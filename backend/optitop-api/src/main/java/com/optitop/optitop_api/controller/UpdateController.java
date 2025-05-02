@@ -16,9 +16,17 @@ import com.optitop.optitop_api.model.QuotationsLines;
 import com.optitop.optitop_api.repository.InvoicesLinesRepository;
 import com.optitop.optitop_api.repository.QuotationsLinesRepository;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+
 @RestController
 @RequestMapping("/api/updates")
 @CrossOrigin(origins = "http://localhost")
+@Tag(name = "Date de dernière mise à jour (UpdateController)", description = "Gestion de la date de dernière MàJ des données")
 public class UpdateController {
 
     @Autowired
@@ -27,6 +35,11 @@ public class UpdateController {
     @Autowired
     private InvoicesLinesRepository invoiceRepository;
 
+    @Operation(summary = "Dernière mise à jour", description = "Récupère la date de la dernière mise à jour entre les factures et les devis")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Date de dernière mise à jour trouvée", content = @Content(mediaType = "application/json", schema = @Schema(type = "string", description = "Date au format ISO-8601", example = "2024-05-02T14:30:00"))),
+            @ApiResponse(responseCode = "404", description = "Aucune donnée disponible", content = @Content)
+    })
     @GetMapping("/last")
     public ResponseEntity<String> getLastUpdate() {
         // Récupérer la dernière date entre quotation et invoice
