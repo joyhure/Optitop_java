@@ -41,7 +41,7 @@
 | Rôle | Permissions |
 |------|-------------|
 | **Collaborateur** | Consultation statistiques personnelles et globales du magasin, renseigner statuts et commentaires de ses devis |
-| **Manager** | Permissions des collaborateurs étendues aux statistiques de chacun et détaillées du magasin, demande sur les comptes |
+| **Manager** | Permissions des collaborateurs étendues aux statistiques de chacun et détaillées du magasin, import des données de statistiques, demande sur les comptes |
 | **Super Manager** | Permissions du manager, accès à l'application mobile |
 | **Admin** | Permissions du supermanager, validation ou refus des demandes sur les comptes |
 
