@@ -1,46 +1,76 @@
-/*container*/
+/* =========================================
+   OPTITOP - STYLES PERSONNALISÉS
+   ========================================= */
+
+/* =========================================
+   1. VARIABLES CSS
+   ========================================= */
+:root {
+    /* Couleurs principales */
+    --optitop-primary: #2989DD;
+    --optitop-primary-dark: #0D4597;
+    --optitop-secondary: #6c757d;
+    --optitop-success: #198754;
+    --optitop-warning: #E54D2E;
+    --optitop-light: #F4FAFF;
+    --optitop-light-blue: #E6F4FE;
+    
+    /* Espacement */
+    --spacing-xs: 0.5rem;
+    --spacing-sm: 1rem;
+    --spacing-md: 1.5rem;
+    --spacing-lg: 2rem;
+    --spacing-xl: 3rem;
+    --spacing-xxl: 5rem;
+    
+    /* Ombres */
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.1);
+    
+    /* Transitions */
+    --transition-fast: 0.2s ease;
+    --transition-normal: 0.3s ease;
+}
+
+/* =========================================
+   2. UTILITAIRES DE TAILLE
+   ========================================= */
+.mt-10 {
+    margin-top: 10rem;
+}
+
+.w-16 {
+    width: 16% !important;
+}
+
+.w-30 {
+    width: 30%;
+}
+
+.w-40 {
+    width: 40%;
+}
+
+/* =========================================
+   3. LAYOUT - CONTAINERS
+   ========================================= */
 .sidebar {
     width: 16%;
 }
 
 #main-dashboard {
     width: 78%;
-    gap: 5rem;
+    gap: var(--spacing-xxl);
 }
 
 #main-quotations {
     width: 80%;
-    gap: 3rem;
+    gap: var(--spacing-xl);
 }
 
 #main-revenue {
     width: 80%;
-}
-
-.card {
-    border: 1px solid #e9ecef;
-    border-radius: 5px;
-    background-color: #F4FAFF;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    width: 45%;
-}
-
-#summary {
-    width: auto;
-    margin-top: 2rem;
-    position: fixed;
-    top: 71%;
-    left: 16.5%;
-    transform: translate(-50%, -50%);
-}
-
-#table-quotations-section {
-    width: 100%;
-    margin-inline: 3rem;
-}
-
-#table-revenue-2024, #table-user-creation, #table-user {
-    width: 100%;
 }
 
 #period-container {
@@ -48,33 +78,38 @@
 }
 
 #userDropdown {
-    padding-inline-end: 0px;
-}
-/*tables*/
-.table-col-date {
-    width: 12%;
+    padding-inline-end: 0;
 }
 
-.table-col-w4 {
-    width: 4%;
+/* =========================================
+   4. COMPOSANTS - CARTES
+   ========================================= */
+.card {
+    border: 1px solid #e9ecef;
+    border-radius: 5px;
+    background-color: var(--optitop-light);
+    box-shadow: var(--shadow-md);
+    width: 45%;
+    transition: var(--transition-normal);
 }
 
-.table-col-w20 {
-    width: 20%;
+.card-dashboard:hover {
+    background-color: #D0E5FF !important; 
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg) !important;
+    border-color: #d0d4d9 !important;
 }
 
-.table-col-w15 {
-    width: 15%;
+.table-card {
+    border: 1px solid #e9ecef !important;
+    border-radius: 5px !important;
+    box-shadow: var(--shadow-md) !important;
 }
 
-.table-col-commentaire {
-    width: 49%;
-}
-
-.table-col-w8 {
-    width: 8%;
-}
-
+/* =========================================
+   5. COMPOSANTS - TABLEAUX
+   ========================================= */
+/* En-têtes de tableau */
 #table-header {
     background-color: #FFF7C2;
 }
@@ -83,65 +118,61 @@
     background-color: #FEFBE9 !important;
 }
 
-.table-card {
-    border: 1px solid #e9ecef !important;
-    border-radius: 5px !important;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+/* Colonnes de tableau */
+.table-col-date {
+    width: 12%;
 }
 
-/*sizes*/
-.mt-10 {
-    margin-top: 10rem;
+.table-col-w4 {
+    width: 4%;
 }
 
-.w-40 {
-    width: 40%;
+.table-col-w8 {
+    width: 8%;
 }
 
-.w-30 {
-    width: 30%;
-    
+.table-col-w15 {
+    width: 15%;
 }
 
-.w-16 {
-    width: 16% !important;
+.table-col-w20 {
+    width: 20%;
 }
 
-/*colors*/
-.link-body-emphasis:hover {
-    background-color: #e9ecef;
-  }
+.table-col-commentaire {
+    width: 49%;
+}
 
-.nav-link:hover {
-    color: #2989DD !important;
-  }
+/* Sections de tableau */
+#table-quotations-section {
+    width: 100%;
+    margin-inline: var(--spacing-xl);
+}
 
+#table-revenue-2024, 
+#table-user-creation, 
+#table-user {
+    width: 100%;
+}
+
+/* =========================================
+   6. COULEURS ET THÈMES
+   ========================================= */
+/* Couleurs principales */
 .light-blue {
-    background-color: #E6F4FE !important;
+    background-color: var(--optitop-light-blue) !important;
 }
 
 .text-blue {
-    color: #2989DD !important;
+    color: var(--optitop-primary) !important;
 }
 
 .row-blueperso {
-    background-color: #2989DD !important;
+    background-color: var(--optitop-primary) !important;
     color: #f8f9fa !important;
 }
 
-.svg-feature {
-    background-color: #2989DD;
-    fill: #f8f9fa;
-}
-
-.svg-unvalidated-quotations {
-    fill: #E54D2E;
-}
-
-.svg-average-basket {
-    fill: #6c757d;
-}
-
+/* Couleurs par rôle */
 .bg-role-admin {
     background-color: #FFDCD3 !important;
 }
@@ -158,27 +189,160 @@
     background-color: #8EC8F6 !important;
 }
 
+/* Hover par rôle */
 .bg-role-admin .nav-link:hover {
     color: #D13415 !important;
 }
 
 .bg-role-collaborator .nav-link:hover {
-    color: #198754 !important;
+    color: var(--optitop-success) !important;
 }
 
 .bg-role-manager .nav-link:hover {
-    color: #2989DD !important;
+    color: var(--optitop-primary) !important;
 }
 
 .bg-role-supermanager .nav-link:hover {
-    color:  #0D4597 !important;
+    color: var(--optitop-primary-dark) !important;
 }
 
+/* =========================================
+   7. NAVIGATION
+   ========================================= */
+.nav-link:hover {
+    color: var(--optitop-primary) !important;
+}
+
+.link-body-emphasis:hover {
+    background-color: #e9ecef;
+}
+
+.nav-link.active {
+    background-color: var(--optitop-primary) !important;
+    color: #f8f9fa !important;
+    pointer-events: none !important;
+}
+
+/* Suppression des bordures arrondies pour nav-pills */
+.nav-pills .nav-link,
+.nav-pills .nav-item,
+.nav-pills .nav-item .nav-link,
+.nav-pills > .nav-item > .nav-link,
+.nav-pills .nav-link.active,
+.nav-pills .show > .nav-link {
+    border-radius: 0 !important;
+}
+
+/* =========================================
+   8. ICÔNES ET SVG
+   ========================================= */
+.svg-feature {
+    background-color: var(--optitop-primary);
+    fill: #f8f9fa;
+    transition: var(--transition-normal);
+}
+
+.card-dashboard:hover .svg-feature {
+    background-color: #f8f9fa;
+    fill: var(--optitop-primary);
+}
+
+.svg-unvalidated-quotations {
+    fill: var(--optitop-warning);
+}
+
+.svg-average-basket {
+    fill: var(--optitop-secondary);
+}
+
+/* =========================================
+   9. INTERACTIONS
+   ========================================= */
+/* Tri de tableaux */
+.sort-icons {
+    cursor: pointer;
+}
+
+.sort-icon {
+    opacity: 0.5;
+    transition: var(--transition-fast);
+}
+
+.sort-icon:hover,
+.sort-icon.active {
+    opacity: 1;
+}
+
+.sort-icon.active {
+    color: var(--optitop-primary);
+}
+
+th {
+    cursor: pointer;
+}
+
+/* Hover overlay */
+.hover-overlay::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(var(--bs-primary-rgb), 0.05);
+    opacity: 0;
+    transition: var(--transition-normal);
+}
+
+.hover-overlay:hover::after {
+    opacity: 1;
+}
+
+/* =========================================
+   10. COMPOSANTS SPÉCIALISÉS
+   ========================================= */
+/* Sélecteur d'actions */
+.action-select {
+    min-width: 120px;
+    max-width: 200px;
+    font-size: 0.875rem;
+}
+
+.action-select:focus {
+    border-color: var(--optitop-primary);
+    box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+}
+
+/* Bouton de sauvegarde fixe */
+#save-button-container {
+    position: fixed;
+    right: 30px;
+    top: 30% !important;
+    transform: translateY(-50%);
+    z-index: 1000;
+}
+
+#save-changes-button {
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition-normal);
+}
+
+#save-changes-button:disabled {
+    opacity: 0.6;
+    box-shadow: none;
+}
+
+#save-changes-button:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+/* Sélecteur de dates */
 .date-range-container {
     min-width: 250px;
     background-color: white;
     border-radius: 0.25rem;
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    box-shadow: var(--shadow-lg);
     position: absolute;
     z-index: 1000;
 }
@@ -191,136 +355,22 @@
     font-size: 0.875rem;
 }
 
-.nav-link.active {
-    background-color: #2989DD !important;
-    color: #f8f9fa !important;
-    pointer-events: none !important;
-}
-
-a.card-dashboard:hover {
-    background-color: #D0E5FF !important; 
-    transform: translateY(-3px);
-    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
-    border-color: #d0d4d9 !important;
-}
-
-a.card-dashboard:hover .svg-feature {
-    background-color: #f8f9fa;
-    fill: #2989DD;
-}
-
-/* Navigation styles */
-.nav-pills .nav-link {
-    border-radius: 0 !important;
-}
-
-.nav-pills .nav-item:first-child .nav-link {
-    border-top-left-radius: 0 !important;
-    border-top-right-radius: 0 !important;
-}
-
-.nav-pills .nav-item:last-child .nav-link {
-    border-bottom-left-radius: 0 !important;
-    border-bottom-right-radius: 0 !important;
-}
-
-.nav-pills,
-.nav-pills .nav-link,
-.nav-pills .nav-item,
-.nav-pills .nav-item .nav-link,
-.nav-pills > .nav-item > .nav-link {
-    border-radius: 0 !important;
-}
-
-.nav-pills .nav-link.active,
-.nav-pills .show > .nav-link {
-    border-radius: 0 !important;
-}
-
-.sort-icons {
-  cursor: pointer;
-}
-
-.sort-icon {
-  opacity: 0.5;
-  transition: opacity 0.2s;
-}
-
-.sort-icon:hover {
-  opacity: 1;
-}
-
-.sort-icon.active {
-  opacity: 1;
-  color: var(--bs-primary);
-}
-
-th {
-  cursor: pointer;
-}
-
-.action-select {
-    min-width: 120px;
-    max-width: 200px;
-    font-size: 0.875rem;
-}
-
-.action-select:focus {
-    border-color: var(--bs-primary);
-    box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
-}
-
-/* Styles pour le bouton de sauvegarde */
-#save-button-container {
-    position: fixed;
-    right: 30px;
-    top: 30% !important;
-    transform: translateY(-50%, -50%);
-    z-index: 1000;
-}
-
-#save-changes-button {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s ease;
-}
-
-#save-changes-button:disabled {
-    opacity: 0.6;
-    box-shadow: none;
-}
-
-#save-changes-button:not(:disabled):hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-/* Styles pour les boutons d'action */
+/* =========================================
+   11. BOUTONS
+   ========================================= */
 .btn-sm.py-1 {
     min-width: 80px;
     line-height: 1.5;
 }
 
 .btn-success.py-1 {
-    background-color: #198754;
+    background-color: var(--optitop-success);
 }
 
-.hover-overlay::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(var(--bs-primary-rgb), 0.05);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.hover-overlay:hover::after {
-    opacity: 1;
-}
-
-/* Style pour les liens désactivés des collaborateurs */
+/* =========================================
+   12. ÉTATS SPÉCIAUX
+   ========================================= */
+/* Liens désactivés pour collaborateurs */
 .collaborator-disabled-link {
     pointer-events: none !important;
     cursor: default !important;
@@ -332,6 +382,16 @@ th {
 .collaborator-disabled-link:hover {
     transform: none !important;
     box-shadow: none !important;
+}
+
+/* Position fixe pour éléments */
+#summary {
+    width: auto;
+    margin-top: var(--spacing-lg);
+    position: fixed;
+    top: 71%;
+    left: 16.5%;
+    transform: translate(-50%, -50%);
 }
 
 
