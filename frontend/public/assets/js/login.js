@@ -4,12 +4,12 @@
 
 // Configuration
 const CONFIG = {
-  API_BASE_URL: 'http://localhost:8080',
+  API_BASE_URL: "http://localhost:8080",
   ENDPOINTS: {
-    LOGIN: '/api/auth/login',
+    LOGIN: "/api/auth/login",
   },
   PAGES: {
-    DASHBOARD: 'dashboard.php',
+    DASHBOARD: "dashboard.php",
   },
 };
 
@@ -23,7 +23,7 @@ const elements = {
 /**
  * Initialisation au chargement du DOM
  */
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener("DOMContentLoaded", function () {
   initializeElements();
   attachEventListeners();
 });
@@ -32,9 +32,9 @@ document.addEventListener('DOMContentLoaded', function () {
  * Initialise les références aux éléments DOM
  */
 function initializeElements() {
-  elements.form = document.querySelector('#loginForm');
-  elements.loginInput = document.querySelector('#login');
-  elements.passwordInput = document.querySelector('#password');
+  elements.form = document.querySelector("#loginForm");
+  elements.loginInput = document.querySelector("#login");
+  elements.passwordInput = document.querySelector("#password");
 }
 
 /**
@@ -42,7 +42,7 @@ function initializeElements() {
  */
 function attachEventListeners() {
   if (elements.form) {
-    elements.form.addEventListener('submit', handleLogin);
+    elements.form.addEventListener("submit", handleLogin);
   }
 }
 
@@ -83,9 +83,9 @@ async function authenticateUser() {
   const response = await fetch(
     `${CONFIG.API_BASE_URL}${CONFIG.ENDPOINTS.LOGIN}`,
     {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(credentials),
     }
@@ -93,7 +93,7 @@ async function authenticateUser() {
 
   if (!response.ok) {
     const errorData = await response.json();
-    throw new Error(errorData.error || 'Erreur lors de la connexion');
+    throw new Error(errorData.error || "Erreur lors de la connexion");
   }
 
   return await response.json();
@@ -111,7 +111,7 @@ function storeUserSession(userData) {
     seller_ref: userData.seller_ref,
   };
 
-  sessionStorage.setItem('user', JSON.stringify(sessionData));
+  sessionStorage.setItem("user", JSON.stringify(sessionData));
 }
 
 /**
@@ -119,10 +119,10 @@ function storeUserSession(userData) {
  * @param {Object} userData - Données utilisateur
  */
 async function synchronizePhpSession(userData) {
-  await fetch('login.php', {
-    method: 'POST',
+  await fetch("login.php", {
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     body: JSON.stringify(userData),
   });
@@ -140,10 +140,10 @@ function redirectToApp() {
  * @param {Error} error - Erreur capturée
  */
 function handleLoginError(error) {
-  console.error('Erreur:', error);
+  console.error("Erreur:", error);
 
   // Afficher l'erreur à l'utilisateur
-  const errorMessage = error.message || 'Erreur de connexion au serveur';
+  const errorMessage = error.message || "Erreur de connexion au serveur";
   alert(errorMessage);
 
   // Réinitialiser le champ mot de passe
@@ -155,6 +155,6 @@ function handleLoginError(error) {
  */
 function clearPasswordField() {
   if (elements.passwordInput) {
-    elements.passwordInput.value = '';
+    elements.passwordInput.value = "";
   }
 }
