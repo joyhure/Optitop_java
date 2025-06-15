@@ -2,14 +2,19 @@ package com.optitop.optitop_api.dto;
 
 import jakarta.validation.constraints.NotBlank;
 
+/**
+ * DTO pour les données de connexion utilisateur
+ */
 public class LoginRequestDTO {
+
     @NotBlank(message = "L'identifiant est obligatoire")
     private String login;
 
     @NotBlank(message = "Le mot de passe est obligatoire")
     private String password;
 
-    // Getters et Setters
+    // ===== GETTERS ET SETTERS =====
+
     public String getLogin() {
         return login;
     }
