@@ -22,7 +22,7 @@
   /**
    * Configuration de la page et inclusion des composants
    */
-  $pageTitle = "dashboard";
+  $pageTitle = "Dashboard";
   require_once 'components/header.html';
   require_once 'components/navbar.php';
   ?>
