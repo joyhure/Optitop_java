@@ -2,47 +2,76 @@
   <div class="px-3 py-2 text-bg-light border-bottom">
     <div class="container">
       <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-        <img src="assets/images/logo_optitop.png" alt="Optitop Logo" width="112px" height="48px"
+        
+        <!-- Logo Optitop -->
+        <img src="assets/images/logo_optitop.png" alt="Optitop Logo" width="112" height="48"
           class="d-flex align-items-center my-2 my-lg-0 me-lg-auto text-white text-decoration-none">
 
+        <!-- Navigation principale -->
         <ul class="nav col-12 col-lg-auto my-2 justify-content-between my-md-0 text-small w-auto">
+          
+          <!-- Sélecteur de période -->
           <div class="d-flex flex-wrap align-items-center justify-content-center mx-5" id="period-container">
             <li class="nav-item dropdown">
-              <a class="nav-link text-dark dropdown-toggle text-dark" href="#" id="periodDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <a class="nav-link text-dark dropdown-toggle" href="#" id="periodDropdown" role="button" 
+                 data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="bi bi-calendar-range d-block mx-auto mb-1 fs-4 text-center"></i>
                 <span id="selectedPeriod">Sélectionner une période</span>
               </a>
               <ul class="dropdown-menu position-absolute mx-0 shadow w-220px gap-1" aria-labelledby="periodDropdown">
                 <li class="position-relative">
-                    <div class="date-range-container px-3 py-2" id="dateRangeContainer">
-                        <div class="mb-2">
-                            <label class="small">Du :</label>
-                            <input type="date" class="form-control form-control-sm" id="startDate">
-                        </div>
-                        <div class="mb-2">
-                            <label class="small">Au :</label>
-                            <input type="date" class="form-control form-control-sm" id="endDate">
-                        </div>
-                        <div class="text-center">
-                            <button class="btn btn-sm btn-primary" id="applyDateRange">Valider</button>
-                        </div>
+                  <div class="date-range-container px-3 py-2" id="dateRangeContainer">
+                    
+                    <!-- Date de début -->
+                    <div class="mb-2">
+                      <label for="startDate" class="small">Du :</label>
+                      <input type="date" class="form-control form-control-sm" id="startDate" required>
                     </div>
+                    
+                    <!-- Date de fin -->
+                    <div class="mb-2">
+                      <label for="endDate" class="small">Au :</label>
+                      <input type="date" class="form-control form-control-sm" id="endDate" required>
+                    </div>
+                    
+                    <!-- Bouton validation -->
+                    <div class="text-center">
+                      <button type="button" class="btn btn-sm btn-primary" id="applyDateRange">Valider</button>
+                    </div>
+                  </div>
                 </li>
               </ul>
             </li>
           </div>
+          
+          <!-- Menu utilisateur -->
           <li>
             <div class="dropdown text-end">
-              <a class="nav-link text-dark dropdown-toggle text-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              <a class="nav-link text-dark dropdown-toggle text-center" href="#" id="userDropdown" role="button" 
+                 data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="bi bi-person-circle d-block mx-auto mb-1 fs-4"></i>
-                <span id="userFirstname"></span>
+                <span id="userFirstname">Utilisateur</span>
               </a>
               <ul class="dropdown-menu position-absolute mx-0 shadow w-220px gap-1" aria-labelledby="userDropdown">
-                <li><a class="dropdown-item text-muted small" href="user-account.php">Mon compte</a></li>
+                
+                <!-- Lien compte utilisateur -->
+                <li>
+                  <a class="dropdown-item text-muted small" href="user-account.php">
+                    <i class="bi bi-person me-2"></i>Mon compte
+                  </a>
+                </li>
+                
+                <!-- Séparateur -->
                 <li>
                   <hr class="dropdown-divider">
                 </li>
-                <li><a class="dropdown-item text-muted small" href="#" id="signOutBtn">Se déconnecter</a></li>
+                
+                <!-- Lien déconnexion -->
+                <li>
+                  <a class="dropdown-item text-muted small" href="#" id="signOutBtn">
+                    <i class="bi bi-box-arrow-right me-2"></i>Se déconnecter
+                  </a>
+                </li>
               </ul>
             </div>
           </li>
@@ -51,4 +80,6 @@
     </div>
   </div>
 </header>
+
+<!-- Conteneur de page -->
 <div id="page-container" class="container px-5">
