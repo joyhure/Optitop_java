@@ -134,17 +134,18 @@ const apiUtils = {
  */
 const formatUtils = {
     /**
-     * Formate un montant en euros
+     * Formate un montant en devise
      * @param {number} amount - Montant à formater
+     * @param {number} decimals - Nombre de décimales (défaut: 0)
      * @returns {string} - Montant formaté
      */
-    formatCurrency(amount) {
+    formatCurrency(amount, decimals = 0) {
         if (amount === null || amount === undefined) return '-';
         return new Intl.NumberFormat(CONFIG.LOCALE, {
             style: 'currency',
             currency: CONFIG.CURRENCY,
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0
+            minimumFractionDigits: decimals,
+            maximumFractionDigits: decimals
         }).format(amount);
     },
 
@@ -301,11 +302,11 @@ async function loadStoreAverageBaskets() {
         const data = await apiUtils.fetchApi(CONFIG.ENDPOINTS.TOTAL_STATS, { startDate, endDate });
         
         if (elements.storeAverageBasket && data.averageBasket !== undefined) {
-            elements.storeAverageBasket.textContent = formatUtils.formatCurrency(data.averageBasket);
+            elements.storeAverageBasket.textContent = formatUtils.formatCurrency(data.averageBasket, 1);
         }
         
         if (elements.storeAverageP2 && data.averageP2 !== undefined) {
-            elements.storeAverageP2.textContent = formatUtils.formatCurrency(data.averageP2);
+            elements.storeAverageP2.textContent = formatUtils.formatCurrency(data.averageP2, 1);
         }
     } catch (error) {
         console.error('Erreur lors du chargement des paniers moyens:', error);
@@ -403,11 +404,11 @@ async function loadPersonalAverageBaskets() {
         const sellerStats = stats.find(s => s.sellerRef === user.seller_ref) || {};
 
         if (elements.personalAverageBasketValue) {
-            elements.personalAverageBasketValue.textContent = formatUtils.formatCurrency(sellerStats.averageBasket || 0);
+            elements.personalAverageBasketValue.textContent = formatUtils.formatCurrency(sellerStats.averageBasket || 0, 1);
         }
 
         if (elements.personalAverageP2Value) {
-            elements.personalAverageP2Value.textContent = formatUtils.formatCurrency(sellerStats.averageP2 || 0);
+            elements.personalAverageP2Value.textContent = formatUtils.formatCurrency(sellerStats.averageP2 || 0, 1);
         }
     } catch (error) {
         console.error('Erreur lors du chargement des paniers moyens personnels:', error);
