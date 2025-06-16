@@ -45,7 +45,7 @@
       <div id="first-line" class="flex-row d-flex justify-content-between align-items-center">
         
         <!-- Card Chiffre d'affaires -->
-        <a id="ca" href="revenue.php" class="text-decoration-none card card-dashboard my-3 px-1 pt-2" style="transition: all 0.3s ease;">
+        <a id="ca" href="revenue.php" class="text-decoration-none card card-dashboard my-3 px-1 pt-2">
           <div class="feature-icon d-inline-flex align-items-center justify-content-center fs-2">
             <svg class="bi svg-feature rounded text-primary" width="1em" height="1em">
               <use xlink:href="assets/vendor/bootstrap-icons/bootstrap-icons.svg#currency-euro"></use>
@@ -55,7 +55,7 @@
         </a>
 
         <!-- Card Devis -->
-        <a id="quotation" href="quotations.php" class="text-decoration-none card card-dashboard my-3 px-1 pt-2" style="transition: all 0.3s ease;">
+        <a id="quotation" href="quotations.php" class="text-decoration-none card card-dashboard my-3 px-1 pt-2">
           <div class="feature-icon d-inline-flex align-items-center justify-content-center fs-2">
             <svg class="bi svg-feature rounded" width="1em" height="1em">
               <use xlink:href="assets/vendor/bootstrap-icons/bootstrap-icons.svg#clipboard2"></use>
@@ -69,7 +69,7 @@
       <div id="second-line" class="flex-row d-flex justify-content-between align-items-center">
         
         <!-- Card Panier moyen -->
-        <a id="average-basket" href="average-basket.php" class="text-decoration-none card card-dashboard my-3 px-1 pt-2" style="transition: all 0.3s ease;">
+        <a id="average-basket" href="average-basket.php" class="text-decoration-none card card-dashboard my-3 px-1 pt-2">
           <div class="feature-icon d-inline-flex align-items-center justify-content-center fs-2">
             <svg class="bi svg-feature rounded" width="1em" height="1em">
               <use xlink:href="assets/vendor/bootstrap-icons/bootstrap-icons.svg#cart4"></use>
@@ -82,7 +82,7 @@
         </a>
 
         <!-- Card Bonus -->
-        <a id="bonus" href="average-basket.php" class="text-decoration-none card card-dashboard my-3 px-3 pt-2" style="transition: all 0.3s ease;">
+        <a id="bonus" href="average-basket.php" class="text-decoration-none card card-dashboard my-3 px-3 pt-2">
           <div class="feature-icon d-inline-flex align-items-center justify-content-center fs-2 mb-2">
             <svg class="bi svg-feature rounded" width="1em" height="1em">
               <use xlink:href="assets/vendor/bootstrap-icons/bootstrap-icons.svg#piggy-bank"></use>
@@ -111,7 +111,7 @@
       <div id="first-line" class="flex-row d-flex justify-content-between align-items-center">
         
         <!-- Card CA personnel -->
-        <div id="personal-ca" class="card card-dashboard my-3 px-3 pt-2" style="transition: all 0.3s ease;">
+        <div id="personal-ca" class="card my-3 px-3 pt-2">
           <div class="feature-icon d-inline-flex align-items-center justify-content-center fs-2 mb-2">
             <svg class="bi svg-feature rounded" width="1em" height="1em">
               <use xlink:href="assets/vendor/bootstrap-icons/bootstrap-icons.svg#currency-euro"></use>
@@ -122,7 +122,7 @@
         </div>
 
         <!-- Card Devis personnels -->
-        <a id="personal-quotations" href="quotations.php" class="text-decoration-none card card-dashboard my-3 px-3 pt-2" style="transition: all 0.3s ease;">
+        <a id="personal-quotations" href="quotations.php" class="text-decoration-none card card-dashboard my-3 px-3 pt-2">
           <div class="feature-icon d-inline-flex align-items-center justify-content-center fs-2 mb-2">
             <svg class="bi svg-feature rounded" width="1em" height="1em">
               <use xlink:href="assets/vendor/bootstrap-icons/bootstrap-icons.svg#clipboard2"></use>
@@ -137,7 +137,7 @@
       <div id="second-line" class="flex-row d-flex justify-content-between align-items-center">
         
         <!-- Card Panier personnel -->
-        <div id="personal-basket-container" class="card card-dashboard my-3 px-3 pt-2" style="transition: all 0.3s ease;">
+        <div id="personal-basket-container" class="card my-3 px-3 pt-2">
           <div class="feature-icon d-inline-flex align-items-center justify-content-center fs-2 mb-2">
             <svg class="bi svg-feature rounded" width="1em" height="1em">
               <use xlink:href="assets/vendor/bootstrap-icons/bootstrap-icons.svg#cart4"></use>
@@ -150,7 +150,7 @@
         </div>
 
         <!-- Card Bonus personnel -->
-        <div id="personal-bonus-frame-card" class="card card-dashboard my-3 px-3 pt-2" style="transition: all 0.3s ease;">
+        <div id="personal-bonus-frame-card" class="card card my-3 px-3 pt-2">
           <div class="feature-icon d-inline-flex align-items-center justify-content-center fs-2 mb-2">
             <svg class="bi svg-feature rounded" width="1em" height="1em">
               <use xlink:href="assets/vendor/bootstrap-icons/bootstrap-icons.svg#piggy-bank"></use>

@@ -94,13 +94,22 @@ function initializeElements() {
 const apiUtils = {
     /**
      * Effectue un appel API standardisé
-     * @param {string} endpoint - Point de terminaison de l'API
+     * @param {string} endpoint - Endpoint de CONFIG.ENDPOINTS
+     * @param {Object} params - Paramètres de requête
      * @param {Object} options - Options pour fetch
      * @returns {Promise<Object>} - Réponse JSON
      */
-    async fetchApi(endpoint, options = {}) {
+    async fetchApi(endpoint, params = {}, options = {}) {
         try {
-            const response = await fetch(`${CONFIG.API_BASE_URL}${endpoint}`, {
+            // Construction de l'URL avec paramètres
+            const url = new URL(`${CONFIG.API_BASE_URL}${endpoint}`);
+            Object.keys(params).forEach(key => {
+                if (params[key] !== null && params[key] !== undefined) {
+                    url.searchParams.append(key, params[key]);
+                }
+            });
+
+            const response = await fetch(url.toString(), {
                 ...options,
                 headers: {
                     'Content-Type': 'application/json',
@@ -125,7 +134,7 @@ const apiUtils = {
  */
 const formatUtils = {
     /**
-     * Formate un montant en devise
+     * Formate un montant en euros
      * @param {number} amount - Montant à formater
      * @returns {string} - Montant formaté
      */
@@ -159,7 +168,7 @@ const formatUtils = {
      * @returns {number} - Pourcentage calculé
      */
     calculatePercentage(total, part) {
-        return total > 0 ? (part * 100 / total).toFixed(1) : 0;
+        return total > 0 ? (part / total * 100).toFixed(1) : 0;
     }
 };
 
@@ -249,7 +258,7 @@ async function loadAllData() {
 async function loadStoreRevenue() {
     try {
         const { startDate, endDate } = sessionUtils.getSessionDates();
-        const data = await apiUtils.fetchApi(`${CONFIG.ENDPOINTS.PERIOD_REVENUE}?startDate=${startDate}&endDate=${endDate}`);
+        const data = await apiUtils.fetchApi(CONFIG.ENDPOINTS.PERIOD_REVENUE, { startDate, endDate });
         
         if (elements.totalRevenue) {
             elements.totalRevenue.textContent = data.currentAmount ? 
@@ -269,7 +278,7 @@ async function loadStoreRevenue() {
 async function loadStoreConcretizationRate() {
     try {
         const { startDate, endDate } = sessionUtils.getSessionDates();
-        const data = await apiUtils.fetchApi(`${CONFIG.ENDPOINTS.QUOTATION_STATS}?startDate=${startDate}&endDate=${endDate}`);
+        const data = await apiUtils.fetchApi(CONFIG.ENDPOINTS.QUOTATION_STATS, { startDate, endDate });
         
         if (elements.storeConcretizationRate && data.concretizationRate !== undefined) {
             const formattedRate = formatUtils.formatPercent(data.concretizationRate);
@@ -289,7 +298,7 @@ async function loadStoreConcretizationRate() {
 async function loadStoreAverageBaskets() {
     try {
         const { startDate, endDate } = sessionUtils.getSessionDates();
-        const data = await apiUtils.fetchApi(`${CONFIG.ENDPOINTS.TOTAL_STATS}?startDate=${startDate}&endDate=${endDate}`);
+        const data = await apiUtils.fetchApi(CONFIG.ENDPOINTS.TOTAL_STATS, { startDate, endDate });
         
         if (elements.storeAverageBasket && data.averageBasket !== undefined) {
             elements.storeAverageBasket.textContent = formatUtils.formatCurrency(data.averageBasket);
@@ -309,7 +318,7 @@ async function loadStoreAverageBaskets() {
 async function loadStoreFrameStats() {
     try {
         const { startDate, endDate } = sessionUtils.getSessionDates();
-        const stats = await apiUtils.fetchApi(`${CONFIG.ENDPOINTS.FRAME_STATS}?startDate=${startDate}&endDate=${endDate}`);
+        const stats = await apiUtils.fetchApi(CONFIG.ENDPOINTS.FRAME_STATS, { startDate, endDate });
         const totals = calculateFrameTotals(stats);
         
         if (elements.storeNbPremiumFrame) {
@@ -336,8 +345,8 @@ async function loadPersonalRevenue() {
         if (!user?.seller_ref) return;
 
         const [personalData, storeData] = await Promise.all([
-            apiUtils.fetchApi(`${CONFIG.ENDPOINTS.SELLER_STATS}?startDate=${startDate}&endDate=${endDate}`),
-            apiUtils.fetchApi(`${CONFIG.ENDPOINTS.PERIOD_REVENUE}?startDate=${startDate}&endDate=${endDate}`)
+            apiUtils.fetchApi(CONFIG.ENDPOINTS.SELLER_STATS, { startDate, endDate }),
+            apiUtils.fetchApi(CONFIG.ENDPOINTS.PERIOD_REVENUE, { startDate, endDate })
         ]);
 
         const sellerStats = personalData.find(s => s.sellerRef === user.seller_ref) || {};
@@ -365,7 +374,7 @@ async function loadPersonalQuotationStats() {
 
         if (!user?.seller_ref) return;
 
-        const stats = await apiUtils.fetchApi(`${CONFIG.ENDPOINTS.QUOTATION_STATS}?startDate=${startDate}&endDate=${endDate}`);
+        const stats = await apiUtils.fetchApi(CONFIG.ENDPOINTS.QUOTATION_STATS, { startDate, endDate });
         const userStats = stats.sellerStats.find(s => s.sellerRef === user.seller_ref) || {};
 
         if (elements.personalConcretizationRate && userStats.concretizationRate !== undefined) {
@@ -390,7 +399,7 @@ async function loadPersonalAverageBaskets() {
 
         if (!user?.seller_ref) return;
 
-        const stats = await apiUtils.fetchApi(`${CONFIG.ENDPOINTS.AVERAGE_BASKETS}?startDate=${startDate}&endDate=${endDate}`);
+        const stats = await apiUtils.fetchApi(CONFIG.ENDPOINTS.AVERAGE_BASKETS, { startDate, endDate });
         const sellerStats = stats.find(s => s.sellerRef === user.seller_ref) || {};
 
         if (elements.personalAverageBasketValue) {
@@ -415,7 +424,7 @@ async function loadPersonalFrameStats() {
 
         if (!user?.seller_ref) return;
 
-        const stats = await apiUtils.fetchApi(`${CONFIG.ENDPOINTS.FRAME_STATS}?startDate=${startDate}&endDate=${endDate}`);
+        const stats = await apiUtils.fetchApi(CONFIG.ENDPOINTS.FRAME_STATS, { startDate, endDate });
         const sellerStats = stats.find(s => s.sellerRef === user.seller_ref) || {};
         
         if (elements.personalRatePremiumFrame) {
