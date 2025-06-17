@@ -1,5 +1,12 @@
 package com.optitop.optitop_api.model;
 
+/**
+ * Entité de configuration email SMTP
+ * 
+ * Modèle JPA pour stocker les paramètres de configuration
+ * du serveur SMTP utilisé pour l'envoi d'emails.
+ */
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -10,6 +17,9 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "email_config")
 public class EmailConfig {
+
+    // ===== ATTRIBUTS =====
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -25,6 +35,8 @@ public class EmailConfig {
 
     @Column(name = "smtp_password", nullable = false)
     private String smtpPassword;
+
+    // ===== GETTERS ET SETTERS =====
 
     public String getSmtpHost() {
         return smtpHost;
