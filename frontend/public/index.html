@@ -2,61 +2,62 @@
 <html lang="fr">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Optitop - Connexion</title>
-  <meta name="description"
-    content="Page de connexion pour l'application Optitop, permettant aux utilisateurs de se connecter à leur compte.">
-  <meta name="author" content="Joy Huré">
+    <!-- ===== MÉTADONNÉES ===== -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Optitop - Connexion</title>
+    <meta name="description" content="Page de connexion pour l'application Optitop, permettant aux utilisateurs de se connecter à leur compte.">
+    <meta name="author" content="Joy Huré">
 
-  <!-- Favicon -->
-  <link rel="icon" href="assets/images/favicon.png">
+    <!-- ===== FAVICON ===== -->
+    <link rel="icon" href="assets/images/favicon.png">
 
-  <!-- Styles -->
-  <link rel="stylesheet" href="assets/vendor/bootstrap/bootstrap.min.css">
-  <link rel="stylesheet" href="assets/vendor/bootstrap-icons/bootstrap-icons.css">
-  <link rel="stylesheet" href="assets/styles/custom.css">
+    <!-- ===== STYLES ===== -->
+    <link rel="stylesheet" href="assets/vendor/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/vendor/bootstrap-icons/bootstrap-icons.css">
+    <link rel="stylesheet" href="assets/styles/custom.css">
 </head>
 
 <body class="mt-10">
-  <main class="w-25 m-auto">
-    <!-- Formulaire de connexion -->
-    <form id="loginForm" class="d-flex justify-content-center flex-column" autocomplete="off">
+    <!-- ===== CONTENU PRINCIPAL ===== -->
+    <main class="w-25 m-auto">
+        
+        <!-- Formulaire de connexion -->
+        <form id="loginForm" class="d-flex justify-content-center flex-column" autocomplete="off">
 
-      <!-- Logo -->
-      <div class="d-flex justify-content-center">
-        <img class="mb-4" src="assets/images/logo_optitop.png" alt="Optitop logo" width="300" height="128">
-      </div>
+            <!-- Logo de l'application -->
+            <div class="d-flex justify-content-center">
+                <img class="mb-4" src="assets/images/logo_optitop.png" alt="Optitop logo" width="300" height="128">
+            </div>
 
-      <!-- Titre -->
-      <h1 class="h3 mb-3 fw-normal text-center">Connexion</h1>
+            <!-- Titre de la page -->
+            <h1 class="h3 mb-3 fw-normal text-center">Connexion</h1>
 
-      <!-- Champ identifiant -->
-      <div class="form-floating mb-3">
-        <input type="text" class="form-control" id="login" name="login" placeholder="Identifiant" autocomplete="off"
-          required>
-        <label for="login">Identifiant</label>
-      </div>
+            <!-- Champ identifiant utilisateur -->
+            <div class="form-floating mb-3">
+                <input type="text" class="form-control" id="login" name="login" placeholder="Identifiant" autocomplete="off" required>
+                <label for="login">Identifiant</label>
+            </div>
 
-      <!-- Champ mot de passe -->
-      <div class="form-floating mb-3">
-        <input type="password" class="form-control" id="password" name="password" placeholder="Mot de Passe"
-          autocomplete="off" required>
-        <label for="password">Mot de Passe</label>
-      </div>
+            <!-- Champ mot de passe -->
+            <div class="form-floating mb-3">
+                <input type="password" class="form-control" id="password" name="password" placeholder="Mot de Passe" autocomplete="off" required>
+                <label for="password">Mot de Passe</label>
+            </div>
 
-      <!-- Lien mot de passe oublié -->
-      <div class="text-end mb-4">
-        <a href="forgot-password.html" class="text-muted small">Mot de passe oublié ?</a>
-      </div>
+            <!-- Lien mot de passe oublié -->
+            <div class="text-end mb-4">
+                <a href="forgot-password.html" class="text-muted small">Mot de passe oublié ?</a>
+            </div>
 
-      <!-- Bouton de connexion -->
-      <button class="btn btn-primary w-100 py-2" type="submit">Se connecter</button>
-    </form>
-  </main>
+            <!-- Bouton de connexion -->
+            <button class="btn btn-primary w-100 py-2" type="submit">Se connecter</button>
+        </form>
+    </main>
 
-  <!-- Scripts -->
-  <script src="assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>
-  <script src="assets/js/login.js"></script>
+    <!-- ===== SCRIPTS ===== -->
+    <script src="assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/login.js"></script>
 </body>
+
 </html>
