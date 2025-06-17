@@ -43,48 +43,48 @@ public class PendingAccountService {
 
     public void createPendingAccount(PendingAccountDTO dto, Integer createdById) {
         User createdBy = userRepository.findById(createdById).get();
-        RequestType requestType = RequestType.valueOf(dto.requestType().toLowerCase());
+        RequestType requestType = RequestType.valueOf(dto.getRequestType().toLowerCase());
 
         PendingAccount pendingAccount;
         if (requestType == RequestType.suppression) {
             // Récupération des informations de l'utilisateur à supprimer
-            User userToDelete = userRepository.findByLogin(dto.login());
+            User userToDelete = userRepository.findByLogin(dto.getLogin());
             if (userToDelete == null) {
-                throw new RuntimeException("Utilisateur non trouvé avec le login : " + dto.login());
+                throw new RuntimeException("Utilisateur non trouvé avec le login : " + dto.getLogin());
             }
 
             pendingAccount = new PendingAccount(
                     userToDelete.getLastname(),
                     userToDelete.getFirstname(),
                     userToDelete.getEmail(),
-                    dto.login(),
+                    dto.getLogin(),
                     userToDelete.getRole(),
                     createdBy,
                     requestType);
         } else if (requestType == RequestType.modification) {
             // Récupération de l'utilisateur à modifier
-            User userToModify = userRepository.findByLogin(dto.login());
+            User userToModify = userRepository.findByLogin(dto.getLogin());
             if (userToModify == null) {
-                throw new RuntimeException("Utilisateur non trouvé avec le login : " + dto.login());
+                throw new RuntimeException("Utilisateur non trouvé avec le login : " + dto.getLogin());
             }
 
             // Utilisation des valeurs saisies si présentes, sinon valeurs existantes
             pendingAccount = new PendingAccount(
-                    dto.lastname() != null ? dto.lastname() : userToModify.getLastname(),
-                    dto.firstname() != null ? dto.firstname() : userToModify.getFirstname(),
-                    dto.email() != null ? dto.email() : userToModify.getEmail(),
-                    dto.login(),
-                    dto.role(),
+                    dto.getLastname() != null ? dto.getLastname() : userToModify.getLastname(),
+                    dto.getFirstname() != null ? dto.getFirstname() : userToModify.getFirstname(),
+                    dto.getEmail() != null ? dto.getEmail() : userToModify.getEmail(),
+                    dto.getLogin(),
+                    dto.getRole(),
                     createdBy,
                     requestType);
         } else {
             // Pour ajout tous les champs sont requis
             pendingAccount = new PendingAccount(
-                    dto.lastname(),
-                    dto.firstname(),
-                    dto.email(),
-                    dto.login(),
-                    dto.role(),
+                    dto.getLastname(),
+                    dto.getFirstname(),
+                    dto.getEmail(),
+                    dto.getLogin(),
+                    dto.getRole(),
                     createdBy,
                     requestType);
         }
@@ -92,7 +92,7 @@ public class PendingAccountService {
         try {
             pendingAccountRepository.save(pendingAccount);
         } catch (DataIntegrityViolationException e) {
-            throw new RuntimeException("Une demande est déjà en cours pour le login : " + dto.login());
+            throw new RuntimeException("Une demande est déjà en cours pour le login : " + dto.getLogin());
         }
     }
 

@@ -49,10 +49,10 @@ document.addEventListener('DOMContentLoaded', () => {
  * Initialise les références aux éléments DOM
  */
 function initializeElements() {
-    elements.form = document.getElementById('new-request-form');
-    elements.askSelect = document.getElementById('ask-select');
-    elements.roleSelect = document.getElementById('role-select');
-    elements.identifiantInput = document.getElementById('identifiant');
+    elements.form = document.querySelector('#new-request-form');
+    elements.askSelect = document.querySelector('#ask-select');
+    elements.roleSelect = document.querySelector('#role-select');
+    elements.identifiantInput = document.querySelector('#identifiant');
     elements.pendingTable = document.querySelector('#accounts-ask-logs tbody');
     elements.usersTable = document.querySelector('#users-table tbody');
     
@@ -69,7 +69,10 @@ function createIdentifiantSelect() {
         elements.identifiantSelect.className = 'form-select form-select-sm';
         elements.identifiantSelect.id = 'identifiant-select';
         elements.identifiantSelect.style.display = 'none';
-        elements.identifiantInput.parentNode.insertBefore(elements.identifiantSelect, elements.identifiantInput.nextSibling);
+        elements.identifiantInput.parentNode.insertBefore(
+            elements.identifiantSelect, 
+            elements.identifiantInput.nextSibling
+        );
     }
 }
 
@@ -140,6 +143,19 @@ const apiUtils = {
     handleApiError: async (response) => {
         if (response.status === 403) {
             throw new Error('Accès non autorisé');
+        }
+        
+        if (response.status === 409) {
+            // Tentative de récupération du message d'erreur spécifique du serveur
+            try {
+                const errorData = await response.json();
+                if (errorData.message && errorData.message.includes('demande en cours')) {
+                    throw new Error('Une demande pour cet utilisateur est déjà en cours de traitement. Veuillez attendre la validation de la demande précédente.');
+                }
+                throw new Error(errorData.message || 'Conflit détecté - demande déjà existante');
+            } catch (parseError) {
+                throw new Error('Une demande similaire est déjà en cours de traitement');
+            }
         }
         
         if (!response.ok) {
@@ -248,6 +264,11 @@ const accountsService = {
                 headers: apiUtils.createAuthHeaders(userId),
                 body: JSON.stringify(formData)
             });
+
+            // Gestion spécifique de l'erreur de demande en cours
+            if (response.status === 409) {
+                throw new Error('Une demande pour cet utilisateur est déjà en cours de traitement. Veuillez attendre la validation de la demande précédente.');
+            }
 
             await apiUtils.handleApiError(response);
         } catch (error) {
@@ -429,20 +450,56 @@ const uiManager = {
     },
 
     /**
+     * Réinitialise le champ identifiant
+     */
+    resetIdentifiantField() {
+        if (elements.identifiantSelect) {
+            elements.identifiantSelect.style.display = 'none';
+            elements.identifiantSelect.innerHTML = '';
+        }
+        if (elements.identifiantInput) {
+            elements.identifiantInput.style.display = 'block';
+            elements.identifiantInput.value = '';
+        }
+    },
+
+    /**
      * Met à jour le champ identifiant selon la sélection
-     * @param {string} selectedRole - Rôle sélectionné
+     * @param {string} selectedRole - Rôle sélectionné (peut être null)
      * @param {string} selectedAskType - Type de demande sélectionné
      */
     async updateIdentifiantField(selectedRole, selectedAskType) {
-        if (!elements.identifiantInput || !elements.identifiantSelect) return;
+        if (!elements.identifiantInput || !elements.identifiantSelect) {
+            console.error('Éléments identifiant introuvables');
+            return;
+        }
 
         try {
             let endpoint = '';
+            let placeholderText = 'Identifiant';
             
-            if (selectedAskType === 'ajout' && (selectedRole === 'collaborator' || selectedRole === 'manager')) {
-                endpoint = CONFIG.ENDPOINTS.AVAILABLE_SELLERS;
-            } else if (selectedAskType === 'modification') {
-                endpoint = CONFIG.ENDPOINTS.USER_LOGINS;
+            // Déterminer l'endpoint selon le type de demande
+            switch(selectedAskType) {
+                case 'suppression':
+                case 'modification':
+                    endpoint = CONFIG.ENDPOINTS.USER_LOGINS;
+                    placeholderText = 'Identifiant';
+                    break;
+                    
+                case 'ajout':
+                    if (selectedRole === 'collaborator' || selectedRole === 'manager') {
+                        endpoint = CONFIG.ENDPOINTS.AVAILABLE_SELLERS;
+                        placeholderText = 'Vendeur';
+                    } else {
+                        // Pour admin/supermanager, on utilise un champ libre
+                        this.resetIdentifiantField();
+                        return;
+                    }
+                    break;
+                    
+                default:
+                    this.resetIdentifiantField();
+                    return;
             }
             
             if (endpoint) {
@@ -452,9 +509,7 @@ const uiManager = {
                 const data = await response.json();
                 
                 elements.identifiantSelect.innerHTML = `
-                    <option value="" selected disabled hidden>
-                        ${endpoint.includes('sellers') ? 'Vendeur' : 'Identifiant'}
-                    </option>
+                    <option value="" selected disabled hidden>${placeholderText}</option>
                     ${data.map(item => `
                         <option value="${typeof item === 'object' ? item.sellerRef : item}">
                             ${typeof item === 'object' ? item.sellerRef : item}
@@ -465,12 +520,12 @@ const uiManager = {
                 elements.identifiantInput.style.display = 'none';
                 elements.identifiantSelect.style.display = 'block';
             } else {
-                elements.identifiantSelect.style.display = 'none';
-                elements.identifiantInput.style.display = 'block';
+                this.resetIdentifiantField();
             }
         } catch (error) {
             console.error('Erreur lors de la mise à jour du champ identifiant:', error);
             alert('Erreur lors de la récupération des données');
+            this.resetIdentifiantField();
         }
     }
 };
@@ -503,22 +558,53 @@ const accountsController = {
         }
         
         if (elements.askSelect) {
-            elements.askSelect.addEventListener('change', this.handleFieldUpdate.bind(this));
+            elements.askSelect.addEventListener('change', this.handleAskTypeChange.bind(this));
         }
     },
 
     /**
-     * Gère la mise à jour des champs du formulaire
+     * Gère spécifiquement le changement de type de demande
+     */
+    async handleAskTypeChange() {
+        const selectedAskType = elements.askSelect?.value;
+        
+        if (!selectedAskType) return;
+        
+        // Mise à jour de la visibilité des champs
+        uiManager.toggleFieldsVisibility(selectedAskType);
+        
+        // Gestion spécifique selon le type de demande
+        switch(selectedAskType) {
+            case 'suppression':
+                await uiManager.updateIdentifiantField(null, 'suppression');
+                break;
+                
+            case 'modification':
+                await uiManager.updateIdentifiantField(null, 'modification');
+                break;
+                
+            case 'ajout':
+                // Pour l'ajout, on attend que le rôle soit sélectionné
+                const selectedRole = elements.roleSelect?.value;
+                if (selectedRole) {
+                    await uiManager.updateIdentifiantField(selectedRole, 'ajout');
+                } else {
+                    // Réinitialiser le champ identifiant
+                    uiManager.resetIdentifiantField();
+                }
+                break;
+        }
+    },
+
+    /**
+     * Gère la mise à jour des champs du formulaire (pour le rôle)
      */
     async handleFieldUpdate() {
         const selectedRole = elements.roleSelect?.value;
         const selectedAskType = elements.askSelect?.value;
         
-        if (selectedAskType) {
-            uiManager.toggleFieldsVisibility(selectedAskType);
-        }
-        
-        if (selectedRole && selectedAskType) {
+        // Si c'est un ajout et qu'on a maintenant un rôle
+        if (selectedAskType === 'ajout' && selectedRole) {
             await uiManager.updateIdentifiantField(selectedRole, selectedAskType);
         }
     },
