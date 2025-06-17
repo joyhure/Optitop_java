@@ -1,3 +1,13 @@
+/// Service de gestion des comptes utilisateurs
+/// 
+/// Service responsable des opérations liées aux comptes :
+/// - Récupération des demandes de comptes en cours
+/// - Validation et rejet des demandes (admin)
+/// - Gestion de la liste des utilisateurs
+/// - Récupération des vendeurs disponibles
+/// 
+library;
+
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:optitop_mobile/config/constants.dart';
@@ -5,7 +15,13 @@ import 'package:optitop_mobile/models/account_request.dart';
 import 'package:optitop_mobile/models/user.dart';
 
 class AccountsService {
-  // Récupérer les demandes en cours (tous les utilisateurs)
+  
+  // ===== GESTION DES DEMANDES =====
+  
+  /// Récupère les demandes de comptes en cours
+  /// 
+  /// @param userId ID de l'utilisateur pour l'authentification
+  /// @return Liste des demandes en attente de validation
   Future<List<AccountRequest>> getPendingAccounts(int userId) async {
     try {
       final response = await http.get(
@@ -27,7 +43,10 @@ class AccountsService {
     }
   }
 
-  // Valider une demande (admin uniquement)
+  /// Valide une demande de compte (admin uniquement)
+  /// 
+  /// @param accountId ID de la demande à valider
+  /// @param validatorId ID de l'administrateur validant
   Future<void> validateAccount(int accountId, int validatorId) async {
     try {
       final response = await http.post(
@@ -46,7 +65,10 @@ class AccountsService {
     }
   }
 
-  // Rejeter une demande (admin uniquement)
+  /// Rejette une demande de compte (admin uniquement)
+  /// 
+  /// @param accountId ID de la demande à rejeter
+  /// @param validatorId ID de l'administrateur rejetant
   Future<void> rejectAccount(int accountId, int validatorId) async {
     try {
       final response = await http.post(
@@ -65,7 +87,12 @@ class AccountsService {
     }
   }
 
-  // Récupérer tous les comptes utilisateurs (admin uniquement)
+  // ===== GESTION DES UTILISATEURS =====
+  
+  /// Récupère tous les comptes utilisateurs (admin uniquement)
+  /// 
+  /// @param userId ID de l'utilisateur pour l'authentification
+  /// @return Liste de tous les utilisateurs du système
   Future<List<User>> getAllUsers(int userId) async {
     final response = await http.get(
       Uri.parse('${AppConstants.apiBaseUrl}/users/all'),
@@ -74,6 +101,7 @@ class AccountsService {
         'Authorization': 'Bearer $userId',
       },
     );
+    
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
       return data.map((json) => User.fromJson(json)).toList();
@@ -82,6 +110,12 @@ class AccountsService {
     }
   }
 
+  // ===== GESTION DES VENDEURS =====
+  
+  /// Récupère la liste des vendeurs disponibles
+  /// 
+  /// @param userId ID de l'utilisateur pour l'authentification
+  /// @return Liste des vendeurs disponibles pour création de compte
   Future<List<Map<String, String>>> getAvailableSellers(int userId) async {
     final response = await http.get(
       Uri.parse('${AppConstants.apiBaseUrl}/sellers/available-sellers'),
@@ -90,6 +124,7 @@ class AccountsService {
         'Authorization': 'Bearer $userId',
       },
     );
+    
     if (response.statusCode == 200) {
       final List<dynamic> data = json.decode(utf8.decode(response.bodyBytes));
       return data.map((seller) => {

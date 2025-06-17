@@ -1,16 +1,40 @@
+/// Service de gestion des notifications
+/// 
+/// Service responsable de la gestion des notifications :
+// Diffusion des notifications de nouvelles demandes
+// Affichage des pop-ups de notification aux admins
+// Gestion du stream d'événements temps réel
+/// 
+library;
+
 import 'dart:async';
 import 'package:flutter/material.dart';
 import '../models/account_request.dart';
 
 class NotificationService with ChangeNotifier {
+  
+  // ===== STREAM CONTROLLER =====
+  
+  /// Contrôleur de stream pour diffuser les nouvelles demandes
   final StreamController<AccountRequest> _requestController = StreamController<AccountRequest>.broadcast();
+  
+  /// Stream des nouvelles demandes de compte
   Stream<AccountRequest> get requestStream => _requestController.stream;
   
+  // ===== GESTION DES NOTIFICATIONS =====
+  
+  /// Notifie une nouvelle demande de compte
+  /// 
+  /// @param request Demande de compte à notifier
   void notifyNewRequest(AccountRequest request) {
     _requestController.add(request);
     notifyListeners();
   }
   
+  /// Affiche une notification pop-up pour une nouvelle demande
+  /// 
+  /// @param context Contexte Flutter pour l'affichage
+  /// @param request Demande de compte à afficher
   void showNewRequestNotification(BuildContext context, AccountRequest request) {
     if (!context.mounted) return;
     
@@ -73,6 +97,8 @@ class NotificationService with ChangeNotifier {
     );
   }
 
+  // ===== NETTOYAGE =====
+  
   @override
   void dispose() {
     _requestController.close();

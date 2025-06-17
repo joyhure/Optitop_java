@@ -1,11 +1,33 @@
+/// Configuration du thème de l'application mobile Optitop
+/// 
+/// Définit les couleurs, styles et thèmes visuels :
+/// - Couleurs personnalisées de l'identité visuelle
+/// - Style de l'AppBar et de la navigation
+/// - Thème des boutons et champs de saisie
+/// - Configuration typographique
+/// 
+/// @author Joy Huré
+/// @version 1.0
+library;
+
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  // Définition des couleurs personnalisées
-  static const primaryColor = Color(0xFF2196F3);    // Bleu principal
-  static const secondaryColor = Color(0xFF1976D2);  // Bleu foncé
-  static const accentColor = Color(0xFF64B5F6);     // Bleu clair
+  
+  // ===== COULEURS PERSONNALISÉES =====
+  
+  /// Couleur principale - Bleu Optitop
+  static const primaryColor = Color(0xFF2196F3);
+  
+  /// Couleur secondaire - Bleu foncé
+  static const secondaryColor = Color(0xFF1976D2);
+  
+  /// Couleur d'accent - Bleu clair
+  static const accentColor = Color(0xFF64B5F6);
 
+  // ===== THÈME PRINCIPAL =====
+  
+  /// Configuration du thème clair de l'application
   static final ThemeData lightTheme = ThemeData(
     primarySwatch: Colors.blue,
     scaffoldBackgroundColor: Colors.grey[50],
@@ -14,8 +36,8 @@ class AppTheme {
     appBarTheme: const AppBarTheme(
       backgroundColor: primaryColor,
       foregroundColor: Colors.white,
-      elevation: 2,  // Ombre légère
-      centerTitle: true,  // Centre le titre
+      elevation: 2,
+      centerTitle: true,
       titleTextStyle: TextStyle(
         fontSize: 20,
         fontWeight: FontWeight.w600,
@@ -31,7 +53,7 @@ class AppTheme {
       ),
     ),
 
-    // Style des boutons
+    // Style des boutons élevés
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         backgroundColor: primaryColor,
@@ -44,7 +66,7 @@ class AppTheme {
       ),
     ),
 
-    // Style des champs de texte
+    // Style des champs de saisie
     inputDecorationTheme: InputDecorationTheme(
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
@@ -59,7 +81,7 @@ class AppTheme {
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
     ),
 
-    // Style des textes
+    // Configuration typographique
     textTheme: const TextTheme(
       titleLarge: TextStyle(
         fontSize: 22,

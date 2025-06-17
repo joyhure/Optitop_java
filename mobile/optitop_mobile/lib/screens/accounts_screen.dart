@@ -1,3 +1,13 @@
+/// Écran de gestion des comptes utilisateurs
+/// 
+/// Interface principale pour la gestion des comptes :
+/// - Création de nouvelles demandes de comptes
+/// - Validation/rejet des demandes en cours (admin)
+/// - Consultation de la liste des utilisateurs (admin)
+/// - Notifications en temps réel des nouvelles demandes
+/// 
+library;
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
@@ -18,11 +28,16 @@ class AccountsScreen extends StatefulWidget {
 }
 
 class _AccountsScreenState extends State<AccountsScreen> {
+  
+  // ===== ÉTAT DU COMPOSANT =====
+  
   late Future<List<AccountRequest>> _pendingAccountsFuture;
   late Future<List<User>> _usersFuture;
   bool _isUserListExpanded = false;
   StreamSubscription<AccountRequest>? _notificationSubscription;
 
+  // ===== CYCLE DE VIE =====
+  
   @override
   void initState() {
     super.initState();
@@ -30,6 +45,14 @@ class _AccountsScreenState extends State<AccountsScreen> {
     _setupNotificationListener();
   }
 
+  @override
+  void dispose() {
+    _notificationSubscription?.cancel();
+    super.dispose();
+  }
+
+  // ===== MÉTHODES D'INITIALISATION =====
+  
   void _initializeData() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
@@ -48,10 +71,8 @@ class _AccountsScreenState extends State<AccountsScreen> {
       final auth = context.read<AuthService>();
       final notificationService = context.read<NotificationService>();
       
-      // Stocker la référence au début
       if (auth.currentUser?.role == 'admin') {
         _notificationSubscription = notificationService.requestStream.listen((request) {
-          // Vérifier si le widget est toujours monté avant d'utiliser context
           if (mounted) {
             notificationService.showNewRequestNotification(context, request);
             _refresh();
@@ -61,6 +82,8 @@ class _AccountsScreenState extends State<AccountsScreen> {
     });
   }
 
+  // ===== ACTIONS UTILISATEUR =====
+  
   void _refresh() {
     setState(() {
       final userId = context.read<AuthService>().currentUser?.id ?? 0;
@@ -110,6 +133,8 @@ class _AccountsScreenState extends State<AccountsScreen> {
     }
   }
 
+  // ===== INTERFACE UTILISATEUR =====
+  
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthService>();
@@ -125,7 +150,6 @@ class _AccountsScreenState extends State<AccountsScreen> {
             Image.asset(
               'assets/images/logo_optitop.png',
               height: 40,
-              // Ajouter errorBuilder pour gérer les erreurs de chargement
               errorBuilder: (context, error, stackTrace) {
                 return const Icon(Icons.store, size: 32);  
               },
@@ -165,7 +189,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
               ),
             ),
 
-            // 1. Bouton nouvelle demande
+            // Bouton nouvelle demande
             ElevatedButton.icon(
               icon: const Icon(Icons.add),
               label: const Text('Nouvelle demande'),
@@ -178,7 +202,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
             ),
             const SizedBox(height: 24),
 
-            // 2. Liste des demandes en cours
+            // Liste des demandes en cours
             Text('Demandes en cours', style: Theme.of(context).textTheme.titleMedium),
             FutureBuilder<List<AccountRequest>>(
               future: _pendingAccountsFuture,
@@ -203,8 +227,7 @@ class _AccountsScreenState extends State<AccountsScreen> {
                     return ListTile(
                       title: Text('${demande.firstname} ${demande.lastname} (${demande.requestType})'),
                       subtitle: Text('${demande.login} - ${demande.role}'),
-                      // Affiche les boutons uniquement pour les admins
-                      trailing: isAdmin // Maintenant cela ne s'applique qu'aux vrais admins
+                      trailing: isAdmin
                         ? Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
@@ -232,8 +255,8 @@ class _AccountsScreenState extends State<AccountsScreen> {
             ),
             const SizedBox(height: 24),
 
-            // 3. Liste des comptes utilisateurs (admin uniquement)
-            if (isAdmin) ...[  // Ne s'affiche que pour les vrais admins
+            // Liste des comptes utilisateurs (admin uniquement)
+            if (isAdmin) ...[
               ExpansionTile(
                 title: Text(
                   'Comptes utilisateurs', 
@@ -283,13 +306,9 @@ class _AccountsScreenState extends State<AccountsScreen> {
       ),
     );
   }
-
-  @override
-  void dispose() {
-    _notificationSubscription?.cancel();
-    super.dispose();
-  }
 }
+
+// ===== DIALOGUE DE NOUVELLE DEMANDE =====
 
 class _NewAccountRequestDialog extends StatefulWidget {
   const _NewAccountRequestDialog();
@@ -299,6 +318,9 @@ class _NewAccountRequestDialog extends StatefulWidget {
 }
 
 class _NewAccountRequestDialogState extends State<_NewAccountRequestDialog> {
+  
+  // ===== ÉTAT DU FORMULAIRE =====
+  
   final _formKey = GlobalKey<FormState>();
   String _requestType = 'ajout';
   String? _role;
@@ -313,32 +335,33 @@ class _NewAccountRequestDialogState extends State<_NewAccountRequestDialog> {
   bool _hasChanges = false;
   Map<String, dynamic> _originalValues = {};
 
+  // ===== CYCLE DE VIE =====
+  
   @override
   void initState() {
     super.initState();
     _loadAvailableLoginsOrSellers();
   }
 
+  // ===== CHARGEMENT DES DONNÉES =====
+  
   Future<void> _loadAvailableLoginsOrSellers() async {
     try {
       final userId = context.read<AuthService>().currentUser?.id ?? 0;
       
-      // Récupérer d'abord toutes les demandes en cours
       final pendingRequests = await AccountsService().getPendingAccounts(userId);
       final pendingLogins = pendingRequests.map((req) => req.login).toSet();
       
       if (_requestType == 'suppression' || _requestType == 'modification') {
-        // Charge tous les utilisateurs et filtre ceux qui ont des demandes en cours
         final users = await AccountsService().getAllUsers(userId);
         setState(() {
           _availableLogins = users
               .map((user) => user.login)
-              .where((login) => !pendingLogins.contains(login)) // Filtrage ici
+              .where((login) => !pendingLogins.contains(login))
               .toList();
           _login = null;
         });
       } else if (_requestType == 'ajout' && (_role == 'collaborator' || _role == 'manager')) {
-        // Pour ajout de collaborator/manager, charge et filtre les vendeurs disponibles
         final sellers = await AccountsService().getAvailableSellers(userId);
         setState(() {
           _availableSellers = sellers
@@ -383,6 +406,8 @@ class _NewAccountRequestDialogState extends State<_NewAccountRequestDialog> {
     }
   }
 
+  // ===== VALIDATION =====
+  
   void _checkChanges() {
     setState(() {
       _hasChanges = false;
@@ -393,6 +418,8 @@ class _NewAccountRequestDialogState extends State<_NewAccountRequestDialog> {
     });
   }
 
+  // ===== SOUMISSION DU FORMULAIRE =====
+  
   Future<void> _submitForm() async {
     if (!_formKey.currentState!.validate()) return;
     _formKey.currentState!.save();
@@ -404,7 +431,6 @@ class _NewAccountRequestDialogState extends State<_NewAccountRequestDialog> {
       final notificationService = context.read<NotificationService>();
       final accountsService = AccountsService();
 
-      // Prépare toutes les données du formulaire
       Map<String, dynamic> formData = {
         'requestType': _requestType,
         'login': _login,
@@ -415,7 +441,6 @@ class _NewAccountRequestDialogState extends State<_NewAccountRequestDialog> {
         'createdByLogin': currentUser.login
       };
 
-      // Retire les champs null pour une demande de suppression
       if (_requestType == 'suppression') {
         formData.removeWhere((key, value) => 
           !['requestType', 'login', 'createdByLogin'].contains(key));
@@ -433,12 +458,10 @@ class _NewAccountRequestDialogState extends State<_NewAccountRequestDialog> {
       if (!mounted) return;
 
       if (response.statusCode == 201) {
-        // Récupération des demandes en cours
         final pendingAccounts = await accountsService.getPendingAccounts(currentUser.id);
         
         if (!mounted) return;
 
-        // Trie et trouve la nouvelle demande
         pendingAccounts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
         final newRequest = pendingAccounts.firstWhere(
           (req) => req.login == _login && req.requestType == _requestType,
@@ -456,12 +479,10 @@ class _NewAccountRequestDialogState extends State<_NewAccountRequestDialog> {
             )
         );
 
-        // Envoie la notification
         notificationService.notifyNewRequest(newRequest);
 
         if (!mounted) return;
         
-        // Navigation et feedback
         Navigator.of(context).pop(true);
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Demande envoyée avec succès')),
@@ -481,9 +502,10 @@ class _NewAccountRequestDialogState extends State<_NewAccountRequestDialog> {
     }
   }
 
+  // ===== CONSTRUCTION DES WIDGETS =====
+  
   Widget _buildLoginField() {
     if (_requestType == 'suppression' || _requestType == 'modification') {
-      // Pour suppression et modification, affiche la liste des logins existants
       return DropdownButtonFormField<String>(
         value: _login,
         decoration: const InputDecoration(
@@ -498,7 +520,6 @@ class _NewAccountRequestDialogState extends State<_NewAccountRequestDialog> {
         validator: (value) => value == null ? 'Champ requis' : null,
       );
     } else if (_requestType == 'ajout' && (_role == 'collaborator' || _role == 'manager')) {
-      // Pour ajout de collaborator/manager, affiche les vendeurs disponibles
       return DropdownButtonFormField<String>(
         value: _login,
         decoration: const InputDecoration(
@@ -513,7 +534,6 @@ class _NewAccountRequestDialogState extends State<_NewAccountRequestDialog> {
         validator: (value) => value == null ? 'Champ requis' : null,
       );
     } else {
-      // Pour autres cas (ajout admin/supermanager), champ texte libre
       return TextFormField(
         decoration: const InputDecoration(
           labelText: 'Login',
@@ -558,9 +578,9 @@ class _NewAccountRequestDialogState extends State<_NewAccountRequestDialog> {
                 onChanged: (value) {
                   setState(() {
                     _requestType = value!;
-                    _login = null; // Reset login
+                    _login = null;
                   });
-                  _loadAvailableLoginsOrSellers(); // Recharge les options selon le type
+                  _loadAvailableLoginsOrSellers();
                 },
               ),
               const SizedBox(height: 16),
@@ -670,14 +690,13 @@ class _NewAccountRequestDialogState extends State<_NewAccountRequestDialog> {
                     DropdownMenuItem(value: 'manager', child: Text('Manager')),
                     DropdownMenuItem(value: 'supermanager', child: Text('SuperManager')),
                     DropdownMenuItem(value: 'admin', child: Text('Admin')),
-                    
                   ],
                   onChanged: (value) {
                     setState(() {
                       _role = value;
-                      _login = null; // Reset login when role changes
+                      _login = null;
                     });
-                    _loadAvailableLoginsOrSellers(); // Reload login options based on role
+                    _loadAvailableLoginsOrSellers();
                   },
                   validator: (value) => _requestType == 'ajout' && value == null
                       ? 'Champ requis'
@@ -685,7 +704,7 @@ class _NewAccountRequestDialogState extends State<_NewAccountRequestDialog> {
                 ),
 
                 const SizedBox(height: 16),
-              _buildLoginField(),
+                _buildLoginField(),
 
                 const SizedBox(height: 16),
                 TextFormField(

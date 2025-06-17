@@ -1,3 +1,13 @@
+/// Service d'authentification de l'application Optitop
+/// 
+/// Service responsable de la gestion de l'authentification :
+/// - Connexion et déconnexion des utilisateurs
+/// - Persistance sécurisée des données utilisateur
+/// - Vérification des rôles et permissions
+/// - Gestion de l'état d'authentification
+/// 
+library;
+
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
@@ -6,13 +16,33 @@ import 'package:optitop_mobile/config/constants.dart';
 import 'package:optitop_mobile/models/user.dart';
 
 class AuthService extends ChangeNotifier {
+  
+  // ===== PROPRIÉTÉS PRIVÉES =====
+  
+  /// Utilisateur actuellement connecté
   User? _currentUser;
+  
+  /// Instance de stockage sécurisé pour la persistance
   final _storage = const FlutterSecureStorage();
   
+  // ===== GETTERS PUBLICS =====
+  
+  /// Utilisateur actuellement connecté
   User? get currentUser => _currentUser;
+  
+  /// Indique si un utilisateur est authentifié
   bool get isAuthenticated => _currentUser != null;
+  
+  /// Indique si l'utilisateur connecté a des privilèges admin
   bool get isAdmin => _currentUser?.role == 'admin' || _currentUser?.role == 'supermanager';
 
+  // ===== MÉTHODES D'AUTHENTIFICATION =====
+  
+  /// Connecte un utilisateur avec ses identifiants
+  /// 
+  /// @param login Identifiant de connexion
+  /// @param password Mot de passe
+  /// @throws Exception si les identifiants sont incorrects ou rôle insuffisant
   Future<void> login(String login, String password) async {
     try {
       final url = '${AppConstants.apiBaseUrl}/auth/login';
@@ -48,6 +78,12 @@ class AuthService extends ChangeNotifier {
     }
   }
 
+  /// Déconnecte l'utilisateur actuel
+  /// 
+  /// Effectue la déconnexion côté serveur puis nettoie les données locales.
+  /// En cas d'erreur serveur, nettoie quand même les données locales.
+  /// 
+  /// @throws Exception si erreur lors de la déconnexion
   Future<void> logout() async {
     try {
       // Appel à l'API pour la déconnexion
@@ -76,6 +112,12 @@ class AuthService extends ChangeNotifier {
     }
   }
 
+  // ===== GESTION DE LA PERSISTANCE =====
+  
+  /// Charge les données utilisateur depuis le stockage sécurisé
+  /// 
+  /// Utilisé au démarrage de l'application pour restaurer la session.
+  /// Supprime les données corrompues si elles ne peuvent être lues.
   Future<void> loadUserFromStorage() async {
     final userStr = await _storage.read(key: 'user');
     if (userStr != null) {
