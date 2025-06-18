@@ -6,8 +6,6 @@
 /// - Thème des boutons et champs de saisie
 /// - Configuration typographique
 /// 
-/// @author Joy Huré
-/// @version 1.0
 library;
 
 import 'package:flutter/material.dart';
