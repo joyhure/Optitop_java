@@ -1,0 +1,76 @@
+<mxfile host="65bd71144e">
+    <diagram name="Page-1" id="nLIQc75Nu-cG2wSetFgc">
+        <mxGraphModel dx="761" dy="499" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="WM9edJ3_Z5W__3I9J4iQ-1" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+                    <mxGeometry x="70" y="30" width="260" height="270" as="geometry"/>
+                </mxCell>
+                <mxCell id="WM9edJ3_Z5W__3I9J4iQ-3" value="Web" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+                    <mxGeometry x="170" y="30" width="60" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="WM9edJ3_Z5W__3I9J4iQ-4" value="Front" style="swimlane;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="70" y="70" width="130" height="230" as="geometry"/>
+                </mxCell>
+                <mxCell id="WM9edJ3_Z5W__3I9J4iQ-5" value="Back" style="swimlane;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="200" y="70" width="130" height="230" as="geometry"/>
+                </mxCell>
+                <mxCell id="WM9edJ3_Z5W__3I9J4iQ-8" value="&lt;div&gt;- Création Page Profil Client sur le modèle de l&#39;existant&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
+                    <mxGeometry x="80" y="90" width="120" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="WM9edJ3_Z5W__3I9J4iQ-9" value="&lt;div&gt;-&lt;/div&gt;&lt;div&gt;-&lt;/div&gt;&lt;div&gt;-&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
+                    <mxGeometry x="200" y="90" width="120" height="200" as="geometry"/>
+                </mxCell>
+                <mxCell id="WM9edJ3_Z5W__3I9J4iQ-18" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
+                    <mxGeometry x="380" y="360" width="170" height="270" as="geometry"/>
+                </mxCell>
+                <mxCell id="WM9edJ3_Z5W__3I9J4iQ-19" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+                    <mxGeometry x="640" y="360" width="170" height="270" as="geometry"/>
+                </mxCell>
+                <mxCell id="WM9edJ3_Z5W__3I9J4iQ-20" value="API" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+                    <mxGeometry x="435" y="360" width="60" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="WM9edJ3_Z5W__3I9J4iQ-21" value="BDD" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+                    <mxGeometry x="695" y="360" width="60" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="WM9edJ3_Z5W__3I9J4iQ-25" value="" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="380" y="400" width="170" height="230" as="geometry"/>
+                </mxCell>
+                <mxCell id="WM9edJ3_Z5W__3I9J4iQ-26" value="" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="640" y="400" width="170" height="230" as="geometry"/>
+                </mxCell>
+                <mxCell id="WM9edJ3_Z5W__3I9J4iQ-27" value="1) Ajouter entité / Model&amp;nbsp;&amp;nbsp;&lt;br&gt;2)Ajouter Repository&lt;div&gt;&lt;font color=&quot;#000000&quot;&gt;3)Ajouter Controller&lt;br&gt;&lt;/font&gt;5) Test !!! Postman !!&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
+                    <mxGeometry x="380" y="400" width="170" height="230" as="geometry"/>
+                </mxCell>
+                <mxCell id="WM9edJ3_Z5W__3I9J4iQ-28" value="1) Ajout de la table client_profiles&lt;br&gt;2) Création jointure sur la table invoices&amp;nbsp;&amp;nbsp;&lt;br&gt;3) Alimentation avec des données de tests ? Mais comment ?&lt;div&gt;&lt;br/&gt;&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
+                    <mxGeometry x="640" y="400" width="170" height="230" as="geometry"/>
+                </mxCell>
+                <mxCell id="WM9edJ3_Z5W__3I9J4iQ-32" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="WM9edJ3_Z5W__3I9J4iQ-27" target="WM9edJ3_Z5W__3I9J4iQ-28" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="580" y="490" as="sourcePoint"/>
+                        <mxPoint x="720" y="490" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="WM9edJ3_Z5W__3I9J4iQ-33" value="" style="endArrow=classic;html=1;rounded=0;exitX=1;exitY=1;exitDx=0;exitDy=0;entryX=-0.011;entryY=0.437;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="WM9edJ3_Z5W__3I9J4iQ-4" target="WM9edJ3_Z5W__3I9J4iQ-27" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="280" y="370" as="sourcePoint"/>
+                        <mxPoint x="420" y="370" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="8" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" parent="1" vertex="1">
+                    <mxGeometry x="435" y="30" width="170" height="270" as="geometry"/>
+                </mxCell>
+                <mxCell id="9" value="Git" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+                    <mxGeometry x="490" y="30" width="60" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="10" value="" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="435" y="70" width="170" height="230" as="geometry"/>
+                </mxCell>
+                <mxCell id="11" value="1)nouvelle branche feat-clients_profiles&lt;div&gt;2)commits reguliers&lt;/div&gt;&lt;div&gt;3) Merge à la fin sur dev et main&lt;/div&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" parent="1" vertex="1">
+                    <mxGeometry x="435" y="70" width="170" height="230" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
