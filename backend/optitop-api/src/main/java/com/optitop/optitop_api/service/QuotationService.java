@@ -87,7 +87,7 @@ public class QuotationService {
             try {
                 updateSingleQuotation(update);
             } catch (Exception e) {
-                String errorMsg = String.format("Erreur lors de la mise à jour du devis %d", update.getId());
+                String errorMsg = "Erreur lors de la mise à jour du devis %d".formatted(update.getId());
                 logger.error(errorMsg, e);
                 throw new RuntimeException(errorMsg, e);
             }

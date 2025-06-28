@@ -104,7 +104,7 @@ public class SalesController {
     })
     @PostMapping(value = "/import", consumes = "multipart/form-data")
     public ResponseEntity<?> importSales(
-            @Parameter(description = "Fichier CSV à importer (encodage UTF-8)", required = true, schema = @Schema(type = "string", format = "binary")) @RequestParam("file") MultipartFile file) {
+            @Parameter(description = "Fichier CSV à importer (encodage UTF-8)", required = true, schema = @Schema(type = "string", format = "binary")) @RequestParam MultipartFile file) {
 
         try {
             // Début du traitement avec logging

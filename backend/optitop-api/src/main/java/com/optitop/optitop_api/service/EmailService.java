@@ -42,7 +42,7 @@ public class EmailService {
         message.setFrom(config.getSmtpUsername());
         message.setTo(to);
         message.setSubject("Vos identifiants Optitop");
-        message.setText(String.format("""
+        message.setText("""
                 Bonjour,
 
                 Votre compte Optitop a été créé avec succès.
@@ -55,7 +55,7 @@ public class EmailService {
 
                 Cordialement,
                 L'équipe Optitop
-                """, login, password));
+                """.formatted(login, password));
 
         JavaMailSender sender = createMailSender();
         sender.send(message);
