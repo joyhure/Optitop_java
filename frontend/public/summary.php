@@ -90,11 +90,11 @@ if (!isset($_SESSION['user']) ||
                         </tr>
                         <tr>
                             <th class="text-center" colspan="2">
-                                <h5 id="period-dates" class="text-secondary">A définir</h5>
+                                <h5 id="period-dates" class="text-secondary">Chargement...</h5>
                             </th>
                             <th class="bg-secondary-subtle"></th>
                             <th class="text-center" colspan="2">
-                                <h5 id="last-update" class="text-secondary">Inconnue</h5>
+                                <h5 id="last-update" class="text-secondary">Chargement...</h5>
                             </th>
                         </tr>
                         <tr>

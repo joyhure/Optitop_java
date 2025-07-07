@@ -67,12 +67,24 @@ const updateLastUpdateDate = async () => {
         if (response.ok) {
             const lastUpdate = await response.text();
             const formattedDate = formatDate(lastUpdate);
-            const updateElement = document.querySelector('#lastUpdate');
-            if (updateElement) {
-                updateElement.textContent = `Mis à jour le ${formattedDate}`;
-            }
+            
+            // Mise à jour de tous les éléments de dernière mise à jour
+            const updateElements = document.querySelectorAll('#lastUpdate, #last-update');
+            updateElements.forEach(element => {
+                if (element) {
+                    element.textContent = `Mis à jour le ${formattedDate}`;
+                }
+            });
         }
     } catch (error) {
         console.error('Erreur lors de la récupération de la date de mise à jour:', error);
+        
+        // En cas d'erreur, afficher un message par défaut
+        const updateElements = document.querySelectorAll('#lastUpdate, #last-update');
+        updateElements.forEach(element => {
+            if (element) {
+                element.textContent = 'Mise à jour indisponible';
+            }
+        });
     }
 };
