@@ -1,6 +1,7 @@
 @startuml Diagramme_Classes_Optitop
+allowmixing
 
-!theme plain
+
 skinparam classAttributeIconSize 0
 skinparam classFontSize 10
 skinparam backgroundColor #FFFFFF
@@ -512,7 +513,7 @@ class PendingAccountRepository
 class EmailConfigRepository
 
 ' ===== BASE DE DONNÉES =====
-database "MySQL Database" as DB
+class DB
 
 ' ===== RELATIONS ENTRE ENTITÉS =====
 User ||--o| Seller : "1:1 optionnel"
