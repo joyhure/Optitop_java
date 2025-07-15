@@ -1,0 +1,581 @@
+@startuml Diagramme_Classes_Optitop
+
+!theme plain
+skinparam classAttributeIconSize 0
+skinparam classFontSize 10
+skinparam backgroundColor #FFFFFF
+skinparam classBackgroundColor #F8F9FA
+skinparam classBorderColor #6C757D
+skinparam arrowColor #495057
+
+title Diagramme de Classes - Système Optitop
+
+' ===== ENTITÉS PRINCIPALES =====
+class User {
+    -Integer id
+    -String lastname
+    -String firstname
+    -String email
+    -String login
+    -String password
+    -Role role
+    -LocalDateTime createdAt
+    --
+    +Role enum: admin, collaborator, manager, supermanager
+    +getId() Integer
+    +setLastname(String)
+    +getFirstname() String
+    +setFirstname(String)
+    +getEmail() String
+    +setEmail(String)
+    +getLogin() String
+    +setLogin(String)
+    +getPassword() String
+    +setPassword(String)
+    +getRole() Role
+    +setRole(Role)
+    +getCreatedAt() LocalDateTime
+}
+
+class Seller {
+    -Integer id
+    -String sellerRef
+    -LocalDateTime createdAt
+    -User user
+    --
+    +getId() Integer
+    +setId(Integer)
+    +getSellerRef() String
+    +setSellerRef(String)
+    +getCreatedAt() LocalDateTime
+    +setCreatedAt(LocalDateTime)
+    +getUser() User
+    +setUser(User)
+}
+
+class Invoices {
+    -Long id
+    -LocalDate date
+    -String clientId
+    -String client
+    -String invoiceRef
+    -Seller seller
+    -Double totalInvoice
+    -String status
+    -Boolean isOptical
+    -LocalDateTime createdAt
+    --
+    +getId() Long
+    +setId(Long)
+    +getDate() LocalDate
+    +setDate(LocalDate)
+    +getClientId() String
+    +setClientId(String)
+    +getClient() String
+    +setClient(String)
+    +getInvoiceRef() String
+    +setInvoiceRef(String)
+    +getSeller() Seller
+    +setSeller(Seller)
+    +getTotalInvoice() Double
+    +setTotalInvoice(Double)
+    +getStatus() String
+    +setStatus(String)
+    +getIsOptical() Boolean
+    +setIsOptical(Boolean)
+    +getCreatedAt() LocalDateTime
+    +setCreatedAt(LocalDateTime)
+}
+
+class InvoicesLines {
+    -Long id
+    -LocalDate date
+    -String clientId
+    -String client
+    -String invoiceRef
+    -String family
+    -Integer quantity
+    -Double totalTtc
+    -Integer pair
+    -Seller seller
+    -Double totalInvoice
+    -String status
+    -LocalDateTime createdAt
+    --
+    +getId() Long
+    +setId(Long)
+    +getDate() LocalDate
+    +setDate(LocalDate)
+    +getClientId() String
+    +setClientId(String)
+    +getClient() String
+    +setClient(String)
+    +getInvoiceRef() String
+    +setInvoiceRef(String)
+    +getFamily() String
+    +setFamily(String)
+    +getQuantity() Integer
+    +setQuantity(Integer)
+    +getTotalTtc() Double
+    +setTotalTtc(Double)
+    +getPair() Integer
+    +setPair(Integer)
+    +getSeller() Seller
+    +setSeller(Seller)
+    +getTotalInvoice() Double
+    +setTotalInvoice(Double)
+    +getStatus() String
+    +setStatus(String)
+    +getCreatedAt() LocalDateTime
+    +setCreatedAt(LocalDateTime)
+}
+
+class Quotations {
+    -Long id
+    -LocalDate date
+    -String clientId
+    -String client
+    -Seller seller
+    -Boolean isValidated
+    -QuotationAction action
+    -String comment
+    -LocalDateTime createdAt
+    --
+    +QuotationAction enum: VOIR_OPTICIEN, NON_VALIDE, ATTENTE_MUTUELLE, A_RELANCER, ATTENTE_RETOUR
+    +getId() Long
+    +setId(Long)
+    +getDate() LocalDate
+    +setDate(LocalDate)
+    +getClientId() String
+    +setClientId(String)
+    +getClient() String
+    +setClient(String)
+    +getSeller() Seller
+    +setSeller(Seller)
+    +getIsValidated() Boolean
+    +setIsValidated(Boolean)
+    +getAction() QuotationAction
+    +setAction(QuotationAction)
+    +getComment() String
+    +setComment(String)
+    +getCreatedAt() LocalDateTime
+    +setCreatedAt(LocalDateTime)
+}
+
+class QuotationsLines {
+    -Long id
+    -LocalDate date
+    -String clientId
+    -String client
+    -String quotationRef
+    -String family
+    -Integer quantity
+    -Double totalTtc
+    -Double totalQuotation
+    -Integer pair
+    -String status
+    -Seller seller
+    -LocalDateTime createdAt
+    --
+    +getId() Long
+    +setId(Long)
+    +getDate() LocalDate
+    +setDate(LocalDate)
+    +getClientId() String
+    +setClientId(String)
+    +getClient() String
+    +setClient(String)
+    +getQuotationRef() String
+    +setQuotationRef(String)
+    +getFamily() String
+    +setFamily(String)
+    +getQuantity() Integer
+    +setQuantity(Integer)
+    +getTotalTtc() Double
+    +setTotalTtc(Double)
+    +getTotalQuotation() Double
+    +setTotalQuotation(Double)
+    +getPair() Integer
+    +setPair(Integer)
+    +getStatus() String
+    +setStatus(String)
+    +getSeller() Seller
+    +setSeller(Seller)
+    +getCreatedAt() LocalDateTime
+    +setCreatedAt(LocalDateTime)
+}
+
+class PendingAccount {
+    -Integer id
+    -String lastname
+    -String firstname
+    -String email
+    -String login
+    -Role role
+    -RequestType requestType
+    -User createdBy
+    -LocalDateTime createdAt
+    --
+    +RequestType enum: ajout, modification, suppression
+    +getId() Integer
+    +setId(Integer)
+    +getLastname() String
+    +setLastname(String)
+    +getFirstname() String
+    +setFirstname(String)
+    +getEmail() String
+    +setEmail(String)
+    +getLogin() String
+    +setLogin(String)
+    +getRole() Role
+    +setRole(Role)
+    +getRequestType() RequestType
+    +setRequestType(RequestType)
+    +getCreatedBy() User
+    +setCreatedBy(User)
+    +getCreatedAt() LocalDateTime
+    +setCreatedAt(LocalDateTime)
+}
+
+class EmailConfig {
+    -Integer id
+    -String smtpHost
+    -Integer smtpPort
+    -String smtpUsername
+    -String smtpPassword
+    --
+    +getSmtpHost() String
+    +setSmtpHost(String)
+    +getSmtpPort() Integer
+    +setSmtpPort(Integer)
+    +getSmtpUsername() String
+    +setSmtpUsername(String)
+    +getSmtpPassword() String
+    +setSmtpPassword(String)
+}
+
+' ===== DTOs =====
+class LoginRequestDTO {
+    -String login
+    -String password
+    --
+    +getLogin() String
+    +setLogin(String)
+    +getPassword() String
+    +setPassword(String)
+}
+
+class UserDisplayDTO {
+    -Integer id
+    -String login
+    -Role role
+    -String lastname
+    -String firstname
+    -String email
+    -LocalDateTime createdAt
+    --
+    +UserDisplayDTO(Integer, String, Role, String, String, String, LocalDateTime)
+    +getId() Integer
+    +getLogin() String
+    +getRole() Role
+    +getLastname() String
+    +getFirstname() String
+    +getEmail() String
+    +getCreatedAt() LocalDateTime
+}
+
+class PendingAccountDTO {
+    -String lastname
+    -String firstname
+    -String email
+    -String login
+    -Role role
+    -String requestType
+    --
+    +PendingAccountDTO(String, String, String, String, Role, String)
+    +getLastname() String
+    +setLastname(String)
+    +getFirstname() String
+    +setFirstname(String)
+    +getEmail() String
+    +setEmail(String)
+    +getLogin() String
+    +setLogin(String)
+    +getRole() Role
+    +setRole(Role)
+    +getRequestType() String
+    +setRequestType(String)
+}
+
+class QuotationDTO {
+    -Long id
+    -LocalDate date
+    -String seller
+    -String client
+    -String action
+    -String comment
+    --
+    +QuotationDTO(Long)
+    +getId() Long
+    +getDate() LocalDate
+    +setDate(LocalDate)
+    +getSeller() String
+    +setSeller(String)
+    +getClient() String
+    +setClient(String)
+    +getAction() String
+    +setAction(String)
+    +getComment() String
+    +setComment(String)
+}
+
+class AverageBasketDTO {
+    -String sellerRef
+    -Double totalAmount
+    -Long invoiceCount
+    -Double averageBasket
+    -Double averageP1MON
+    -Double averageP1VER
+    -Double averageP2
+    -Long p2Count
+    --
+    +AverageBasketDTO(String, Double, Long, Double, Long, Double, Long, Double, Long)
+    +getSellerRef() String
+    +getTotalAmount() Double
+    +getInvoiceCount() Long
+    +getAverageBasket() Double
+    +getAverageP1MON() Double
+    +getAverageP1VER() Double
+    +getAverageP2() Double
+    +getP2Count() Long
+}
+
+' ===== SERVICES =====
+class SalesService {
+    -InvoicesLinesRepository invoicesLinesRepository
+    -QuotationsLinesRepository quotationsLinesRepository
+    -InvoicesRepository invoicesRepository
+    -QuotationsRepository quotationsRepository
+    -SellerRepository sellerRepository
+    -UserRepository userRepository
+    --
+    +processBatch(List~String~) void
+    -prepareDataLines(List~String~) List~String~
+    -calculateDateRange(List~String~) LocalDate[]
+    -deleteExistingData(LocalDate, LocalDate) void
+    -processDataLines(List~String~) void
+    -createAggregatedEntities(LocalDate, LocalDate) void
+}
+
+class QuotationService {
+    -QuotationsRepository quotationsRepository
+    -SellerRepository sellerRepository
+    --
+    +batchUpdate(List~QuotationUpdateDTO~) void
+    -validateQuotationUpdate(QuotationUpdateDTO) void
+    -applyQuotationUpdate(QuotationUpdateDTO) void
+}
+
+class InvoiceService {
+    -InvoicesLinesRepository invoicesLinesRepository
+    -InvoicesRepository invoicesRepository
+    --
+    +getAverageBaskets(LocalDate, LocalDate) List~AverageBasketDTO~
+    +getFrameStats(LocalDate, LocalDate) List~FrameStatsDTO~
+    +getTotalStats(LocalDate, LocalDate) Map~String, Object~
+    +getYears() List~Integer~
+    +getMonthlyRevenue(Integer) Map~String, Double~
+    +getPeriodRevenue(LocalDate, LocalDate) Map~String, Object~
+    +getSellerStats(LocalDate, LocalDate) List~Map~String, Object~~
+}
+
+class PendingAccountService {
+    -PasswordEncoder passwordEncoder
+    -EmailService emailService
+    -SellerRepository sellerRepository
+    -PendingAccountRepository pendingAccountRepository
+    -UserRepository userRepository
+    --
+    +createPendingAccount(PendingAccountDTO, Integer) void
+    +getAllPendingAccounts() List~PendingAccount~
+    +validatePendingAccount(Integer, Integer) void
+    +rejectPendingAccount(Integer, Integer) void
+    -generateSecurePassword() String
+}
+
+class SellerService {
+    -SellerRepository sellerRepository
+    -PendingAccountRepository pendingAccountRepository
+    --
+    +findAvailableSellers() List~SellerDTO~
+}
+
+class PasswordService {
+    -BCryptPasswordEncoder passwordEncoder
+    --
+    +hashPassword(String) String
+    +verifyPassword(String, String) boolean
+}
+
+class EmailService {
+    -EmailConfigRepository emailConfigRepository
+    --
+    +sendPasswordEmail(String, String, String) void
+    -createMailSender() JavaMailSender
+}
+
+' ===== CONTRÔLEURS =====
+class AuthController {
+    -UserRepository userRepository
+    -PasswordService passwordService
+    --
+    +login(LoginRequestDTO) ResponseEntity~Map~String, Object~~
+    +logout() ResponseEntity~Map~String, Boolean~~
+    +handleValidationErrors(MethodArgumentNotValidException) ResponseEntity~Map~String, String~~
+}
+
+class UserController {
+    -UserRepository userRepository
+    -PasswordService passwordService
+    -PendingAccountRepository pendingAccountRepository
+    --
+    +getUserByLogin(String) ResponseEntity~User~
+    +getUserLastname(Integer) ResponseEntity~String~
+    +getUserFirstname(Integer) ResponseEntity~String~
+    +getUserEmail(Integer) ResponseEntity~String~
+    +getUserLogin(Integer) ResponseEntity~String~
+    +getAllUsers() ResponseEntity~List~UserDisplayDTO~~
+    +changePassword(Integer, PasswordChangeRequestDTO) ResponseEntity~String~
+    +isLoginAvailable(String) ResponseEntity~Boolean~
+}
+
+class PendingAccountController {
+    -PendingAccountService pendingAccountService
+    --
+    +createPendingAccount(PendingAccountDTO, String) ResponseEntity~Object~
+    +getAllPendingAccounts() ResponseEntity~List~PendingAccountDisplayDTO~~
+    +validatePendingAccount(Integer, String) ResponseEntity~Object~
+    +rejectPendingAccount(Integer, String) ResponseEntity~Object~
+}
+
+class QuotationController {
+    -QuotationsRepository quotationsRepository
+    -QuotationService quotationService
+    --
+    +getUnvalidatedQuotations(String, String, String, String) ResponseEntity~List~QuotationDTO~~
+    +batchUpdate(List~QuotationUpdateDTO~) ResponseEntity~Object~
+    +getQuotationActions() ResponseEntity~List~Map~String, String~~
+    +getQuotationStats(String, String) ResponseEntity~QuotationStatsDTO~
+    +getPreviousConcretization(String, String) ResponseEntity~Double~
+}
+
+class InvoiceController {
+    -InvoiceService invoiceService
+    --
+    +getAverageBaskets(LocalDate, LocalDate) ResponseEntity~List~AverageBasketDTO~~
+    +getTotalStats(LocalDate, LocalDate) ResponseEntity~Map~String, Object~~
+    +getFrameStats(LocalDate, LocalDate) ResponseEntity~List~FrameStatsDTO~~
+    +getYears() ResponseEntity~List~Integer~~
+    +getMonthlyRevenue(Integer) ResponseEntity~Map~String, Double~~
+    +getPeriodRevenue(LocalDate, LocalDate) ResponseEntity~Map~String, Object~~
+    +getSellerStats(LocalDate, LocalDate) ResponseEntity~List~Map~String, Object~~
+}
+
+class SellerController {
+    -SellerService sellerService
+    --
+    +getAvailableSellers() ResponseEntity~List~SellerDTO~~
+}
+
+class SalesController {
+    -SalesService salesService
+    --
+    +importSalesData(MultipartFile) ResponseEntity~String~
+    -readFileLines(MultipartFile) List~String~
+}
+
+class UpdateController {
+    -QuotationsLinesRepository quotationsLinesRepository
+    -InvoicesLinesRepository invoiceRepository
+    --
+    +getLastUpdate() ResponseEntity~String~
+}
+
+' ===== REPOSITORIES =====
+class UserRepository
+class SellerRepository
+class InvoicesRepository
+class InvoicesLinesRepository
+class QuotationsRepository
+class QuotationsLinesRepository
+class PendingAccountRepository
+class EmailConfigRepository
+
+' ===== BASE DE DONNÉES =====
+database "MySQL Database" as DB
+
+' ===== RELATIONS ENTRE ENTITÉS =====
+User ||--o| Seller : "1:1 optionnel"
+Seller ||--o{ Invoices : "1:N"
+Seller ||--o{ InvoicesLines : "1:N"
+Seller ||--o{ Quotations : "1:N"
+Seller ||--o{ QuotationsLines : "1:N"
+User ||--o{ PendingAccount : "1:N"
+Invoices ||--o{ InvoicesLines : "1:N"
+Quotations ||--o{ QuotationsLines : "1:N"
+
+' ===== RELATIONS AVEC LES CONTRÔLEURS =====
+AuthController --> SalesService : "utilise"
+UserController --> SalesService : "utilise"
+PendingAccountController --> PendingAccountService : "utilise"
+QuotationController --> QuotationService : "utilise"
+InvoiceController --> InvoiceService : "utilise"
+SellerController --> SellerService : "utilise"
+SalesController --> SalesService : "utilise"
+
+' ===== RELATIONS AVEC LES SERVICES =====
+SalesService --> InvoicesLinesRepository : "utilise"
+SalesService --> QuotationsLinesRepository : "utilise"
+SalesService --> InvoicesRepository : "utilise"
+SalesService --> QuotationsRepository : "utilise"
+SalesService --> SellerRepository : "utilise"
+SalesService --> UserRepository : "utilise"
+QuotationService --> QuotationsRepository : "utilise"
+QuotationService --> SellerRepository : "utilise"
+InvoiceService --> InvoicesLinesRepository : "utilise"
+InvoiceService --> InvoicesRepository : "utilise"
+PendingAccountService --> PendingAccountRepository : "utilise"
+PendingAccountService --> UserRepository : "utilise"
+PendingAccountService --> SellerRepository : "utilise"
+SellerService --> SellerRepository : "utilise"
+SellerService --> PendingAccountRepository : "utilise"
+EmailService --> EmailConfigRepository : "utilise"
+
+' ===== RELATIONS AVEC LES REPOSITORIES =====
+UserRepository --> DB : "accède à"
+SellerRepository --> DB : "accède à"
+InvoicesRepository --> DB : "accède à"
+InvoicesLinesRepository --> DB : "accède à"
+QuotationsRepository --> DB : "accède à"
+QuotationsLinesRepository --> DB : "accède à"
+PendingAccountRepository --> DB : "accède à"
+EmailConfigRepository --> DB : "accède à"
+
+' ===== RELATIONS AVEC LES DTOs =====
+SalesService ..> LoginRequestDTO : "utilise"
+SalesService ..> UserDisplayDTO : "utilise"
+PendingAccountService ..> PendingAccountDTO : "utilise"
+QuotationService ..> QuotationDTO : "utilise"
+InvoiceService ..> AverageBasketDTO : "utilise"
+
+' ===== RELATIONS AVEC LES ENTITÉS =====
+SalesService ..> User : "manipule"
+SalesService ..> Seller : "manipule"
+SalesService ..> Invoices : "manipule"
+SalesService ..> InvoicesLines : "manipule"
+SalesService ..> Quotations : "manipule"
+SalesService ..> QuotationsLines : "manipule"
+SalesService ..> PendingAccount : "manipule"
+EmailService ..> EmailConfig : "manipule"
+
+@enduml
